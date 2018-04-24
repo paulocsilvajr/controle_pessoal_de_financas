@@ -1,0 +1,14 @@
+psql  # invoca interpretador psql e abre o banco com o nome do usuário atual.
+createdb controle_pessoal_de_financas  # cria o banco controle_pessoal_de_financas para o usuário atual.
+psql controle_pessoal_de_financas  # abre o psql com o banco informado.
+pg_dump controle_pessoal_de_financas > controle_pessoal_de_financas.sql  # realiza backup do banco para o arquivo.sql
+psql controle_pessoal_de_financas < controle_pessoal_de_financas.sql  # realiza a restauração do banco a partir de arquivo.sql
+
+=>      \q          # quit, sai do psql
+        \d          # lista tabelas, visões e sequências
+        \dt         # lista tabelas
+        \dD         # lista domínios
+        \ds         # lista sequências
+        \l          # lista bancos
+        \d tabela   # descreve tabela, visão ou sequências informada
+

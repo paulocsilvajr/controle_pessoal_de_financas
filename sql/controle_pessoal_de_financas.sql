@@ -365,7 +365,7 @@ ALTER TABLE ONLY tipo_conta
 --
 
 ALTER TABLE ONLY conta
-    ADD CONSTRAINT fk_conta_tipo_conta_nome FOREIGN KEY (tipo_conta_nome) REFERENCES tipo_conta(nome);
+    ADD CONSTRAINT fk_conta_tipo_conta_nome FOREIGN KEY (tipo_conta_nome) REFERENCES tipo_conta(nome) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -373,7 +373,7 @@ ALTER TABLE ONLY conta
 --
 
 ALTER TABLE ONLY detalhe_lancamento
-    ADD CONSTRAINT fk_detalhe_lancamento_conta_nome FOREIGN KEY (conta_nome) REFERENCES conta(nome);
+    ADD CONSTRAINT fk_detalhe_lancamento_conta_nome FOREIGN KEY (conta_nome) REFERENCES conta(nome) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -381,7 +381,7 @@ ALTER TABLE ONLY detalhe_lancamento
 --
 
 ALTER TABLE ONLY detalhe_lancamento
-    ADD CONSTRAINT fk_detalhe_lancamento_lancamento_id FOREIGN KEY (lancamento_id) REFERENCES lancamento(id);
+    ADD CONSTRAINT fk_detalhe_lancamento_lancamento_id FOREIGN KEY (lancamento_id) REFERENCES lancamento(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -389,7 +389,7 @@ ALTER TABLE ONLY detalhe_lancamento
 --
 
 ALTER TABLE ONLY lancamento
-    ADD CONSTRAINT fk_lancamento_pessoa_cpf FOREIGN KEY (pessoa_cpf) REFERENCES pessoa(cpf);
+    ADD CONSTRAINT fk_lancamento_pessoa_cpf FOREIGN KEY (pessoa_cpf) REFERENCES pessoa(cpf) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -397,7 +397,7 @@ ALTER TABLE ONLY lancamento
 --
 
 ALTER TABLE ONLY log
-    ADD CONSTRAINT fk_log_pessoa_cpf FOREIGN KEY (pessoa_cpf) REFERENCES pessoa(cpf);
+    ADD CONSTRAINT fk_log_pessoa_cpf FOREIGN KEY (pessoa_cpf) REFERENCES pessoa(cpf) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

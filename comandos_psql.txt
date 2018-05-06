@@ -1,0 +1,15 @@
+$ psql                                   # invoca interpretador psql e abre o banco com o nome do usuário atual.
+$ createdb nome_banco                    # cria o banco com nome informado para o usuário atual.
+$ psql nome_banco                        # abre o psql com o banco informado.
+$ pg_dump nome_banco > nome_banco.sql    # realiza backup do banco para o arquivo.sql
+$ psql nome_banco < nome_banco.sql       # realiza a restauração do banco a partir de arquivo.sql
+
+banco=> \q               # quit, sai do psql
+banco=> \d               # lista tabelas, visões e sequências
+banco=> \dt              # lista tabelas
+banco=> \dD              # lista domínios
+banco=> \ds              # lista sequências
+banco=> \l               # lista bancos
+banco=> \d nome_tabela   # descreve tabela, visão ou sequências informada
+banco=> \c nome_banco    # conecta no banco informado
+

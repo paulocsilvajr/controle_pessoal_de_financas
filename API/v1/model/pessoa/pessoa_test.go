@@ -144,3 +144,17 @@ func TestFuncoesInternasPessoa(t *testing.T) {
 		t.Error(err, usuario)
 	}
 }
+
+func TestAlteraEstadoPessoa(t *testing.T) {
+	p1, _ := getPessoaTest()
+
+	p1.Inativa()
+	if p1.Estado != false {
+		t.Error("Estado inválido, esperando false, obtido ", p1.Estado)
+	}
+
+	p1.Ativa()
+	if p1.Estado != true {
+		t.Error("Estado inválido, esperando true, obtido ", p1.Estado)
+	}
+}

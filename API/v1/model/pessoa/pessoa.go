@@ -36,29 +36,48 @@ const (
 type Pessoas []*Pessoa
 
 func NewPessoa(cpf, nome, usuario, senha, email string) (pessoa *Pessoa, err error) {
-	if err = verificaCPF(cpf); err != nil {
-		return
-	} else if err = verificaNome(nome); err != nil {
-		return
-	} else if err = verificaUsuario(usuario); err != nil {
-		return
-	} else if err = verificaSenha(senha); err != nil {
-		return
-	} else if err = verificaEmail(email); err != nil {
-		return
-	}
-
 	pessoa = &Pessoa{
 		Cpf:             cpf,
 		NomeCompleto:    nome,
 		Usuario:         usuario,
 		Senha:           senha,
 		Email:           email,
-		DataCriacao:     time.Now(),
-		DataModificacao: time.Now(),
+		DataCriacao:     time.Now().Local(),
+		DataModificacao: time.Now().Local(),
 		Estado:          true}
 
+	if err = pessoa.VerificaAtributos(); err != nil {
+		pessoa = nil
+	}
+
 	return
+}
+
+func (p *Pessoa) Altera(cpf, nome, usuario, senha, email string) (err error) {
+	if err = verifica(cpf, nome, usuario, senha, email); err != nil {
+		return
+	}
+
+	p.Cpf = cpf
+	p.NomeCompleto = nome
+	p.Usuario = usuario
+	p.Senha = senha
+	p.Email = email
+	p.DataModificacao = time.Now().Local()
+
+	return
+}
+
+func (p *Pessoa) alteraEstado(estado bool) {
+	p.Estado = estado
+}
+
+func (p *Pessoa) Ativa() {
+	p.alteraEstado(true)
+}
+
+func (p *Pessoa) Inativa() {
+	p.alteraEstado(false)
 }
 
 func (p *Pessoa) String() string {
@@ -78,15 +97,19 @@ func (p *Pessoa) Repr() string {
 }
 
 func (p *Pessoa) VerificaAtributos() (err error) {
-	if err = verificaCPF(p.Cpf); err != nil {
+	return verifica(p.Cpf, p.NomeCompleto, p.Usuario, p.Senha, p.Email)
+}
+
+func verifica(cpf, nome, usuario, senha, email string) (err error) {
+	if err = verificaCPF(cpf); err != nil {
 		return
-	} else if err = verificaNome(p.NomeCompleto); err != nil {
+	} else if err = verificaNome(nome); err != nil {
 		return
-	} else if err = verificaUsuario(p.Usuario); err != nil {
+	} else if err = verificaUsuario(usuario); err != nil {
 		return
-	} else if err = verificaSenha(p.Senha); err != nil {
+	} else if err = verificaSenha(senha); err != nil {
 		return
-	} else if err = verificaEmail(p.Email); err != nil {
+	} else if err = verificaEmail(email); err != nil {
 		return
 	}
 

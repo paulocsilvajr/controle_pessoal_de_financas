@@ -1,6 +1,9 @@
 package dao
 
-import "testing"
+import (
+	"controle_pessoal_de_financas/API/v1/model/pessoa"
+	"testing"
+)
 
 var db = GetDB()
 
@@ -14,4 +17,16 @@ func TestDaoCarregaPessoas(t *testing.T) {
 	// if len(listaPessoas) > 0 {
 	// 	t.Error(listaPessoas)
 	// }
+}
+
+func TestDaoAdicionaPessoa(t *testing.T) {
+	p, _ := pessoa.GetPessoaTest()
+	p.Cpf = "38674832680"
+	p.Usuario = "teste_alteracao"
+	p, err := DaoAdicionaPessoa(db, p)
+
+	strErroChavePrimariaDuplicada := "pq: duplicate key value violates unique constraint \"pessoa_pk\""
+	if err != nil && err.Error() != strErroChavePrimariaDuplicada {
+		t.Error(err, p)
+	}
 }

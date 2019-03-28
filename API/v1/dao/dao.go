@@ -55,3 +55,31 @@ func carrega(db *sql.DB, query string, appendRegistros func(rows *sql.Rows, regi
 
 	return
 }
+
+func adiciona(db *sql.DB, novoRegistro interface{}, query string, setValores func(*sql.Stmt, interface{}) (sql.Result, error)) (r interface{}, err error) {
+
+	transacao, err := db.Begin()
+	if err != nil {
+		return
+	}
+
+	stmt, err := transacao.Prepare(query)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = setValores(stmt, novoRegistro)
+	if err != nil {
+		return
+	}
+
+	err = transacao.Commit()
+	if err != nil {
+		return
+	}
+
+	r = novoRegistro
+
+	return
+}

@@ -33,6 +33,49 @@ FROM
 	return carregaPessoas(db, query)
 }
 
+func DaoAdicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+	p, err = pessoa.NewPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
+	if err != nil {
+		return
+	}
+
+	sql := `
+INSERT INTO {{.tabela}}(
+	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}})
+VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+`
+	query := getTemplateQuery("AlteraPessoa", pessoaDB, sql)
+
+	return adicionaPessoa(db, novaPessoa, query)
+}
+
+func adicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa, query string) (p *pessoa.Pessoa, err error) {
+	resultado, err := adiciona(db, novaPessoa, query, setValores01)
+	pessoaTemp, ok := resultado.(*pessoa.Pessoa)
+	if ok {
+		p = pessoaTemp
+	}
+	return
+}
+
+func setValores01(stmt *sql.Stmt, novoRegistro interface{}) (r sql.Result, err error) {
+
+	novaPessoa, ok := novoRegistro.(*pessoa.Pessoa)
+
+	if ok {
+		r, err = stmt.Exec(
+			novaPessoa.Cpf,
+			novaPessoa.NomeCompleto,
+			novaPessoa.Usuario,
+			novaPessoa.Senha,
+			novaPessoa.Email,
+			novaPessoa.DataCriacao,
+			novaPessoa.DataModificacao,
+			novaPessoa.Estado)
+	}
+	return
+}
+
 func carregaPessoas(db *sql.DB, query string) (pessoas pessoa.Pessoas, err error) {
 	registros, err := carrega(db, query, registrosPessoas01)
 
@@ -102,5 +145,39 @@ func scanPessoas01(rows *sql.Rows, pessoaAtual *pessoa.Pessoa) error {
 // 		return
 // 	}
 
+// 	return
+// }
+
+// func OLDadicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa, query string) (p *pessoa.Pessoa, err error) {
+// 	transacao, err := db.Begin()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	stmt, err := transacao.Prepare(query)
+// 	if err != nil {
+// 		return
+// 	}
+// 	defer stmt.Close()
+
+// 	_, err = stmt.Exec(
+// 		novaPessoa.Cpf,
+// 		novaPessoa.NomeCompleto,
+// 		novaPessoa.Usuario,
+// 		novaPessoa.Senha,
+// 		novaPessoa.Email,
+// 		novaPessoa.DataCriacao,
+// 		novaPessoa.DataModificacao,
+// 		novaPessoa.Estado)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	err = transacao.Commit()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	p = novaPessoa
 // 	return
 // }

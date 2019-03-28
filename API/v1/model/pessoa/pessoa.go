@@ -41,7 +41,7 @@ func NewPessoa(cpf, nome, usuario, senha, email string) (pessoa *Pessoa, err err
 		Cpf:             cpf,
 		NomeCompleto:    nome,
 		Usuario:         usuario,
-		Senha:           senha,
+		Senha:           helper.GetSenhaSha256(senha),
 		Email:           email,
 		DataCriacao:     time.Now().Local(),
 		DataModificacao: time.Now().Local(),
@@ -62,7 +62,9 @@ func (p *Pessoa) Altera(cpf, nome, usuario, senha, email string) (err error) {
 	p.Cpf = cpf
 	p.NomeCompleto = nome
 	p.Usuario = usuario
-	p.Senha = senha
+	if p.Senha != senha {
+		p.Senha = helper.GetSenhaSha256(senha)
+	}
 	p.Email = email
 	p.DataModificacao = time.Now().Local()
 
@@ -103,7 +105,7 @@ func (p *Pessoa) AlteraCampos(campos map[string]string) (err error) {
 			if err = verificaSenha(valor); err != nil {
 				return
 			}
-			p.Senha = valor
+			p.Senha = helper.GetSenhaSha256(valor)
 		case "email":
 			if err = verificaEmail(valor); err != nil {
 				return
@@ -203,6 +205,14 @@ func verificaEmail(email string) (err error) {
 	} else if len(email) == 0 {
 		err = erro.ErroTamanho(MsgErroEmail01, len(email))
 	}
+
+	return
+}
+
+func GetPessoaTest() (pessoa *Pessoa, err error) {
+	pessoa, err = NewPessoa("12345678910", "Teste 01", "teste01", "123456", "teste01@email.com")
+	pessoa.DataCriacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
+	pessoa.DataModificacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
 
 	return
 }

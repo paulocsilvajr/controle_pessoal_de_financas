@@ -49,6 +49,17 @@ VALUES($1, $2, $3, $4, $5, $6, $7, $8)
 	return adicionaPessoa(db, novaPessoa, query)
 }
 
+func DaoRemovePessoa(db *sql.DB, cpf string) (err error) {
+	sql := `
+DELETE FROM
+	{{.tabela}}
+WHERE {{.cpf}} = $1
+`
+	query := getTemplateQuery("RemovePessoa", pessoaDB, sql)
+
+	return remove(db, cpf, query)
+}
+
 func adicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa, query string) (p *pessoa.Pessoa, err error) {
 	resultado, err := adiciona(db, novaPessoa, query, setValores01)
 	pessoaTemp, ok := resultado.(*pessoa.Pessoa)
@@ -179,5 +190,32 @@ func scanPessoas01(rows *sql.Rows, pessoaAtual *pessoa.Pessoa) error {
 // 	}
 
 // 	p = novaPessoa
+// 	return
+// }
+
+// func DaoRemovePessoa(db *sql.DB, cpf string) (err error) {
+// 	transacao, err := db.Begin()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	stmt, err := transacao.Prepare(`
+// DELETE FROM pessoa WHERE cpf = $1
+// `)
+// 	if err != nil {
+// 		return
+// 	}
+// 	defer stmt.Close()
+
+// 	_, err = stmt.Exec(cpf)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	err = transacao.Commit()
+// 	if err != nil {
+// 		return
+// 	}
+
 // 	return
 // }

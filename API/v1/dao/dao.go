@@ -83,3 +83,28 @@ func adiciona(db *sql.DB, novoRegistro interface{}, query string, setValores fun
 
 	return
 }
+
+func remove(db *sql.DB, chavePrimaria interface{}, query string) (err error) {
+	transacao, err := db.Begin()
+	if err != nil {
+		return
+	}
+
+	stmt, err := transacao.Prepare(query)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(chavePrimaria)
+	if err != nil {
+		return
+	}
+
+	err = transacao.Commit()
+	if err != nil {
+		return
+	}
+
+	return
+}

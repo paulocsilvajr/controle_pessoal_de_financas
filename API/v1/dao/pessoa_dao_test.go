@@ -5,7 +5,10 @@ import (
 	"testing"
 )
 
-var db = GetDB()
+var (
+	db  = GetDB()
+	cpf = "38674832680"
+)
 
 func TestDaoCarregaPessoas(t *testing.T) {
 	listaPessoas, err := DaoCarregaPessoas(db)
@@ -21,12 +24,19 @@ func TestDaoCarregaPessoas(t *testing.T) {
 
 func TestDaoAdicionaPessoa(t *testing.T) {
 	p, _ := pessoa.GetPessoaTest()
-	p.Cpf = "38674832680"
+	p.Cpf = cpf
 	p.Usuario = "teste_alteracao"
 	p, err := DaoAdicionaPessoa(db, p)
 
 	strErroChavePrimariaDuplicada := "pq: duplicate key value violates unique constraint \"pessoa_pk\""
 	if err != nil && err.Error() != strErroChavePrimariaDuplicada {
 		t.Error(err, p)
+	}
+}
+
+func TestDaoRemovePessoa(t *testing.T) {
+	err := DaoRemovePessoa(db, cpf)
+	if err != nil {
+		t.Error(err, cpf)
 	}
 }

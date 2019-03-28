@@ -7,6 +7,7 @@ import (
 func main() {
 	fmt.Println("Principal")
 
+	////////////////////////////////////////////////////////////////
 	// var db = dao.GetDB()
 
 	// listaPessoas, err := dao.DaoCarregaPessoas(db)
@@ -15,4 +16,6 @@ func main() {
 	// for n, p := range listaPessoas {
 	// 	fmt.Printf("%3d [%T]: %v\n", n, p, p)
 	// }
+	///////////////////////////////////////////////////////////////
+
 }

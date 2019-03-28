@@ -143,6 +143,27 @@ func TestFuncoesInternasPessoa(t *testing.T) {
 	if err.Error() != msgTamanhoIncorreto {
 		t.Error(err, usuario)
 	}
+
+	usuario = "pedro_@ 2"
+	msgFormatoIncorreto = erro.ErroDetalhe(MsgErroUsuario02, usuario).Error()
+	err = verificaUsuario(usuario)
+	if err.Error() != msgFormatoIncorreto {
+		t.Error(err, usuario)
+	}
+}
+
+func TestAlteraPessoa(t *testing.T) {
+	p1, _ := getPessoaTest()
+
+	err := p1.Altera("12365487910", "Teste alterado", "usuario_2", "S3nh4N0v4", "teste@teste.com.br")
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = p1.AlteraCampos(map[string]string{"senha": "123", "nome": "Teste alterado 2"})
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestAlteraEstadoPessoa(t *testing.T) {

@@ -29,6 +29,7 @@ const (
 	MsgErroCpf02     = "CPF deve ser formado somente por números"
 	MsgErroNome01    = "Nome com tamanho inválido"
 	MsgErroUsuario01 = "Usuário com tamanho inválido"
+	MsgErroUsuario02 = "Usuário deve ser formado somente por letras, números ou _(underline)"
 	MsgErroSenha01   = "Senha com tamanho inválido"
 	MsgErroEmail01   = "Email com tamanho inválido"
 )
@@ -78,6 +79,41 @@ func (p *Pessoa) Ativa() {
 
 func (p *Pessoa) Inativa() {
 	p.alteraEstado(false)
+}
+
+func (p *Pessoa) AlteraCampos(campos map[string]string) (err error) {
+	for chave, valor := range campos {
+		switch chave {
+		case "cpf":
+			if err = verificaCPF(valor); err != nil {
+				return
+			}
+			p.Cpf = valor
+		case "nome":
+			if err = verificaNome(valor); err != nil {
+				return
+			}
+			p.NomeCompleto = valor
+		case "usuario":
+			if err = verificaUsuario(valor); err != nil {
+				return
+			}
+			p.Usuario = valor
+		case "senha":
+			if err = verificaSenha(valor); err != nil {
+				return
+			}
+			p.Senha = valor
+		case "email":
+			if err = verificaEmail(valor); err != nil {
+				return
+			}
+			p.Email = valor
+		}
+	}
+	p.DataModificacao = time.Now().Local()
+
+	return
 }
 
 func (p *Pessoa) String() string {
@@ -139,10 +175,13 @@ func verificaNome(nome string) (err error) {
 }
 
 func verificaUsuario(usuario string) (err error) {
+	padrao, _ := regexp.Compile("^[a-zA-Z0-9_]*$")
 	if len(usuario) > MaxUsuario {
 		err = erro.ErroTamanho(MsgErroUsuario01, len(usuario))
 	} else if len(usuario) == 0 {
 		err = erro.ErroTamanho(MsgErroUsuario01, len(usuario))
+	} else if !padrao.MatchString(usuario) {
+		err = erro.ErroDetalhe(MsgErroUsuario02, usuario)
 	}
 
 	return

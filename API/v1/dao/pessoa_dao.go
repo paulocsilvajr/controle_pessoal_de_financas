@@ -3,6 +3,7 @@ package dao
 import (
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"database/sql"
+	"errors"
 )
 
 var (
@@ -60,6 +61,26 @@ WHERE {{.cpf}} = $1
 	return remove(db, cpf, query)
 }
 
+func DaoProcuraPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
+	sql := `
+SELECT
+	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+FROM
+	{{.tabela}}
+WHERE {{.cpf}} = $1
+`
+	query := getTemplateQuery("ProcuraPessoa", pessoaDB, sql)
+
+	pessoas, err := carregaPessoas(db, query, cpf)
+	if len(pessoas) == 1 {
+		p = pessoas[0]
+	} else {
+		err = errors.New("Não foi encontrado registros com o cpf " + cpf)
+	}
+
+	return
+}
+
 func adicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa, query string) (p *pessoa.Pessoa, err error) {
 	resultado, err := adiciona(db, novaPessoa, query, setValores01)
 	pessoaTemp, ok := resultado.(*pessoa.Pessoa)
@@ -87,8 +108,8 @@ func setValores01(stmt *sql.Stmt, novoRegistro interface{}) (r sql.Result, err e
 	return
 }
 
-func carregaPessoas(db *sql.DB, query string) (pessoas pessoa.Pessoas, err error) {
-	registros, err := carrega(db, query, registrosPessoas01)
+func carregaPessoas(db *sql.DB, query string, args ...interface{}) (pessoas pessoa.Pessoas, err error) {
+	registros, err := carrega(db, query, registrosPessoas01, args...)
 
 	pessoas = converteEmPessoas(registros)
 

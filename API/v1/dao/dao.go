@@ -28,13 +28,13 @@ func getTemplateQuery(nome string, campos map[string]string, sql string) string 
 	return query.String()
 }
 
-func carrega(db *sql.DB, query string, appendRegistros func(rows *sql.Rows, registros []interface{}) (novosRegistros []interface{}, err error)) (registros []interface{}, err error) {
+func carrega(db *sql.DB, query string, appendRegistros func(rows *sql.Rows, registros []interface{}) (novosRegistros []interface{}, err error), args ...interface{}) (registros []interface{}, err error) {
 	queryStmt, err := db.Prepare(query)
 	if err != nil {
 		return
 	}
 
-	rows, err := queryStmt.Query()
+	rows, err := queryStmt.Query(args...)
 	defer queryStmt.Close()
 	if err != nil {
 		return

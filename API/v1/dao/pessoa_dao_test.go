@@ -40,3 +40,10 @@ func TestDaoRemovePessoa(t *testing.T) {
 		t.Error(err, cpf)
 	}
 }
+
+func TestDaoProcuraPessoa(t *testing.T) {
+	p, err := DaoProcuraPessoa(db, cpf)
+	if err != nil {
+		t.Error(err, p)
+	}
+}

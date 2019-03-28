@@ -1,7 +1,9 @@
 package dao
 
 import (
+	"bytes"
 	"database/sql"
+	"html/template"
 	"log"
 
 	_ "github.com/lib/pq"
@@ -16,4 +18,40 @@ func GetDB() *sql.DB {
 	}
 
 	return db
+}
+
+func getTemplateQuery(nome string, campos map[string]string, sql string) string {
+	t := template.Must(template.New(nome).Parse(sql))
+	query := new(bytes.Buffer)
+	t.Execute(query, campos)
+
+	return query.String()
+}
+
+func carrega(db *sql.DB, query string, appendRegistros func(rows *sql.Rows, registros []interface{}) (novosRegistros []interface{}, err error)) (registros []interface{}, err error) {
+	queryStmt, err := db.Prepare(query)
+	if err != nil {
+		return
+	}
+
+	rows, err := queryStmt.Query()
+	defer queryStmt.Close()
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		registros, err = appendRegistros(rows, registros)
+		if err != nil {
+			return
+		}
+
+	}
+	err = rows.Err()
+	if err != nil {
+		registros = nil
+		return
+	}
+
+	return
 }

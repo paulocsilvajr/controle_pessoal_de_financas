@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"controle_pessoal_de_financas/API/v1/helper"
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"testing"
 )
@@ -52,6 +53,12 @@ func TestDaoAlteraPessoa(t *testing.T) {
 	if err != nil {
 		t.Error(err, p2)
 	}
+
+	if p2.NomeCompleto != p1.NomeCompleto ||
+		p2.Usuario != p1.Usuario ||
+		p2.Senha != helper.GetSenhaSha256(p1.Senha) {
+		t.Error("Erro na alteração de pessoa(NomeCompleto ou Usuario ou Senha)", p2)
+	}
 }
 
 func TestDaoInativaPessoa(t *testing.T) {
@@ -59,12 +66,20 @@ func TestDaoInativaPessoa(t *testing.T) {
 	if err != nil {
 		t.Error(err, p)
 	}
+
+	if p.Estado != false {
+		t.Error("Estado de pessoa inválido, deveria ser false", p)
+	}
 }
 
 func TestDaoAtivaPessoa(t *testing.T) {
 	p, err := DaoAtivaPessoa(db, cpf)
 	if err != nil {
 		t.Error(err, p)
+	}
+
+	if p.Estado != true {
+		t.Error("Estado de pessoa inválido, deveria ser true", p)
 	}
 }
 

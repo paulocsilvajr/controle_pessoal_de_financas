@@ -72,6 +72,7 @@ func (p *Pessoa) Altera(cpf, nome, usuario, senha, email string) (err error) {
 }
 
 func (p *Pessoa) alteraEstado(estado bool) {
+	p.DataModificacao = time.Now().Local()
 	p.Estado = estado
 }
 

@@ -54,6 +54,20 @@ func TestDaoAlteraPessoa(t *testing.T) {
 	}
 }
 
+func TestDaoInativaPessoa(t *testing.T) {
+	p, err := DaoInativaPessoa(db, cpf)
+	if err != nil {
+		t.Error(err, p)
+	}
+}
+
+func TestDaoAtivaPessoa(t *testing.T) {
+	p, err := DaoAtivaPessoa(db, cpf)
+	if err != nil {
+		t.Error(err, p)
+	}
+}
+
 func TestDaoRemovePessoa(t *testing.T) {
 	err := DaoRemovePessoa(db, cpf)
 	if err != nil {

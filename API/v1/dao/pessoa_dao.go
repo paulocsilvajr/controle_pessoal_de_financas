@@ -110,6 +110,65 @@ WHERE {{.cpf}} = $6
 	return alteraPessoa(db, pessoaBanco, query, cpf)
 }
 
+func DaoAtivaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := DaoProcuraPessoa(db, cpf)
+	if err != nil {
+		return
+	}
+
+	pessoaBanco.Ativa()
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.estado}} = $1, {{.dataModificacao}} = $2
+WHERE {{.cpf}} = $3
+`
+
+	query := getTemplateQuery("AtivaPessoa", pessoaDB, sql)
+
+	return estadoPessoa(db, pessoaBanco, query, cpf)
+}
+
+func DaoInativaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := DaoProcuraPessoa(db, cpf)
+	if err != nil {
+		return
+	}
+
+	pessoaBanco.Inativa()
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.estado}} = $1, {{.dataModificacao}} = $2
+WHERE {{.cpf}} = $3
+`
+
+	query := getTemplateQuery("InativaPessoa", pessoaDB, sql)
+
+	return estadoPessoa(db, pessoaBanco, query, cpf)
+}
+
+func estadoPessoa(db *sql.DB, pessoaBanco *pessoa.Pessoa, query, chave string) (p *pessoa.Pessoa, err error) {
+	resultado, err := altera(db, pessoaBanco, query, setValores03, chave)
+	pessoaTemp, ok := resultado.(*pessoa.Pessoa)
+	if ok {
+		p = pessoaTemp
+	}
+	return
+}
+
+func setValores03(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
+	novaPessoa, ok := novoRegistro.(*pessoa.Pessoa)
+
+	if ok {
+		r, err = stmt.Exec(
+			novaPessoa.Estado,
+			novaPessoa.DataModificacao,
+			chave)
+	}
+	return
+}
+
 func alteraPessoa(db *sql.DB, pessoaBanco *pessoa.Pessoa, query, chave string) (p *pessoa.Pessoa, err error) {
 	resultado, err := altera(db, pessoaBanco, query, setValores02, chave)
 	pessoaTemp, ok := resultado.(*pessoa.Pessoa)

@@ -10,18 +10,6 @@ var (
 	cpf = "38674832680"
 )
 
-func TestDaoCarregaPessoas(t *testing.T) {
-	listaPessoas, err := DaoCarregaPessoas(db)
-
-	if err != nil {
-		t.Error(err, listaPessoas)
-	}
-
-	// if len(listaPessoas) > 0 {
-	// 	t.Error(listaPessoas)
-	// }
-}
-
 func TestDaoAdicionaPessoa(t *testing.T) {
 	p, _ := pessoa.GetPessoaTest()
 	p.Cpf = cpf
@@ -34,17 +22,40 @@ func TestDaoAdicionaPessoa(t *testing.T) {
 	}
 }
 
-func TestDaoRemovePessoa(t *testing.T) {
-	err := DaoRemovePessoa(db, cpf)
+func TestDaoCarregaPessoas(t *testing.T) {
+	listaPessoas, err := DaoCarregaPessoas(db)
+
 	if err != nil {
-		t.Error(err, cpf)
+		t.Error(err, listaPessoas)
+	}
+
+	if len(listaPessoas) == 0 {
+		t.Error(listaPessoas)
 	}
 }
 
 func TestDaoProcuraPessoa(t *testing.T) {
-	TestDaoAdicionaPessoa(t)
 	p, err := DaoProcuraPessoa(db, cpf)
 	if err != nil {
 		t.Error(err, p)
+	}
+}
+
+func TestDaoAlteraPessoa(t *testing.T) {
+	p1, _ := pessoa.GetPessoaTest()
+	p1.NomeCompleto = "Teste Alteração"
+	p1.Usuario = "teste_alteracao"
+	p1.Senha = "123457"
+
+	p2, err := DaoAlteraPessoa(db, cpf, p1)
+	if err != nil {
+		t.Error(err, p2)
+	}
+}
+
+func TestDaoRemovePessoa(t *testing.T) {
+	err := DaoRemovePessoa(db, cpf)
+	if err != nil {
+		t.Error(err, cpf)
 	}
 }

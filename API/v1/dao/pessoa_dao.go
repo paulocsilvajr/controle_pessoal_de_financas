@@ -86,6 +86,8 @@ WHERE {{.cpf}} = $1
 	return
 }
 
+// DaoAlteraPessoa altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao.
+// Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
 func DaoAlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
 	pessoaBanco, err := DaoProcuraPessoa(db, cpf)
 	if err != nil {

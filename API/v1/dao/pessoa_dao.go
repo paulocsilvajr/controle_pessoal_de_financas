@@ -45,7 +45,7 @@ INSERT INTO {{.tabela}}(
 	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}})
 VALUES($1, $2, $3, $4, $5, $6, $7, $8)
 `
-	query := getTemplateQuery("AlteraPessoa", pessoaDB, sql)
+	query := getTemplateQuery("AdicionaPessoa", pessoaDB, sql)
 
 	return adicionaPessoa(db, p, query)
 }
@@ -97,39 +97,39 @@ func DaoAlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p 
 		return
 	}
 
-	transacao, err := db.Begin()
-	if err != nil {
-		return
+	sql := `
+UPDATE {{.tabela}}
+SET {{.nomeCompleto}} = $1, {{.usuario}} = $2, {{.senha}} = $3, {{.email}} = $4, {{.dataModificacao}} = $5
+WHERE {{.cpf}} = $6
+`
+
+	query := getTemplateQuery("AlteraPessoa", pessoaDB, sql)
+
+	return alteraPessoa(db, pessoaBanco, query, cpf)
+}
+
+func alteraPessoa(db *sql.DB, pessoaBanco *pessoa.Pessoa, query, chave string) (p *pessoa.Pessoa, err error) {
+	resultado, err := altera(db, pessoaBanco, query, setValores02, chave)
+	pessoaTemp, ok := resultado.(*pessoa.Pessoa)
+	if ok {
+		p = pessoaTemp
 	}
+	return
+}
 
-	stmt, err := transacao.Prepare(`
-UPDATE pessoa
-SET nome_completo = $1, usuario = $2, senha = $3, email = $4, data_modificacao = $5
-WHERE cpf = $6
-`)
-	if err != nil {
-		return
+func setValores02(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
+
+	novaPessoa, ok := novoRegistro.(*pessoa.Pessoa)
+
+	if ok {
+		r, err = stmt.Exec(
+			novaPessoa.NomeCompleto,
+			novaPessoa.Usuario,
+			novaPessoa.Senha,
+			novaPessoa.Email,
+			novaPessoa.DataModificacao,
+			chave)
 	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(
-		pessoaBanco.NomeCompleto,
-		pessoaBanco.Usuario,
-		pessoaBanco.Senha,
-		pessoaBanco.Email,
-		pessoaBanco.DataModificacao,
-		cpf)
-	if err != nil {
-		return
-	}
-
-	err = transacao.Commit()
-	if err != nil {
-		return
-	}
-
-	p = pessoaBanco
-
 	return
 }
 
@@ -289,6 +289,53 @@ func scanPessoas01(rows *sql.Rows, pessoaAtual *pessoa.Pessoa) error {
 // 	if err != nil {
 // 		return
 // 	}
+
+// 	return
+// }
+
+// func DaoAlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+// 	pessoaBanco, err := DaoProcuraPessoa(db, cpf)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	err = pessoaBanco.Altera(pessoaAlteracao.Cpf, pessoaAlteracao.NomeCompleto, pessoaAlteracao.Usuario, pessoaAlteracao.Senha, pessoaAlteracao.Email)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	transacao, err := db.Begin()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	stmt, err := transacao.Prepare(`
+// UPDATE pessoa
+// SET nome_completo = $1, usuario = $2, senha = $3, email = $4, data_modificacao = $5
+// WHERE cpf = $6
+// `)
+// 	if err != nil {
+// 		return
+// 	}
+// 	defer stmt.Close()
+
+// 	_, err = stmt.Exec(
+// 		pessoaBanco.NomeCompleto,
+// 		pessoaBanco.Usuario,
+// 		pessoaBanco.Senha,
+// 		pessoaBanco.Email,
+// 		pessoaBanco.DataModificacao,
+// 		cpf)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	err = transacao.Commit()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	p = pessoaBanco
 
 // 	return
 // }

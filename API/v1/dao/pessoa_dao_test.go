@@ -8,7 +8,7 @@ import (
 
 var (
 	db  = GetDB()
-	cpf = "38674832680"
+	cpf = "38674832680" // cpf inválido somente para teste(com Dígito Verificador[DV] incorreto)
 )
 
 func TestDaoAdicionaPessoa(t *testing.T) {

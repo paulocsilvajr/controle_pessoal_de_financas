@@ -42,6 +42,7 @@ func TestDaoRemovePessoa(t *testing.T) {
 }
 
 func TestDaoProcuraPessoa(t *testing.T) {
+	TestDaoAdicionaPessoa(t)
 	p, err := DaoProcuraPessoa(db, cpf)
 	if err != nil {
 		t.Error(err, p)

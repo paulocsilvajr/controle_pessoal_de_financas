@@ -58,7 +58,12 @@ WHERE {{.cpf}} = $1
 `
 	query := getTemplateQuery("RemovePessoa", pessoaDB, sql)
 
-	return remove(db, cpf, query)
+	p, err := DaoProcuraPessoa(db, cpf)
+	if p != nil {
+		err = remove(db, p.Cpf, query)
+	}
+
+	return
 }
 
 func DaoProcuraPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
@@ -75,7 +80,7 @@ WHERE {{.cpf}} = $1
 	if len(pessoas) == 1 {
 		p = pessoas[0]
 	} else {
-		err = errors.New("Não foi encontrado registros com o cpf " + cpf)
+		err = errors.New("Não foi encontrado um registro com o cpf " + cpf)
 	}
 
 	return

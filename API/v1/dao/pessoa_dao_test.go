@@ -16,6 +16,7 @@ func TestDaoAdicionaPessoa(t *testing.T) {
 	p.Cpf = cpf
 	p.Usuario = "teste_inclusao"
 	p.Email = "testei@gmail.com"
+	p.Senha = "987321"
 	p, err := DaoAdicionaPessoa(db, p)
 
 	strErroChavePrimariaDuplicada := "pq: duplicate key value violates unique constraint \"pessoa_pk\""

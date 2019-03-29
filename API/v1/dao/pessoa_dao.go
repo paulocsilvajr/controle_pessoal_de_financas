@@ -86,9 +86,52 @@ WHERE {{.cpf}} = $1
 	return
 }
 
-// func DaoAlteraPessoa(db *sql.DB, p pessoa.Pessoa) {
+func DaoAlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := DaoProcuraPessoa(db, cpf)
+	if err != nil {
+		return
+	}
 
-// }
+	err = pessoaBanco.Altera(pessoaAlteracao.Cpf, pessoaAlteracao.NomeCompleto, pessoaAlteracao.Usuario, pessoaAlteracao.Senha, pessoaAlteracao.Email)
+	if err != nil {
+		return
+	}
+
+	transacao, err := db.Begin()
+	if err != nil {
+		return
+	}
+
+	stmt, err := transacao.Prepare(`
+UPDATE pessoa
+SET nome_completo = $1, usuario = $2, senha = $3, email = $4, data_modificacao = $5
+WHERE cpf = $6
+`)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		pessoaBanco.NomeCompleto,
+		pessoaBanco.Usuario,
+		pessoaBanco.Senha,
+		pessoaBanco.Email,
+		pessoaBanco.DataModificacao,
+		cpf)
+	if err != nil {
+		return
+	}
+
+	err = transacao.Commit()
+	if err != nil {
+		return
+	}
+
+	p = pessoaBanco
+
+	return
+}
 
 func adicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa, query string) (p *pessoa.Pessoa, err error) {
 	resultado, err := adiciona(db, novaPessoa, query, setValores01)

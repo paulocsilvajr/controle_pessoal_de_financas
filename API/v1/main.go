@@ -24,7 +24,7 @@ func main() {
 	// var db = dao.GetDB()
 	// p, _ := pessoa.GetPessoaTest()
 	// p.Cpf = "38674832680"
-	// p.Usuario = "teste_alteracao"
+	// p.Usuario = "teste_inclusao"
 	// p, err := dao.DaoAdicionaPessoa(db, p)
 	// fmt.Println(p, err)
 	///////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ func main() {
 	//////////////////////////////////////////////////////////////
 	// TESTE dao.DaoRemovePessoa
 	//////////////////////////////////////////////////////////////
-	// var db := dao.GetDB()
+	// db := dao.GetDB()
 	// cpf := "38674832680"
 	// err := dao.DaoRemovePessoa(db, cpf)
 	// fmt.Println(err)

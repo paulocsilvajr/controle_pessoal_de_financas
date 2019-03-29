@@ -25,7 +25,7 @@ func TestDaoCarregaPessoas(t *testing.T) {
 func TestDaoAdicionaPessoa(t *testing.T) {
 	p, _ := pessoa.GetPessoaTest()
 	p.Cpf = cpf
-	p.Usuario = "teste_alteracao"
+	p.Usuario = "teste_inclusao"
 	p, err := DaoAdicionaPessoa(db, p)
 
 	strErroChavePrimariaDuplicada := "pq: duplicate key value violates unique constraint \"pessoa_pk\""

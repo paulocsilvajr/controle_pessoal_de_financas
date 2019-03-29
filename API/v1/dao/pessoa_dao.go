@@ -47,7 +47,7 @@ VALUES($1, $2, $3, $4, $5, $6, $7, $8)
 `
 	query := getTemplateQuery("AlteraPessoa", pessoaDB, sql)
 
-	return adicionaPessoa(db, novaPessoa, query)
+	return adicionaPessoa(db, p, query)
 }
 
 func DaoRemovePessoa(db *sql.DB, cpf string) (err error) {
@@ -85,6 +85,10 @@ WHERE {{.cpf}} = $1
 
 	return
 }
+
+// func DaoAlteraPessoa(db *sql.DB, p pessoa.Pessoa) {
+
+// }
 
 func adicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa, query string) (p *pessoa.Pessoa, err error) {
 	resultado, err := adiciona(db, novaPessoa, query, setValores01)

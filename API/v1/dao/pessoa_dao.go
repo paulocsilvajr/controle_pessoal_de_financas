@@ -4,6 +4,7 @@ import (
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"database/sql"
 	"errors"
+	"time"
 )
 
 var (
@@ -19,6 +20,15 @@ var (
 		"estado":          "estado"}
 )
 
+type PessoaSimples struct {
+	Usuario         string    `json:"usuario"`
+	Email           string    `json:"email"`
+	DataCriacao     time.Time `json:"data_criacao"`
+	DataModificacao time.Time `json:"data_modificacao"`
+}
+
+type PessoasSimples []*PessoaSimples
+
 func CarregaPessoas(db *sql.DB) (pessoas pessoa.Pessoas, err error) {
 	sql := `
 SELECT
@@ -32,6 +42,18 @@ FROM
 	query := getTemplateQuery("CarregaPessoas", pessoaDB, sql)
 
 	return carregaPessoas(db, query)
+}
+
+func CarregaPessoasSimples(db *sql.DB) (pessoas PessoasSimples, err error) {
+	sql := `
+SELECT
+	{{.usuario}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}
+FROM
+	{{.tabela}}
+`
+	query := getTemplateQuery("CarregaPessoas", pessoaDB, sql)
+
+	return carregaPessoasSimples(db, query)
 }
 
 func AdicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
@@ -81,6 +103,26 @@ WHERE {{.cpf}} = $1
 		p = pessoas[0]
 	} else {
 		err = errors.New("Não foi encontrado um registro com o cpf " + cpf)
+	}
+
+	return
+}
+
+func ProcuraPessoaPorUsuario(db *sql.DB, usuario string) (p *pessoa.Pessoa, err error) {
+	sql := `
+SELECT
+	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+FROM
+	{{.tabela}}
+WHERE {{.usuario}} = $1
+`
+	query := getTemplateQuery("ProcuraPessoaPorUsuario", pessoaDB, sql)
+
+	pessoas, err := carregaPessoas(db, query, usuario)
+	if len(pessoas) == 1 {
+		p = pessoas[0]
+	} else {
+		err = errors.New("Não foi encontrado um registro com o usuário " + usuario)
 	}
 
 	return
@@ -229,10 +271,30 @@ func carregaPessoas(db *sql.DB, query string, args ...interface{}) (pessoas pess
 	return
 }
 
+func carregaPessoasSimples(db *sql.DB, query string, args ...interface{}) (pessoas PessoasSimples, err error) {
+	registros, err := carrega(db, query, registrosPessoas02, args...)
+
+	pessoas = converteEmPessoasSimples(registros)
+
+	return
+}
+
 func converteEmPessoas(registros []interface{}) (pessoas pessoa.Pessoas) {
 	for _, r := range registros {
 		// fmt.Printf(">>> %T\n", r)
 		p, ok := r.(*pessoa.Pessoa)
+		if ok {
+			pessoas = append(pessoas, p)
+		}
+	}
+
+	return
+}
+
+func converteEmPessoasSimples(registros []interface{}) (pessoas PessoasSimples) {
+	for _, r := range registros {
+		// fmt.Printf(">>> %T\n", r)
+		p, ok := r.(*PessoaSimples)
 		if ok {
 			pessoas = append(pessoas, p)
 		}
@@ -252,6 +314,17 @@ func registrosPessoas01(rows *sql.Rows, registros []interface{}) (novosRegistros
 	return
 }
 
+func registrosPessoas02(rows *sql.Rows, registros []interface{}) (novosRegistros []interface{}, err error) {
+	pessoaAtual := new(PessoaSimples)
+	err = scanPessoas02(rows, pessoaAtual)
+	if err != nil {
+		return
+	}
+	novosRegistros = append(registros, pessoaAtual)
+
+	return
+}
+
 func scanPessoas01(rows *sql.Rows, pessoaAtual *pessoa.Pessoa) error {
 	return rows.Scan(
 		&pessoaAtual.Cpf,
@@ -262,6 +335,14 @@ func scanPessoas01(rows *sql.Rows, pessoaAtual *pessoa.Pessoa) error {
 		&pessoaAtual.DataCriacao,
 		&pessoaAtual.DataModificacao,
 		&pessoaAtual.Estado)
+}
+
+func scanPessoas02(rows *sql.Rows, pessoaAtual *PessoaSimples) error {
+	return rows.Scan(
+		&pessoaAtual.Usuario,
+		&pessoaAtual.Email,
+		&pessoaAtual.DataCriacao,
+		&pessoaAtual.DataModificacao)
 }
 
 // func OLDcarregaPessoas(db *sql.DB, query string) (pessoas pessoa.Pessoas, err error) {

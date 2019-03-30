@@ -7,14 +7,15 @@ import (
 )
 
 var (
-	db  = GetDB()
-	cpf = "38674832680" // cpf inválido somente para teste(com Dígito Verificador[DV] incorreto)
+	db      = GetDB()
+	cpf     = "38674832680" // cpf inválido somente para teste(com Dígito Verificador[DV] incorreto)
+	usuario = "teste_inclusao"
 )
 
 func TestAdicionaPessoa(t *testing.T) {
 	p, _ := pessoa.GetPessoaTest()
 	p.Cpf = cpf
-	p.Usuario = "teste_inclusao"
+	p.Usuario = usuario
 	p.Email = "testei@gmail.com"
 	p.Senha = "987321"
 	p, err := AdicionaPessoa(db, p)
@@ -39,6 +40,13 @@ func TestCarregaPessoas(t *testing.T) {
 
 func TestProcuraPessoa(t *testing.T) {
 	p, err := ProcuraPessoa(db, cpf)
+	if err != nil {
+		t.Error(err, p)
+	}
+}
+
+func TestProcuraPessoaPorUsuario(t *testing.T) {
+	p, err := ProcuraPessoaPorUsuario(db, usuario)
 	if err != nil {
 		t.Error(err, p)
 	}

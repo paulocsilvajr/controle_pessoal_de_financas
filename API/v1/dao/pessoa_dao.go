@@ -19,7 +19,7 @@ var (
 		"estado":          "estado"}
 )
 
-func DaoCarregaPessoas(db *sql.DB) (pessoas pessoa.Pessoas, err error) {
+func CarregaPessoas(db *sql.DB) (pessoas pessoa.Pessoas, err error) {
 	sql := `
 SELECT
 	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
@@ -34,7 +34,7 @@ FROM
 	return carregaPessoas(db, query)
 }
 
-func DaoAdicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+func AdicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
 	p, err = pessoa.NewPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
 	if err != nil {
 		return
@@ -50,7 +50,7 @@ VALUES($1, $2, $3, $4, $5, $6, $7, $8)
 	return adicionaPessoa(db, p, query)
 }
 
-func DaoRemovePessoa(db *sql.DB, cpf string) (err error) {
+func RemovePessoa(db *sql.DB, cpf string) (err error) {
 	sql := `
 DELETE FROM
 	{{.tabela}}
@@ -58,7 +58,7 @@ WHERE {{.cpf}} = $1
 `
 	query := getTemplateQuery("RemovePessoa", pessoaDB, sql)
 
-	p, err := DaoProcuraPessoa(db, cpf)
+	p, err := ProcuraPessoa(db, cpf)
 	if p != nil {
 		err = remove(db, p.Cpf, query)
 	}
@@ -66,7 +66,7 @@ WHERE {{.cpf}} = $1
 	return
 }
 
-func DaoProcuraPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
+func ProcuraPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
 	sql := `
 SELECT
 	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
@@ -86,10 +86,10 @@ WHERE {{.cpf}} = $1
 	return
 }
 
-// DaoAlteraPessoa altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao.
+// AlteraPessoa altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa.
 // Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
-func DaoAlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
-	pessoaBanco, err := DaoProcuraPessoa(db, cpf)
+func AlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := ProcuraPessoa(db, cpf)
 	if err != nil {
 		return
 	}
@@ -110,8 +110,8 @@ WHERE {{.cpf}} = $6
 	return alteraPessoa(db, pessoaBanco, query, cpf)
 }
 
-func DaoAtivaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
-	pessoaBanco, err := DaoProcuraPessoa(db, cpf)
+func AtivaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := ProcuraPessoa(db, cpf)
 	if err != nil {
 		return
 	}
@@ -129,8 +129,8 @@ WHERE {{.cpf}} = $3
 	return estadoPessoa(db, pessoaBanco, query, cpf)
 }
 
-func DaoInativaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
-	pessoaBanco, err := DaoProcuraPessoa(db, cpf)
+func InativaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := ProcuraPessoa(db, cpf)
 	if err != nil {
 		return
 	}

@@ -4,6 +4,7 @@ import (
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -29,6 +30,20 @@ type PessoaSimples struct {
 
 type PessoasSimples []*PessoaSimples
 
+func (ps PessoasSimples) ProcuraPessoaPorUsuario(usuario string) (p *PessoaSimples, err error) {
+	for _, pessoaLista := range ps {
+		if pessoaLista.Usuario == usuario {
+			p = pessoaLista
+			return
+		}
+	}
+
+	err = errors.New(fmt.Sprintf(
+		"Pessoa com usuário %s informado não existe na listagem", usuario))
+
+	return
+}
+
 func CarregaPessoas(db *sql.DB) (pessoas pessoa.Pessoas, err error) {
 	sql := `
 SELECT
@@ -50,6 +65,8 @@ SELECT
 	{{.usuario}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}
 FROM
 	{{.tabela}}
+WHERE
+	{{.estado}} = true
 `
 	query := getTemplateQuery("CarregaPessoas", pessoaDB, sql)
 

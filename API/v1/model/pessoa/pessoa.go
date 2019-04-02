@@ -3,6 +3,7 @@ package pessoa
 import (
 	"controle_pessoal_de_financas/API/v1/helper"
 	"controle_pessoal_de_financas/API/v1/model/erro"
+	"errors"
 	"fmt"
 	"regexp"
 	"time"
@@ -214,6 +215,20 @@ func GetPessoaTest() (pessoa *Pessoa, err error) {
 	pessoa, err = NewPessoa("12345678910", "Teste 01", "teste01", "123456", "teste01@email.com")
 	pessoa.DataCriacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
 	pessoa.DataModificacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
+
+	return
+}
+
+func (ps Pessoas) ProcuraPessoaPorUsuario(usuario string) (p *Pessoa, err error) {
+	for _, pessoaLista := range ps {
+		if pessoaLista.Usuario == usuario {
+			p = pessoaLista
+			return
+		}
+	}
+
+	err = errors.New(fmt.Sprintf(
+		"Pessoa com usuário %s informado não existe na listagem", usuario))
 
 	return
 }

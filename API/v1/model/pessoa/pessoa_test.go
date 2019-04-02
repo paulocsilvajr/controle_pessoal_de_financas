@@ -169,3 +169,19 @@ func TestAlteraEstadoPessoa(t *testing.T) {
 		t.Error("Estado inválido, esperando true, obtido ", p1.Estado)
 	}
 }
+
+func TestProcuraPessoaPorUsuario(t *testing.T) {
+	p1, err := GetPessoaTest()
+	p2, err := NewPessoa("12378945610", "Usuário Teste 02", "teste02", "147852", "teste02@email.com")
+
+	pessoas := Pessoas{p1, p2}
+
+	p3, err := pessoas.ProcuraPessoaPorUsuario("teste02")
+	if err != nil {
+		t.Error(err, p3)
+	}
+
+	if p3.Email != "teste02@email.com" {
+		t.Error("Recuperado pelo método Pessoas.ProcuraPessoaPorUsuario() uma Pessoa com email diferente do informado na sua criação", p3)
+	}
+}

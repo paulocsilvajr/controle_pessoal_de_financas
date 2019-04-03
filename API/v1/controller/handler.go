@@ -32,6 +32,11 @@ type Retorno struct {
 	Mensagem   string `json:"mensagem"`
 }
 
+type RetornoToken struct {
+	Retorno
+	Token string `json:"token"`
+}
+
 // func Index(w http.ResponseWriter, r *http.Request) {
 // 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 // 	// O header ACESS-CONTROL-ALLOW-ORIGIN deve ser declarado em cada página
@@ -151,16 +156,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	tokenString, _ := token.SignedString(MySigningKey)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-
-	json.NewEncoder(w).Encode(
-		map[string]string{"token": tokenString},
-	)
+	status = http.StatusOK
+	msg := fmt.Sprintf("Token com duração de %d segundos", intSegundos)
+	defineStatusETokenEmRetornoELog(w, status, msg, tokenString)
 }
 
 func TokenValido(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+
+	defineStatusEMensagemEmRetornoELog(w, http.StatusOK, "Token válido")
 }
 
 func retornoStatus(w http.ResponseWriter, status int) {
@@ -178,11 +182,31 @@ func retornoStatusMsg(w http.ResponseWriter, status int, msg string) {
 	json.NewEncoder(w).Encode(retorno)
 }
 
+func retornoStatusMsgToken(w http.ResponseWriter, status int, msg, token string) {
+	retorno := new(RetornoToken)
+	retorno.StatusCode = status
+	retorno.Mensagem = msg
+	retorno.Token = token
+
+	json.NewEncoder(w).Encode(retorno)
+}
+
 func defineStatusEmRetornoELog(w http.ResponseWriter, status int, err error) {
+	defineStatusEMensagemEmRetornoELog(w, status, err.Error())
+}
+
+func defineStatusEMensagemEmRetornoELog(w http.ResponseWriter, status int, msg string) {
 	w.WriteHeader(status) // w.WriteHeader deve vir SEMPRE antes de json.NewEncoder()
-	msg := err.Error()
 
 	retornoStatusMsg(w, status, msg)
+
+	logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, msg), time.Now())
+}
+
+func defineStatusETokenEmRetornoELog(w http.ResponseWriter, status int, msg, token string) {
+	w.WriteHeader(status)
+
+	retornoStatusMsgToken(w, status, msg, token)
 
 	logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, msg), time.Now())
 }

@@ -1,14 +1,13 @@
 package route
 
 import (
+	"controle_pessoal_de_financas/API/v1/controller"
+	"controle_pessoal_de_financas/API/v1/logger"
 	"net/http"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
-
-	"scak_api_go/v1/controller"
-	"scak_api_go/v1/logger"
 )
 
 var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{

@@ -98,6 +98,36 @@
 				"description": "Consulta de quilometragens utilizando token previamente solicitada."
 			},
 			"response": []
+		},
+		{
+			"name": "TokenValido",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://{{base}}:{{porta}}/token",
+					"protocol": "http",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"token"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

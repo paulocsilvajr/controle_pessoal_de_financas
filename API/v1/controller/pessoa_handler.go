@@ -10,11 +10,6 @@ import (
 	"time"
 )
 
-type Retorno struct {
-	Status int    `json:"status"`
-	Err    string `json:"erro"`
-}
-
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	var status int

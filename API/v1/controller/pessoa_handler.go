@@ -64,14 +64,6 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func defineStatusEmRetornoELog(w http.ResponseWriter, status int, err error) {
-	w.WriteHeader(status) // w.WriteHeader deve vir SEMPRE antes de json.NewEncoder()
-
-	retornoStatus(w, status)
-
-	logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, err.Error()), time.Now())
-}
-
 // func UsuarioShow(w http.ResponseWriter, r *http.Request) {
 // 	vars := mux.Vars(r)
 // 	nomeUsuario := vars["usuarioNome"]

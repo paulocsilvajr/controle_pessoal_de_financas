@@ -4,8 +4,10 @@ import (
 	"controle_pessoal_de_financas/API/v1/config"
 	"controle_pessoal_de_financas/API/v1/dao"
 	"controle_pessoal_de_financas/API/v1/helper"
+	"controle_pessoal_de_financas/API/v1/logger"
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -24,6 +26,11 @@ I know of no reason why the gunpowder treason
 Should ever be forgot.`)
 	db = dao.GetDB()
 )
+
+type Retorno struct {
+	StatusCode int    `json:"status"`
+	Mensagem   string `json:"mensagem"`
+}
 
 // func Index(w http.ResponseWriter, r *http.Request) {
 // 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -160,4 +167,22 @@ func retornoStatus(w http.ResponseWriter, status int) {
 	json.NewEncoder(w).Encode(
 		map[string]int{"status": status},
 	)
+}
+
+func retornoStatusMsg(w http.ResponseWriter, status int, msg string) {
+	retorno := &Retorno{
+		StatusCode: status,
+		Mensagem:   msg,
+	}
+
+	json.NewEncoder(w).Encode(retorno)
+}
+
+func defineStatusEmRetornoELog(w http.ResponseWriter, status int, err error) {
+	w.WriteHeader(status) // w.WriteHeader deve vir SEMPRE antes de json.NewEncoder()
+	msg := err.Error()
+
+	retornoStatusMsg(w, status, msg)
+
+	logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, msg), time.Now())
 }

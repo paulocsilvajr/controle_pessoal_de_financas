@@ -27,14 +27,20 @@ Should ever be forgot.`)
 	db = dao.GetDB()
 )
 
-type Retorno struct {
+type ReturnJson struct {
 	StatusCode int    `json:"status"`
-	Mensagem   string `json:"mensagem"`
+	Message    string `json:"message"`
 }
 
-type RetornoToken struct {
-	Retorno
+type ReturnTokenJson struct {
+	ReturnJson
 	Token string `json:"token"`
+}
+
+type ReturnData struct {
+	ReturnJson
+	Count int         `json:"count"`
+	Data  interface{} `json:"data"`
 }
 
 // func Index(w http.ResponseWriter, r *http.Request) {
@@ -95,33 +101,38 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.Unmarshal(body, &usuarioInformado); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		SetHeaderJson(w)
 		status = http.StatusUnprocessableEntity // 422
-		w.WriteHeader(status)
+		// w.WriteHeader(status)
 
-		retornoStatus(w, status)
-		// if err := json.NewEncoder(w).Encode(err); err != nil {
-		// 	log.Println(err)
-		// }
+		// retornoStatus(w, status)
+		defineStatusEmRetornoELog(w, status, err)
+
+		return
 	}
 
 	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, nomeUsuario)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		SetHeaderJson(w)
 		status = http.StatusNotAcceptable // 406
-		w.WriteHeader(status)
+		// w.WriteHeader(status)
 
-		retornoStatus(w, status)
+		// retornoStatus(w, status)
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
 
 	if usuarioEncontrado.Estado == false {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		SetHeaderJson(w)
 		status = http.StatusNotFound // 404
-		w.WriteHeader(status)
+		// w.WriteHeader(status)
 
-		retornoStatus(w, status)
+		// retornoStatus(w, status)
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
@@ -129,11 +140,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	senhaHash := usuarioEncontrado.Senha
 	senhaInformadaHash := helper.GetSenhaSha256(usuarioInformado.Senha)
 	if senhaHash != senhaInformadaHash {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		SetHeaderJson(w)
 		status = http.StatusNotAcceptable // 406
-		w.WriteHeader(status)
+		// w.WriteHeader(status)
 
-		retornoStatus(w, status)
+		// retornoStatus(w, status)
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
@@ -142,11 +155,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	duracao := config.AbrirConfiguracoes()["duracao_token"]
 	intSegundos, err := strconv.Atoi(duracao)
-	segundos := time.Duration(intSegundos)
 	if err != nil {
 		log.Println(err)
-		segundos = 3600
+		intSegundos = 3600
 	}
+	segundos := time.Duration(intSegundos)
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["usuario"] = usuarioEncontrado.Usuario
@@ -155,16 +168,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, _ := token.SignedString(MySigningKey)
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	SetHeaderJson(w)
 	status = http.StatusOK
-	msg := fmt.Sprintf("Token com duração de %d segundos", intSegundos)
+	funcao := "Login"
+	msg := fmt.Sprintf("%s: Token com duração de %d segundos", funcao, intSegundos)
 	defineStatusETokenEmRetornoELog(w, status, msg, tokenString)
 }
 
 func TokenValido(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	SetHeaderJson(w)
 
-	defineStatusEMensagemEmRetornoELog(w, http.StatusOK, "Token válido")
+	funcao := "TokenValido"
+	msg := fmt.Sprintf("%s: Token válido", funcao)
+	defineStatusEMensagemEmRetornoELog(w, http.StatusOK, msg)
 }
 
 func retornoStatus(w http.ResponseWriter, status int) {
@@ -173,40 +191,50 @@ func retornoStatus(w http.ResponseWriter, status int) {
 	)
 }
 
-func retornoStatusMsg(w http.ResponseWriter, status int, msg string) {
-	retorno := &Retorno{
+func retornoStatusMsg(w http.ResponseWriter, status int, msg string) error {
+	retorno := &ReturnJson{
 		StatusCode: status,
-		Mensagem:   msg,
+		Message:    msg,
 	}
 
-	json.NewEncoder(w).Encode(retorno)
+	return json.NewEncoder(w).Encode(retorno)
 }
 
-func retornoStatusMsgToken(w http.ResponseWriter, status int, msg, token string) {
-	retorno := new(RetornoToken)
+func retornoStatusMsgToken(w http.ResponseWriter, status int, msg, token string) error {
+	retorno := new(ReturnTokenJson)
 	retorno.StatusCode = status
-	retorno.Mensagem = msg
+	retorno.Message = msg
 	retorno.Token = token
 
-	json.NewEncoder(w).Encode(retorno)
+	return json.NewEncoder(w).Encode(retorno)
 }
 
-func defineStatusEmRetornoELog(w http.ResponseWriter, status int, err error) {
-	defineStatusEMensagemEmRetornoELog(w, status, err.Error())
+func retornoData(w http.ResponseWriter, status int, msg string, count int, data interface{}) error {
+	retorno := new(ReturnData)
+	retorno.StatusCode = status
+	retorno.Message = msg
+	retorno.Count = count
+	retorno.Data = data
+
+	return json.NewEncoder(w).Encode(retorno)
 }
 
-func defineStatusEMensagemEmRetornoELog(w http.ResponseWriter, status int, msg string) {
+func defineStatusEmRetornoELog(w http.ResponseWriter, status int, err error) error {
+	return defineStatusEMensagemEmRetornoELog(w, status, err.Error())
+}
+
+func defineStatusEMensagemEmRetornoELog(w http.ResponseWriter, status int, msg string) error {
 	w.WriteHeader(status) // w.WriteHeader deve vir SEMPRE antes de json.NewEncoder()
 
-	retornoStatusMsg(w, status, msg)
-
 	logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, msg), time.Now())
+
+	return retornoStatusMsg(w, status, msg)
 }
 
-func defineStatusETokenEmRetornoELog(w http.ResponseWriter, status int, msg, token string) {
+func defineStatusETokenEmRetornoELog(w http.ResponseWriter, status int, msg, token string) error {
 	w.WriteHeader(status)
 
-	retornoStatusMsgToken(w, status, msg, token)
-
 	logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, msg), time.Now())
+
+	return retornoStatusMsgToken(w, status, msg, token)
 }

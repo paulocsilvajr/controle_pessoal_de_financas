@@ -4,15 +4,16 @@ import (
 	"controle_pessoal_de_financas/API/v1/dao"
 	"controle_pessoal_de_financas/API/v1/helper"
 	"controle_pessoal_de_financas/API/v1/logger"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 )
 
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	var status int
+
+	SetHeaderJson(w)
 
 	token, err := helper.GetToken(r, MySigningKey)
 	if err != nil {
@@ -47,15 +48,20 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status = http.StatusOK
-	w.WriteHeader(status)
+	// w.WriteHeader(status)
 
-	if err := json.NewEncoder(w).Encode(listaPessoas); err != nil {
+	// err = json.NewEncoder(w).Encode(listaPessoas)
+	funcao := "PessoaIndex"
+	msg := fmt.Sprintf("%s: Listagem de pessoas simples", funcao)
+	retornoData(w, status, msg, len(listaPessoas), listaPessoas)
+	if err != nil {
 		logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, err.Error()), time.Now())
 
 		return
 	}
 
-	logger.GeraLogFS(fmt.Sprintf("[%d] %s[%d elementos]", status, "Enviando listagem de pessoas", len(listaPessoas)), time.Now())
+	msg = fmt.Sprintf("%s: Enviando listagem de pessoas", funcao)
+	logger.GeraLogFS(fmt.Sprintf("[%d] %s[%d elementos]", status, msg, len(listaPessoas)), time.Now())
 
 }
 

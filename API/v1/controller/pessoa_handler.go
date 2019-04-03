@@ -3,9 +3,11 @@ package controller
 import (
 	"controle_pessoal_de_financas/API/v1/dao"
 	"controle_pessoal_de_financas/API/v1/helper"
+	"controle_pessoal_de_financas/API/v1/logger"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
+	"time"
 )
 
 type Retorno struct {
@@ -20,11 +22,7 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 	token, err := helper.GetToken(r, MySigningKey)
 	if err != nil {
 		status = http.StatusInternalServerError
-		w.WriteHeader(status) // w.WriteHeader deve vir SEMPRE antes de json.NewEncoder()
-
-		retornoStatus(w, status)
-
-		log.Println(err)
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
@@ -32,11 +30,7 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 	usuarioToken, emailToken, err := helper.GetClaims(token)
 	if err != nil {
 		status = http.StatusInternalServerError
-		w.WriteHeader(status)
-
-		retornoStatus(w, status)
-
-		log.Println(err)
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
@@ -44,11 +38,7 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 	listaPessoas, err := dao.CarregaPessoasSimples(db)
 	if err != nil {
 		status = http.StatusInternalServerError
-		w.WriteHeader(status)
-
-		retornoStatus(w, status)
-
-		log.Println(err)
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
@@ -56,20 +46,30 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 	p, err := listaPessoas.ProcuraPessoaPorUsuario(usuarioToken)
 	if err != nil || p.Email != emailToken {
 		status = http.StatusInternalServerError
-		w.WriteHeader(status)
-
-		retornoStatus(w, status)
-
-		log.Println(err)
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	status = http.StatusOK
+	w.WriteHeader(status)
 
 	if err := json.NewEncoder(w).Encode(listaPessoas); err != nil {
-		log.Println(err)
+		logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, err.Error()), time.Now())
+
+		return
 	}
+
+	logger.GeraLogFS(fmt.Sprintf("[%d] %s[%d elementos]", status, "Enviando listagem de pessoas", len(listaPessoas)), time.Now())
+
+}
+
+func defineStatusEmRetornoELog(w http.ResponseWriter, status int, err error) {
+	w.WriteHeader(status) // w.WriteHeader deve vir SEMPRE antes de json.NewEncoder()
+
+	retornoStatus(w, status)
+
+	logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, err.Error()), time.Now())
 }
 
 // func UsuarioShow(w http.ResponseWriter, r *http.Request) {

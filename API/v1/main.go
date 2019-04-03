@@ -1,11 +1,34 @@
 package main
 
 import (
+	"controle_pessoal_de_financas/API/v1/config"
+	"controle_pessoal_de_financas/API/v1/config/route"
+	"controle_pessoal_de_financas/API/v1/helper"
 	"fmt"
+	"log"
+	"net/http"
 )
 
 func main() {
-	fmt.Println("Principal")
+	helper.CriarDiretorioSeNaoExistir("config")
+
+	configuracoes := config.AbrirConfiguracoes()
+	porta := fmt.Sprintf(":%s", configuracoes["porta"])
+	host := configuracoes["host"]
+
+	router := route.NewRouter()
+
+	var endereco string
+	if host != "localhost" {
+		endereco = host + porta
+	} else {
+		endereco = porta
+	}
+
+	fmt.Printf("Acesse o servidor/API pelo endereço: http://%s%s\n", host, porta)
+	fmt.Printf("ou pelo IP: http://%s%s\n\n[CTRL + c] para sair\n\n", helper.GetLocalIP(), porta)
+
+	log.Fatal(http.ListenAndServe(endereco, router))
 
 	// testes()
 }

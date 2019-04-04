@@ -15,6 +15,7 @@ func criarConfigPadrao() {
 	configuracoes["porta"] = "8085"
 	configuracoes["host"] = "localhost"
 	configuracoes["duracao_token"] = "3600"
+	configuracoes["protocolo"] = "https"
 
 	encodeFile, err := os.Create(arquivo)
 	if err != nil {

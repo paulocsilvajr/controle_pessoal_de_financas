@@ -15,6 +15,7 @@ func main() {
 	configuracoes := config.AbrirConfiguracoes()
 	porta := fmt.Sprintf(":%s", configuracoes["porta"])
 	host := configuracoes["host"]
+	protocolo := configuracoes["protocolo"]
 
 	router := route.NewRouter()
 
@@ -25,10 +26,16 @@ func main() {
 		endereco = porta
 	}
 
-	fmt.Printf("Acesse o servidor/API pelo endereço: http://%s%s\n", host, porta)
-	fmt.Printf("ou pelo IP: http://%s%s\n\n[CTRL + c] para sair\n\n", helper.GetLocalIP(), porta)
+	fmt.Printf("Acesse o servidor/API pelo endereço: %s://%s%s\n", protocolo, host, porta)
+	fmt.Printf("ou pelo IP: %s://%s%s\n\n[CTRL + c] para sair\n\n", protocolo, helper.GetLocalIP(), porta)
 
-	log.Fatal(http.ListenAndServe(endereco, router))
+	if protocolo == "https" {
+		certFile := "keys/new.cert.cert"
+		keyFile := "keys/new.cert.key"
+		log.Fatal(http.ListenAndServeTLS(endereco, certFile, keyFile, router))
+	} else {
+		log.Fatal(http.ListenAndServe(endereco, router))
+	}
 
 	// testes()
 }

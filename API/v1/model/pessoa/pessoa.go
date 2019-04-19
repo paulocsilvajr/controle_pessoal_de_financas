@@ -46,25 +46,6 @@ func NewPessoaAdmin(cpf, nome, usuario, senha, email string) (*Pessoa, error) {
 	return newPessoa(cpf, nome, usuario, senha, email, true)
 }
 
-func newPessoa(cpf, nome, usuario, senha, email string, admin bool) (pessoa *Pessoa, err error) {
-	pessoa = &Pessoa{
-		Cpf:             cpf,
-		NomeCompleto:    nome,
-		Usuario:         usuario,
-		Senha:           helper.GetSenhaSha256(senha),
-		Email:           email,
-		DataCriacao:     time.Now().Local(),
-		DataModificacao: time.Now().Local(),
-		Estado:          true,
-		Administrador:   admin}
-
-	if err = pessoa.VerificaAtributos(); err != nil {
-		pessoa = nil
-	}
-
-	return
-}
-
 func (p *Pessoa) Altera(cpf, nome, usuario, senha, email string) (err error) {
 	if err = verifica(cpf, nome, usuario, senha, email); err != nil {
 		return
@@ -82,17 +63,17 @@ func (p *Pessoa) Altera(cpf, nome, usuario, senha, email string) (err error) {
 	return
 }
 
-func (p *Pessoa) alteraEstado(estado bool) {
-	p.DataModificacao = time.Now().Local()
-	p.Estado = estado
-}
-
 func (p *Pessoa) Ativa() {
 	p.alteraEstado(true)
 }
 
 func (p *Pessoa) Inativa() {
 	p.alteraEstado(false)
+}
+
+func (p *Pessoa) SetAdmin(admin bool) {
+	p.DataModificacao = time.Now().Local()
+	p.Administrador = admin
 }
 
 func (p *Pessoa) AlteraCampos(campos map[string]string) (err error) {
@@ -153,6 +134,52 @@ func (p *Pessoa) Repr() string {
 
 func (p *Pessoa) VerificaAtributos() (err error) {
 	return verifica(p.Cpf, p.NomeCompleto, p.Usuario, p.Senha, p.Email)
+}
+
+func (ps Pessoas) ProcuraPessoaPorUsuario(usuario string) (p *Pessoa, err error) {
+	for _, pessoaLista := range ps {
+		if pessoaLista.Usuario == usuario {
+			p = pessoaLista
+			return
+		}
+	}
+
+	err = errors.New(fmt.Sprintf(
+		"Pessoa com usuário %s informado não existe na listagem", usuario))
+
+	return
+}
+
+func GetPessoaTest() (pessoa *Pessoa, err error) {
+	pessoa, err = NewPessoa("12345678910", "Teste 01", "teste01", "123456", "teste01@email.com")
+	pessoa.DataCriacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
+	pessoa.DataModificacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
+
+	return
+}
+
+func newPessoa(cpf, nome, usuario, senha, email string, admin bool) (pessoa *Pessoa, err error) {
+	pessoa = &Pessoa{
+		Cpf:             cpf,
+		NomeCompleto:    nome,
+		Usuario:         usuario,
+		Senha:           helper.GetSenhaSha256(senha),
+		Email:           email,
+		DataCriacao:     time.Now().Local(),
+		DataModificacao: time.Now().Local(),
+		Estado:          true,
+		Administrador:   admin}
+
+	if err = pessoa.VerificaAtributos(); err != nil {
+		pessoa = nil
+	}
+
+	return
+}
+
+func (p *Pessoa) alteraEstado(estado bool) {
+	p.DataModificacao = time.Now().Local()
+	p.Estado = estado
 }
 
 func verifica(cpf, nome, usuario, senha, email string) (err error) {
@@ -222,28 +249,6 @@ func verificaEmail(email string) (err error) {
 	} else if len(email) == 0 {
 		err = erro.ErroTamanho(MsgErroEmail01, len(email))
 	}
-
-	return
-}
-
-func GetPessoaTest() (pessoa *Pessoa, err error) {
-	pessoa, err = NewPessoa("12345678910", "Teste 01", "teste01", "123456", "teste01@email.com")
-	pessoa.DataCriacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
-	pessoa.DataModificacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
-
-	return
-}
-
-func (ps Pessoas) ProcuraPessoaPorUsuario(usuario string) (p *Pessoa, err error) {
-	for _, pessoaLista := range ps {
-		if pessoaLista.Usuario == usuario {
-			p = pessoaLista
-			return
-		}
-	}
-
-	err = errors.New(fmt.Sprintf(
-		"Pessoa com usuário %s informado não existe na listagem", usuario))
 
 	return
 }

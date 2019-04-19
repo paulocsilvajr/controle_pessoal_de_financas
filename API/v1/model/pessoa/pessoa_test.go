@@ -39,6 +39,13 @@ func TestMakePessoaAdmin(t *testing.T) {
 	if !p1.Administrador {
 		t.Error("Função NewPessoaAdmin não está criando uma Pessoa como Administrador", p1, err)
 	}
+
+	p2, err := GetPessoaTest()
+	p2.SetAdmin(true)
+	if !p2.Administrador {
+		t.Error("Função SetAdmin(true) não está definindo como Administrador uma Pessoa", p1, err)
+	}
+
 }
 
 func TestVerificaAtributosPessoa(t *testing.T) {

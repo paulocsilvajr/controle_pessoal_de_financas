@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	jwtreq "github.com/dgrijalva/jwt-go/request"
@@ -42,16 +43,27 @@ func GetToken(r *http.Request, secret_key []byte) (token *jwt.Token, err error) 
 }
 
 // GetClaims obtém variáveis incluídas no token e verifica se ele é válido. error != nil caso token inválido.
-func GetClaims(token *jwt.Token) (usuario string, email string, err error) {
+func GetClaims(token *jwt.Token) (usuario string, email string, admin bool, err error) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		usuario = claims["usuario"].(string)
 		email = claims["email"].(string)
+		admin = claims["admin"].(bool)
 		return
 	} else {
 		err = errors.New("Token vazio/inválido, sem claims")
 		return
 	}
 
+}
+
+func SetClaims(token *jwt.Token, duracaoSegundos time.Duration, usuario, email string, admin bool) (claims jwt.MapClaims) {
+	claims = token.Claims.(jwt.MapClaims)
+	claims["usuario"] = usuario
+	claims["email"] = email
+	claims["admin"] = admin
+	claims["exp"] = time.Now().Add(time.Second * duracaoSegundos).Unix()
+
+	return
 }
 
 func CriarDiretorioSeNaoExistir(nomeDiretorio string) (err error) {

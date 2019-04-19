@@ -35,20 +35,6 @@ FROM
 	return carregaPessoas(db, query)
 }
 
-func CarregaPessoasSimples(db *sql.DB) (pessoas pessoa.PessoasSimples, err error) {
-	sql := `
-SELECT
-	{{.usuario}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}
-FROM
-	{{.tabela}}
-WHERE
-	{{.estado}} = true
-`
-	query := getTemplateQuery("CarregaPessoas", pessoaDB, sql)
-
-	return carregaPessoasSimples(db, query)
-}
-
 func AdicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
 	p, err = pessoa.NewPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
 	if err != nil {
@@ -264,30 +250,10 @@ func carregaPessoas(db *sql.DB, query string, args ...interface{}) (pessoas pess
 	return
 }
 
-func carregaPessoasSimples(db *sql.DB, query string, args ...interface{}) (pessoas pessoa.PessoasSimples, err error) {
-	registros, err := carrega(db, query, registrosPessoas02, args...)
-
-	pessoas = converteEmPessoasSimples(registros)
-
-	return
-}
-
 func converteEmPessoas(registros []interface{}) (pessoas pessoa.Pessoas) {
 	for _, r := range registros {
 		// fmt.Printf(">>> %T\n", r)
 		p, ok := r.(*pessoa.Pessoa)
-		if ok {
-			pessoas = append(pessoas, p)
-		}
-	}
-
-	return
-}
-
-func converteEmPessoasSimples(registros []interface{}) (pessoas pessoa.PessoasSimples) {
-	for _, r := range registros {
-		// fmt.Printf(">>> %T\n", r)
-		p, ok := r.(*pessoa.PessoaSimples)
 		if ok {
 			pessoas = append(pessoas, p)
 		}

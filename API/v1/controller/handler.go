@@ -149,7 +149,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	segundos := time.Duration(intSegundos)
 
-	fmt.Println(">>>2", usuarioEncontrado.Usuario, usuarioEncontrado.Administrador)
 	helper.SetClaims(
 		token,
 		segundos,

@@ -161,10 +161,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	segundos := time.Duration(intSegundos)
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["usuario"] = usuarioEncontrado.Usuario
-	claims["email"] = usuarioEncontrado.Email
-	claims["exp"] = time.Now().Add(time.Second * segundos).Unix()
+	// claims := token.Claims.(jwt.MapClaims)
+	// claims["usuario"] = usuarioEncontrado.Usuario
+	// claims["email"] = usuarioEncontrado.Email
+	// claims["exp"] = time.Now().Add(time.Second * segundos).Unix()
+	helper.SetClaims(
+		token,
+		segundos,
+		usuarioEncontrado.Usuario,
+		usuarioEncontrado.Email,
+		usuarioEncontrado.Administrador)
 
 	tokenString, _ := token.SignedString(MySigningKey)
 

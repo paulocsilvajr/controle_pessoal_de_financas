@@ -38,12 +38,25 @@ const (
 
 type Pessoas []*Pessoa
 
+type PessoaI interface {
+	GetEmail() string
+}
+
+type PessoasI interface {
+	ProcuraPessoaPorUsuario(string) (PessoaI, error)
+	Len() int
+}
+
 func NewPessoa(cpf, nome, usuario, senha, email string) (*Pessoa, error) {
 	return newPessoa(cpf, nome, usuario, senha, email, false)
 }
 
 func NewPessoaAdmin(cpf, nome, usuario, senha, email string) (*Pessoa, error) {
 	return newPessoa(cpf, nome, usuario, senha, email, true)
+}
+
+func (p *Pessoa) GetEmail() string {
+	return p.Email
 }
 
 func (p *Pessoa) Altera(cpf, nome, usuario, senha, email string) (err error) {
@@ -136,7 +149,8 @@ func (p *Pessoa) VerificaAtributos() (err error) {
 	return verifica(p.Cpf, p.NomeCompleto, p.Usuario, p.Senha, p.Email)
 }
 
-func (ps Pessoas) ProcuraPessoaPorUsuario(usuario string) (p *Pessoa, err error) {
+// func (ps Pessoas) ProcuraPessoaPorUsuario(usuario string) (p *Pessoa, err error) {
+func (ps Pessoas) ProcuraPessoaPorUsuario(usuario string) (p PessoaI, err error) {
 	for _, pessoaLista := range ps {
 		if pessoaLista.Usuario == usuario {
 			p = pessoaLista
@@ -148,6 +162,10 @@ func (ps Pessoas) ProcuraPessoaPorUsuario(usuario string) (p *Pessoa, err error)
 		"Pessoa com usuário %s informado não existe na listagem", usuario))
 
 	return
+}
+
+func (ps Pessoas) Len() int {
+	return len(ps)
 }
 
 func GetPessoaTest() (pessoa *Pessoa, err error) {

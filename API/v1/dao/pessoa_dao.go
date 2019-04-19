@@ -4,8 +4,6 @@ import (
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"database/sql"
 	"errors"
-	"fmt"
-	"time"
 )
 
 var (
@@ -20,29 +18,6 @@ var (
 		"dataModificacao": "data_modificacao",
 		"estado":          "estado"}
 )
-
-type PessoaSimples struct {
-	Usuario         string    `json:"usuario"`
-	Email           string    `json:"email"`
-	DataCriacao     time.Time `json:"data_criacao"`
-	DataModificacao time.Time `json:"data_modificacao"`
-}
-
-type PessoasSimples []*PessoaSimples
-
-func (ps PessoasSimples) ProcuraPessoaPorUsuario(usuario string) (p *PessoaSimples, err error) {
-	for _, pessoaLista := range ps {
-		if pessoaLista.Usuario == usuario {
-			p = pessoaLista
-			return
-		}
-	}
-
-	err = errors.New(fmt.Sprintf(
-		"Pessoa com usuário %s informado não existe na listagem", usuario))
-
-	return
-}
 
 func CarregaPessoas(db *sql.DB) (pessoas pessoa.Pessoas, err error) {
 	sql := `
@@ -59,7 +34,7 @@ FROM
 	return carregaPessoas(db, query)
 }
 
-func CarregaPessoasSimples(db *sql.DB) (pessoas PessoasSimples, err error) {
+func CarregaPessoasSimples(db *sql.DB) (pessoas pessoa.PessoasSimples, err error) {
 	sql := `
 SELECT
 	{{.usuario}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}
@@ -288,7 +263,7 @@ func carregaPessoas(db *sql.DB, query string, args ...interface{}) (pessoas pess
 	return
 }
 
-func carregaPessoasSimples(db *sql.DB, query string, args ...interface{}) (pessoas PessoasSimples, err error) {
+func carregaPessoasSimples(db *sql.DB, query string, args ...interface{}) (pessoas pessoa.PessoasSimples, err error) {
 	registros, err := carrega(db, query, registrosPessoas02, args...)
 
 	pessoas = converteEmPessoasSimples(registros)
@@ -308,10 +283,10 @@ func converteEmPessoas(registros []interface{}) (pessoas pessoa.Pessoas) {
 	return
 }
 
-func converteEmPessoasSimples(registros []interface{}) (pessoas PessoasSimples) {
+func converteEmPessoasSimples(registros []interface{}) (pessoas pessoa.PessoasSimples) {
 	for _, r := range registros {
 		// fmt.Printf(">>> %T\n", r)
-		p, ok := r.(*PessoaSimples)
+		p, ok := r.(*pessoa.PessoaSimples)
 		if ok {
 			pessoas = append(pessoas, p)
 		}
@@ -332,7 +307,7 @@ func registrosPessoas01(rows *sql.Rows, registros []interface{}) (novosRegistros
 }
 
 func registrosPessoas02(rows *sql.Rows, registros []interface{}) (novosRegistros []interface{}, err error) {
-	pessoaAtual := new(PessoaSimples)
+	pessoaAtual := new(pessoa.PessoaSimples)
 	err = scanPessoas02(rows, pessoaAtual)
 	if err != nil {
 		return
@@ -354,7 +329,7 @@ func scanPessoas01(rows *sql.Rows, pessoaAtual *pessoa.Pessoa) error {
 		&pessoaAtual.Estado)
 }
 
-func scanPessoas02(rows *sql.Rows, pessoaAtual *PessoaSimples) error {
+func scanPessoas02(rows *sql.Rows, pessoaAtual *pessoa.PessoaSimples) error {
 	return rows.Scan(
 		&pessoaAtual.Usuario,
 		&pessoaAtual.Email,

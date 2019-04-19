@@ -18,6 +18,7 @@ type Pessoa struct {
 	DataCriacao     time.Time `json:"data_criacao"`
 	DataModificacao time.Time `json:"data_modificacao"`
 	Estado          bool      `json:"estado"`
+	Administrador   bool      `json:administrador`
 }
 
 const (
@@ -37,7 +38,15 @@ const (
 
 type Pessoas []*Pessoa
 
-func NewPessoa(cpf, nome, usuario, senha, email string) (pessoa *Pessoa, err error) {
+func NewPessoa(cpf, nome, usuario, senha, email string) (*Pessoa, error) {
+	return newPessoa(cpf, nome, usuario, senha, email, false)
+}
+
+func NewPessoaAdmin(cpf, nome, usuario, senha, email string) (*Pessoa, error) {
+	return newPessoa(cpf, nome, usuario, senha, email, true)
+}
+
+func newPessoa(cpf, nome, usuario, senha, email string, admin bool) (pessoa *Pessoa, err error) {
 	pessoa = &Pessoa{
 		Cpf:             cpf,
 		NomeCompleto:    nome,
@@ -46,7 +55,8 @@ func NewPessoa(cpf, nome, usuario, senha, email string) (pessoa *Pessoa, err err
 		Email:           email,
 		DataCriacao:     time.Now().Local(),
 		DataModificacao: time.Now().Local(),
-		Estado:          true}
+		Estado:          true,
+		Administrador:   admin}
 
 	if err = pessoa.VerificaAtributos(); err != nil {
 		pessoa = nil
@@ -122,18 +132,23 @@ func (p *Pessoa) AlteraCampos(campos map[string]string) (err error) {
 
 func (p *Pessoa) String() string {
 	estado := "ativo"
+	tipo := "Administrador"
 	if !p.Estado {
 		estado = "inativo"
+	}
+
+	if !p.Administrador {
+		tipo = "Comum"
 	}
 
 	dataCriacao := helper.DataFormatada(p.DataCriacao)
 	dataModificacao := helper.DataFormatada(p.DataModificacao)
 
-	return fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", p.Cpf, p.NomeCompleto, p.Usuario, p.Senha, p.Email, dataCriacao, dataModificacao, estado)
+	return fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", p.Cpf, p.NomeCompleto, p.Usuario, p.Senha, p.Email, dataCriacao, dataModificacao, estado, tipo)
 }
 
 func (p *Pessoa) Repr() string {
-	return fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%v", p.Cpf, p.NomeCompleto, p.Usuario, p.Senha, p.Email, p.DataCriacao, p.DataModificacao, p.Estado)
+	return fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%v\t%v", p.Cpf, p.NomeCompleto, p.Usuario, p.Senha, p.Email, p.DataCriacao, p.DataModificacao, p.Estado, p.Administrador)
 }
 
 func (p *Pessoa) VerificaAtributos() (err error) {

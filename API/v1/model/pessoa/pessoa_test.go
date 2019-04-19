@@ -4,6 +4,7 @@ package pessoa
 import (
 	"controle_pessoal_de_financas/API/v1/model/erro"
 	"testing"
+	"time"
 )
 
 func TestMakePessoa(t *testing.T) {
@@ -12,11 +13,11 @@ func TestMakePessoa(t *testing.T) {
 		t.Error(err, p1)
 	}
 
-	if p1.String() != "12345678910	Teste 01	teste01	8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92	teste01@email.com	01/02/2000 12:30:00	01/02/2000 12:30:00	ativo" {
+	if p1.String() != "12345678910	Teste 01	teste01	8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92	teste01@email.com	01/02/2000 12:30:00	01/02/2000 12:30:00	ativo	Comum" {
 		t.Error("Erro na método String de Pessoa", p1)
 	}
 
-	if p1.Repr() != "12345678910	Teste 01	teste01	8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92	teste01@email.com	2000-02-01 12:30:00 +0000 UTC	2000-02-01 12:30:00 +0000 UTC	true" {
+	if p1.Repr() != "12345678910	Teste 01	teste01	8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92	teste01@email.com	2000-02-01 12:30:00 +0000 UTC	2000-02-01 12:30:00 +0000 UTC	true	false" {
 		t.Error("Erro no método Repr de Pessoa", p1)
 	}
 
@@ -27,6 +28,16 @@ func TestMakePessoa(t *testing.T) {
 
 	if p1.VerificaAtributos() != nil {
 		t.Error(err, p1)
+	}
+}
+
+func TestMakePessoaAdmin(t *testing.T) {
+	p1, err := NewPessoaAdmin("12345678910", "Teste 01", "teste01", "123456", "teste01@email.com")
+	p1.DataCriacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
+	p1.DataModificacao = time.Date(2000, 2, 1, 12, 30, 0, 0, new(time.Location))
+
+	if !p1.Administrador {
+		t.Error("Função NewPessoaAdmin não está criando uma Pessoa como Administrador", p1, err)
 	}
 }
 

@@ -16,13 +16,14 @@ var (
 		"email":           "email",
 		"dataCriacao":     "data_criacao",
 		"dataModificacao": "data_modificacao",
-		"estado":          "estado"}
+		"estado":          "estado",
+		"administrador":   "administrador"}
 )
 
 func CarregaPessoas(db *sql.DB) (pessoas pessoa.Pessoas, err error) {
 	sql := `
 SELECT
-	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}, {{.administrador}}
 FROM
 	{{.tabela}}
 `
@@ -83,7 +84,7 @@ WHERE {{.cpf}} = $1
 func ProcuraPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
 	sql := `
 SELECT
-	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}, {{.administrador}}
 FROM
 	{{.tabela}}
 WHERE {{.cpf}} = $1
@@ -103,7 +104,7 @@ WHERE {{.cpf}} = $1
 func ProcuraPessoaPorUsuario(db *sql.DB, usuario string) (p *pessoa.Pessoa, err error) {
 	sql := `
 SELECT
-	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}, {{.administrador}}
 FROM
 	{{.tabela}}
 WHERE {{.usuario}} = $1
@@ -326,7 +327,8 @@ func scanPessoas01(rows *sql.Rows, pessoaAtual *pessoa.Pessoa) error {
 		&pessoaAtual.Email,
 		&pessoaAtual.DataCriacao,
 		&pessoaAtual.DataModificacao,
-		&pessoaAtual.Estado)
+		&pessoaAtual.Estado,
+		&pessoaAtual.Administrador)
 }
 
 func scanPessoas02(rows *sql.Rows, pessoaAtual *pessoa.PessoaSimples) error {

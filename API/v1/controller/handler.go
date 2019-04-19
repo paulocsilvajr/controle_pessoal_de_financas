@@ -101,12 +101,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.Unmarshal(body, &usuarioInformado); err != nil {
-		// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		SetHeaderJson(w)
 		status = http.StatusUnprocessableEntity // 422
-		// w.WriteHeader(status)
 
-		// retornoStatus(w, status)
 		defineStatusEmRetornoELog(w, status, err)
 
 		return
@@ -114,24 +111,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, nomeUsuario)
 	if err != nil {
-		// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		SetHeaderJson(w)
 		status = http.StatusNotAcceptable // 406
-		// w.WriteHeader(status)
 
-		// retornoStatus(w, status)
 		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
 
 	if usuarioEncontrado.Estado == false {
-		// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		SetHeaderJson(w)
 		status = http.StatusNotFound // 404
-		// w.WriteHeader(status)
 
-		// retornoStatus(w, status)
 		defineStatusEmRetornoELog(w, status, err)
 
 		return
@@ -140,12 +131,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	senhaHash := usuarioEncontrado.Senha
 	senhaInformadaHash := helper.GetSenhaSha256(usuarioInformado.Senha)
 	if senhaHash != senhaInformadaHash {
-		// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		SetHeaderJson(w)
 		status = http.StatusNotAcceptable // 406
-		// w.WriteHeader(status)
 
-		// retornoStatus(w, status)
 		defineStatusEmRetornoELog(w, status, err)
 
 		return
@@ -161,10 +149,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	segundos := time.Duration(intSegundos)
 
-	// claims := token.Claims.(jwt.MapClaims)
-	// claims["usuario"] = usuarioEncontrado.Usuario
-	// claims["email"] = usuarioEncontrado.Email
-	// claims["exp"] = time.Now().Add(time.Second * segundos).Unix()
+	fmt.Println(">>>2", usuarioEncontrado.Usuario, usuarioEncontrado.Administrador)
 	helper.SetClaims(
 		token,
 		segundos,
@@ -174,7 +159,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, _ := token.SignedString(MySigningKey)
 
-	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	SetHeaderJson(w)
 	status = http.StatusOK
 	funcao := "Login"
@@ -183,7 +167,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func TokenValido(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	SetHeaderJson(w)
 
 	funcao := "TokenValido"

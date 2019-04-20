@@ -7,6 +7,7 @@ import (
 	"controle_pessoal_de_financas/API/v1/logger"
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -68,42 +69,34 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	if err := json.Unmarshal(body, &usuarioInformado); err != nil {
-		SetHeaderJson(w)
-		status = http.StatusUnprocessableEntity // 422
-
-		defineStatusEmRetornoELog(w, status, err)
-
+	err = json.Unmarshal(body, &usuarioInformado)
+	status = http.StatusUnprocessableEntity // 422
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
 		return
 	}
 
 	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, nomeUsuario)
+	status = http.StatusNotAcceptable // 406
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
 	if err != nil {
-		SetHeaderJson(w)
-		status = http.StatusNotAcceptable // 406
-
-		defineStatusEmRetornoELog(w, status, err)
-
 		return
 	}
 
-	if usuarioEncontrado.Estado == false {
-		SetHeaderJson(w)
-		status = http.StatusNotFound // 404
-
-		defineStatusEmRetornoELog(w, status, err)
-
+	status = http.StatusNotFound // 404
+	verif := usuarioEncontrado.Estado == false
+	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Usuário inativo"))
+	if err != nil {
 		return
 	}
 
 	senhaHash := usuarioEncontrado.Senha
 	senhaInformadaHash := helper.GetSenhaSha256(usuarioInformado.Senha)
-	if senhaHash != senhaInformadaHash {
-		SetHeaderJson(w)
-		status = http.StatusNotAcceptable // 406
-
-		defineStatusEmRetornoELog(w, status, err)
-
+	usuarioBD := usuarioEncontrado.Usuario
+	verif = senhaHash != senhaInformadaHash || usuarioBD != usuarioInformado.Usuario
+	status = http.StatusNotAcceptable // 406
+	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Usuário ou Senha inválida"))
+	if err != nil {
 		return
 	}
 
@@ -139,6 +132,17 @@ func TokenValido(w http.ResponseWriter, r *http.Request) {
 	funcao := "TokenValido"
 	msg := fmt.Sprintf("%s: Token válido", funcao)
 	defineStatusEMensagemEmRetornoELog(w, http.StatusOK, msg)
+}
+
+func DefineHeaderRetorno(w http.ResponseWriter, header func(w http.ResponseWriter), verif bool, status int, err error) error {
+	if verif {
+		header(w)
+
+		defineStatusEmRetornoELog(w, status, err)
+
+		return err
+	}
+	return nil
 }
 
 func retornoStatus(w http.ResponseWriter, status int) {

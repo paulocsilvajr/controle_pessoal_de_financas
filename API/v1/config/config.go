@@ -61,7 +61,7 @@ func AbrirConfiguracoes() Configuracoes {
 }
 
 func criarConfigPadrao() {
-	configuracoes := make(map[string]string)
+	configuracoes := make(Configuracoes)
 	configuracoes["porta"] = "8085"
 	configuracoes["host"] = "localhost"
 	configuracoes["duracao_token"] = "3600"

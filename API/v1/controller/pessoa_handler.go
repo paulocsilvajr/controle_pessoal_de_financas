@@ -6,7 +6,6 @@ import (
 	"controle_pessoal_de_financas/API/v1/logger"
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -65,54 +64,63 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 
 	funcao := "PessoaIndex"
 	msg := fmt.Sprintf("%s: Listagem de pessoas", funcao)
-	retornoData(w, status, msg, listaPessoas.Len(), listaPessoas)
-	if err != nil {
-		logger.GeraLogFS(fmt.Sprintf("[%d] %s", status, err.Error()), time.Now())
+	err = retornoData(w, status, msg, listaPessoas.Len(), listaPessoas)
 
-		return
-	}
-
-	msg = fmt.Sprintf("%s: Enviando listagem de pessoas", funcao)
-	logger.GeraLogFS(fmt.Sprintf("[%d] %s[%d elementos]", status, msg, listaPessoas.Len()), time.Now())
+	logger.GeraLogFS(
+		fmt.Sprintf("[%d] %s: Enviando listagem de pessoas[%d elementos] %v",
+			status,
+			funcao,
+			listaPessoas.Len(),
+			err),
+		time.Now())
 }
 
 func PessoaShow(w http.ResponseWriter, r *http.Request) {
 	var status int
 	var msg string
 
-	vars := mux.Vars(r)
-	usuario := vars["usuario"]
-
-	token, err := helper.GetToken(r, MySigningKey)
-	usuarioToken, _, _, err := helper.GetClaims(token)
-	if err != nil {
-		log.Println(err)
-	}
-
 	SetHeaderJson(w)
 
-	if usuarioToken != usuario {
-		status = http.StatusNotFound
-		msg = "Usuário não autenticado(token)"
-		defineStatusEMensagemEmRetornoELog(w, status, msg)
+	vars := mux.Vars(r)
+	usuarioRota := vars["usuario"]
+
+	token, err := helper.GetToken(r, MySigningKey)
+	if err != nil {
+		status = http.StatusInternalServerError
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
 
-	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, usuario)
+	usuarioToken, _, _, err := helper.GetClaims(token)
+	if usuarioToken != usuarioRota || err != nil {
+		status = http.StatusInternalServerError
+		defineStatusEmRetornoELog(w, status, err)
+
+		return
+	}
+
+	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, usuarioRota)
 	if err != nil {
 		status = http.StatusInternalServerError
-		defineStatusEMensagemEmRetornoELog(w, status, err.Error())
+		defineStatusEmRetornoELog(w, status, err)
 
 		return
 	}
 
 	status = http.StatusOK
+
 	funcao := "PessoaShow"
 	msg = fmt.Sprintf("%s: Dados de usuário %s", funcao, usuarioEncontrado.Usuario)
 	quant := 1
-	retornoData(w, status, msg, quant, usuarioEncontrado)
+	err = retornoData(w, status, msg, quant, usuarioEncontrado)
 
-	msg = fmt.Sprintf("%s: Enviando dados de pessoa %s", funcao, usuarioEncontrado.Usuario)
-	logger.GeraLogFS(fmt.Sprintf("[%d] %s[%d elementos]", status, msg, quant), time.Now())
+	logger.GeraLogFS(
+		fmt.Sprintf("[%d] %s: Enviando dados de pessoa %s[%d elementos] %v",
+			status,
+			funcao,
+			usuarioEncontrado.Usuario,
+			quant,
+			err),
+		time.Now())
 }

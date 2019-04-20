@@ -43,47 +43,15 @@ type ReturnData struct {
 	Data  interface{} `json:"data"`
 }
 
-// func Index(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-// 	// O header ACESS-CONTROL-ALLOW-ORIGIN deve ser declarado em cada página
-// 	// em que houver requisições à API.
-// 	// Como a aplicação está sendo desenvolvida em Vue.js, é uma SPA(Single Page Application),
-// 	// portando, é necessário declarar o header somente na página inicial.
-// 	w.Header().Set("Access-Control-Allow-Origin", "*")
+func Index(w http.ResponseWriter, r *http.Request) {
+	SetHeaderJson(w)
 
-// 	// data := make(map[string]string)
-// 	// data["title"] = "SCAK"
+	status := http.StatusOK
+	msg := "Rotas de API"
+	rotas := config.Rotas
 
-// 	tmpl, err := template.ParseFiles("www/index.html")
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-
-// 	// tmpl.Execute(w, data)
-// 	tmpl.Execute(w, nil)
-// }
-
-// func GetStatic(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	nomeStatic := vars["nomeStatic"]
-// 	pathStatic := fmt.Sprintf("www/dist/%s", nomeStatic)
-
-// 	if strings.Contains(nomeStatic, ".css") {
-// 		w.Header().Set("Content-Type", "text/css; charset=utf-8")
-// 	} else if strings.Contains(nomeStatic, ".js") {
-// 		w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
-// 	} else {
-// 		log.Printf("Arquivo %s inválido", nomeStatic)
-// 		return
-// 	}
-
-// 	tmpl, err := template.ParseFiles(pathStatic)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-
-// 	tmpl.Execute(w, nil)
-// }
+	retornoData(w, status, msg, len(rotas), rotas)
+}
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	var status int

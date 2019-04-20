@@ -1,6 +1,7 @@
 package route
 
 import (
+	"controle_pessoal_de_financas/API/v1/config"
 	"controle_pessoal_de_financas/API/v1/controller"
 	"net/http"
 )
@@ -15,39 +16,32 @@ type Route struct {
 
 type Routes []Route
 
-var routes = Routes{
-	// Route{
-	// 	"Index",
-	// 	"GET",
-	// 	"/",
-	// 	controller.Index,
-	// 	false,
-	// },
-	// Route{
-	// 	"GetStaticDist",
-	// 	"GET",
-	// 	"/dist/{nomeStatic}",
-	// 	controller.GetStatic,
-	// 	false,
-	// },
+var MyRoutes = Routes{
+	Route{
+		"Index",
+		config.Rotas["Index"].Tipo,
+		config.Rotas["Index"].Rota,
+		controller.Index,
+		true,
+	},
 	Route{
 		"Login",
-		"POST",
-		"/login/{usuario}",
+		config.Rotas["Login"].Tipo,
+		config.Rotas["Login"].Rota,
 		controller.Login,
 		false,
 	},
 	Route{
 		"TokenValido",
-		"GET",
-		"/token",
+		config.Rotas["TokenValido"].Tipo,
+		config.Rotas["TokenValido"].Rota,
 		controller.TokenValido,
 		true,
 	},
 	Route{
 		"PessoaIndex",
-		"GET",
-		"/pessoas",
+		config.Rotas["PessoaIndex"].Tipo,
+		config.Rotas["PessoaIndex"].Rota,
 		controller.PessoaIndex,
 		true,
 	},

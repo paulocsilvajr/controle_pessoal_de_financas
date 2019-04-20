@@ -10,24 +10,31 @@ import (
 
 const arquivo = "config/config.json"
 
-func criarConfigPadrao() {
-	configuracoes := make(map[string]string)
-	configuracoes["porta"] = "8085"
-	configuracoes["host"] = "localhost"
-	configuracoes["duracao_token"] = "3600"
-	configuracoes["protocolo"] = "https"
+type rota struct {
+	Tipo, Rota, Descricao string
+}
 
-	encodeFile, err := os.Create(arquivo)
-	if err != nil {
-		log.Println(err)
-	}
-
-	encoder := json.NewEncoder(encodeFile)
-
-	if err := encoder.Encode(configuracoes); err != nil {
-		log.Println(err)
-	}
-	encodeFile.Close()
+var Rotas = map[string]rota{
+	"Index": rota{
+		"GET",
+		"/",
+		"",
+	},
+	"Login": rota{
+		"POST",
+		"/login/{usuario}",
+		"",
+	},
+	"TokenValido": rota{
+		"GET",
+		"/token",
+		"",
+	},
+	"PessoaIndex": rota{
+		"GET",
+		"/pessoas",
+		"",
+	},
 }
 
 func AbrirConfiguracoes() map[string]string {
@@ -49,4 +56,24 @@ func AbrirConfiguracoes() map[string]string {
 	decoder.Decode(&configuracoes)
 
 	return configuracoes
+}
+
+func criarConfigPadrao() {
+	configuracoes := make(map[string]string)
+	configuracoes["porta"] = "8085"
+	configuracoes["host"] = "localhost"
+	configuracoes["duracao_token"] = "3600"
+	configuracoes["protocolo"] = "https"
+
+	encodeFile, err := os.Create(arquivo)
+	if err != nil {
+		log.Println(err)
+	}
+
+	encoder := json.NewEncoder(encodeFile)
+
+	if err := encoder.Encode(configuracoes); err != nil {
+		log.Println(err)
+	}
+	encodeFile.Close()
 }

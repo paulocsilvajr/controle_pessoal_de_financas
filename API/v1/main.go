@@ -2,8 +2,8 @@ package main
 
 import (
 	"controle_pessoal_de_financas/API/v1/config"
-	"controle_pessoal_de_financas/API/v1/config/route"
 	"controle_pessoal_de_financas/API/v1/helper"
+	"controle_pessoal_de_financas/API/v1/route"
 	"fmt"
 	"log"
 	"net/http"

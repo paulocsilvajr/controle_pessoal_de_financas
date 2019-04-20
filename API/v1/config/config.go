@@ -37,7 +37,9 @@ var Rotas = map[string]rota{
 	},
 }
 
-func AbrirConfiguracoes() map[string]string {
+type Configuracoes map[string]string
+
+func AbrirConfiguracoes() Configuracoes {
 	decodeFile, err := os.Open(arquivo)
 	if err != nil {
 		criarConfigPadrao()
@@ -51,7 +53,7 @@ func AbrirConfiguracoes() map[string]string {
 
 	decoder := json.NewDecoder(decodeFile)
 
-	configuracoes := make(map[string]string)
+	configuracoes := make(Configuracoes)
 
 	decoder.Decode(&configuracoes)
 

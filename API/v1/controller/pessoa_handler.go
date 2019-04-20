@@ -6,8 +6,11 @@ import (
 	"controle_pessoal_de_financas/API/v1/logger"
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
@@ -71,5 +74,45 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 
 	msg = fmt.Sprintf("%s: Enviando listagem de pessoas", funcao)
 	logger.GeraLogFS(fmt.Sprintf("[%d] %s[%d elementos]", status, msg, listaPessoas.Len()), time.Now())
+}
 
+func PessoaShow(w http.ResponseWriter, r *http.Request) {
+	var status int
+	var msg string
+
+	vars := mux.Vars(r)
+	usuario := vars["usuario"]
+
+	token, err := helper.GetToken(r, MySigningKey)
+	usuarioToken, _, _, err := helper.GetClaims(token)
+	if err != nil {
+		log.Println(err)
+	}
+
+	SetHeaderJson(w)
+
+	if usuarioToken != usuario {
+		status = http.StatusNotFound
+		msg = "Usuário não autenticado(token)"
+		defineStatusEMensagemEmRetornoELog(w, status, msg)
+
+		return
+	}
+
+	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, usuario)
+	if err != nil {
+		status = http.StatusInternalServerError
+		defineStatusEMensagemEmRetornoELog(w, status, err.Error())
+
+		return
+	}
+
+	status = http.StatusOK
+	funcao := "PessoaShow"
+	msg = fmt.Sprintf("%s: Dados de usuário %s", funcao, usuarioEncontrado.Usuario)
+	quant := 1
+	retornoData(w, status, msg, quant, usuarioEncontrado)
+
+	msg = fmt.Sprintf("%s: Enviando dados de pessoa %s", funcao, usuarioEncontrado.Usuario)
+	logger.GeraLogFS(fmt.Sprintf("[%d] %s[%d elementos]", status, msg, quant), time.Now())
 }

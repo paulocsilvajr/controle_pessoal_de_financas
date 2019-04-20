@@ -35,6 +35,11 @@ var Rotas = map[string]rota{
 		"/pessoas",
 		"",
 	},
+	"PessoaShow": rota{
+		"GET",
+		"/pessoas/{usuario}",
+		"",
+	},
 }
 
 type Configuracoes map[string]string

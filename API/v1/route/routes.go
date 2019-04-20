@@ -45,13 +45,13 @@ var MyRoutes = Routes{
 		controller.PessoaIndex,
 		true,
 	},
-	// Route{
-	// 	"UsuarioShow",
-	// 	"GET",
-	// 	"/usuarios/{usuarioNome}",
-	// 	controller.UsuarioShow,
-	// 	true,
-	// },
+	Route{
+		"PessoaShow",
+		config.Rotas["PessoaShow"].Tipo,
+		config.Rotas["PessoaShow"].Rota,
+		controller.PessoaShow,
+		true,
+	},
 	// Route{
 	// 	"UsuarioShowAdmin",
 	// 	"GET",

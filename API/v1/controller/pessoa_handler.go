@@ -88,7 +88,7 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, usuarioRota)
+	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario(db, usuarioRota)
 	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
 	if err != nil {
 		return
@@ -100,8 +100,64 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 		w,
 		SetHeaderJson,
 		status,
-		usuarioEncontrado,
+		pessoaEncontrada,
 		funcao,
-		fmt.Sprintf("Dados de pessoa %s", usuarioEncontrado.Usuario),
-		fmt.Sprintf("Enviando dados de pessoa %s", usuarioEncontrado.Usuario))
+		fmt.Sprintf("Dados de pessoa '%s'", pessoaEncontrada.Usuario),
+		fmt.Sprintf("Enviando dados de pessoa '%s'", pessoaEncontrada.Usuario))
+}
+
+func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError
+
+	vars := mux.Vars(r)
+	usuarioAdmin := vars["usuarioAdmin"]
+	usuario := vars["usuario"]
+
+	token, err := helper.GetToken(r, MySigningKey)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioToken, _, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	verif := usuarioToken != usuarioAdmin
+	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Usuário de token diferente do informado na rota"))
+	if err != nil {
+		return
+	}
+
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioAdmin)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	verif = !admin || !usuarioDB.Administrador
+	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Somente administradores podem usar essa rota"))
+	if err != nil {
+		return
+	}
+
+	status = http.StatusNotFound
+	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario(db, usuario)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	status = http.StatusOK
+	funcao := "PessoaShowAdmin"
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJson,
+		status,
+		pessoaEncontrada,
+		funcao,
+		fmt.Sprintf("Dados de pessoa '%s'", pessoaEncontrada.Usuario),
+		fmt.Sprintf("Enviando dados de pessoa '%s'", pessoaEncontrada.Usuario))
 }

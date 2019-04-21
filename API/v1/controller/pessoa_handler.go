@@ -3,124 +3,105 @@ package controller
 import (
 	"controle_pessoal_de_financas/API/v1/dao"
 	"controle_pessoal_de_financas/API/v1/helper"
-	"controle_pessoal_de_financas/API/v1/logger"
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
+	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 )
 
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
-	var status int
-
-	SetHeaderJson(w)
+	var status = http.StatusInternalServerError
 
 	token, err := helper.GetToken(r, MySigningKey)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
 	if err != nil {
-		status = http.StatusInternalServerError
-		defineStatusEmRetornoELog(w, status, err)
-
 		return
 	}
 
 	usuarioToken, emailToken, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
 	if err != nil {
-		status = http.StatusInternalServerError
-		defineStatusEmRetornoELog(w, status, err)
-
 		return
 	}
 
 	var listaPessoas pessoa.PessoasI
 	if admin {
 		listaPessoas, err = dao.CarregaPessoas(db)
+		err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
 		if err != nil {
-			status = http.StatusInternalServerError
-			defineStatusEmRetornoELog(w, status, err)
-
 			return
 		}
 	} else {
 		listaPessoas, err = dao.CarregaPessoasSimples(db)
+		err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
 		if err != nil {
-			status = http.StatusInternalServerError
-			defineStatusEmRetornoELog(w, status, err)
-
 			return
 		}
 	}
 
 	p, err := listaPessoas.ProcuraPessoaPorUsuario(usuarioToken)
-	if err != nil || p.GetEmail() != emailToken {
-		status = http.StatusInternalServerError
-		defineStatusEmRetornoELog(w, status, err)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
 
+	err = DefineHeaderRetorno(w, SetHeaderJson, p.GetEmail() != emailToken, status, errors.New("Email de token não confere com email de pessoa"))
+	if err != nil {
 		return
 	}
 
 	status = http.StatusOK
-
 	funcao := "PessoaIndex"
-	msg := fmt.Sprintf("%s: Listagem de pessoas", funcao)
-	err = retornoData(w, status, msg, listaPessoas.Len(), listaPessoas)
-
-	logger.GeraLogFS(
-		fmt.Sprintf("[%d] %s: Enviando listagem de pessoas[%d elementos] %v",
-			status,
-			funcao,
-			listaPessoas.Len(),
-			err),
-		time.Now())
+	DefineHeaderRetornoDados(
+		w,
+		SetHeaderJson,
+		status,
+		listaPessoas,
+		funcao,
+		"Listagem de pessoas",
+		"Enviando listagem de pessoas")
 }
 
 func PessoaShow(w http.ResponseWriter, r *http.Request) {
-	var status int
-	var msg string
-
-	SetHeaderJson(w)
+	var status = http.StatusInternalServerError
 
 	vars := mux.Vars(r)
 	usuarioRota := vars["usuario"]
 
 	token, err := helper.GetToken(r, MySigningKey)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
 	if err != nil {
-		status = http.StatusInternalServerError
-		defineStatusEmRetornoELog(w, status, err)
-
 		return
 	}
 
 	usuarioToken, _, _, err := helper.GetClaims(token)
-	if usuarioToken != usuarioRota || err != nil {
-		status = http.StatusInternalServerError
-		defineStatusEmRetornoELog(w, status, err)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
 
+	verif := usuarioToken != usuarioRota
+	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Usuário de token diferente do solicitado na rota"))
+	if err != nil {
 		return
 	}
 
 	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, usuarioRota)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
 	if err != nil {
-		status = http.StatusInternalServerError
-		defineStatusEmRetornoELog(w, status, err)
-
 		return
 	}
 
 	status = http.StatusOK
-
 	funcao := "PessoaShow"
-	msg = fmt.Sprintf("%s: Dados de usuário %s", funcao, usuarioEncontrado.Usuario)
-	quant := 1
-	err = retornoData(w, status, msg, quant, usuarioEncontrado)
-
-	logger.GeraLogFS(
-		fmt.Sprintf("[%d] %s: Enviando dados de pessoa %s[%d elementos] %v",
-			status,
-			funcao,
-			usuarioEncontrado.Usuario,
-			quant,
-			err),
-		time.Now())
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJson,
+		status,
+		usuarioEncontrado,
+		funcao,
+		fmt.Sprintf("Dados de pessoa %s", usuarioEncontrado.Usuario),
+		fmt.Sprintf("Enviando dados de pessoa %s", usuarioEncontrado.Usuario))
 }

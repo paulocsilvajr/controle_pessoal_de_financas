@@ -44,6 +44,10 @@ type ReturnData struct {
 	Data  interface{} `json:"data"`
 }
 
+type Dados interface {
+	Len() int
+}
+
 func Index(w http.ResponseWriter, r *http.Request) {
 	SetHeaderJson(w)
 
@@ -143,6 +147,62 @@ func DefineHeaderRetorno(w http.ResponseWriter, header func(w http.ResponseWrite
 		return err
 	}
 	return nil
+}
+
+func DefineHeaderRetornoDados(
+	w http.ResponseWriter,
+	header func(w http.ResponseWriter),
+	status int,
+	dados Dados,
+	funcao, msgRetorno, msgLog string) error {
+
+	header(w)
+
+	err := retornoData(
+		w,
+		status,
+		fmt.Sprintf("%s: %s", funcao, msgRetorno),
+		dados.Len(),
+		dados)
+
+	logger.GeraLogFS(
+		fmt.Sprintf("[%d] %s: %s[%d elementos] %v",
+			status,
+			funcao,
+			msgLog,
+			dados.Len(),
+			err),
+		time.Now())
+
+	return err
+}
+
+func DefineHeaderRetornoDado(
+	w http.ResponseWriter,
+	header func(w http.ResponseWriter),
+	status int,
+	dado interface{},
+	funcao, msgRetorno, msgLog string) error {
+
+	header(w)
+
+	err := retornoData(
+		w,
+		status,
+		fmt.Sprintf("%s: %s", funcao, msgRetorno),
+		1,
+		dado)
+
+	logger.GeraLogFS(
+		fmt.Sprintf("[%d] %s: %s[%d elemento] %v",
+			status,
+			funcao,
+			msgLog,
+			1,
+			err),
+		time.Now())
+
+	return err
 }
 
 func retornoStatus(w http.ResponseWriter, status int) {

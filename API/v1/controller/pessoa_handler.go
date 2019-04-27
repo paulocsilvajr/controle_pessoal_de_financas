@@ -245,29 +245,60 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando dados de pessoa '%s'", p.Usuario))
 }
 
-// func UsuarioRemove(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	nomeUsuario := vars["usuarioNome"]
+func PessoaRemove(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError // 500
 
-// 	token := helper.GetToken(r, MySigningKey)
+	vars := mux.Vars(r)
+	usuarioRemocao := vars["usuario"]
 
-// 	admin, _, err := helper.GetClaims(token)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
+	token, err := helper.GetToken(r, MySigningKey)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
 
-// 	if admin {
-// 		err := usuario.DaoRemoveUsuario(nomeUsuario)
-// 		if err != nil {
-// 			log.Println(err)
-// 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-// 			w.WriteHeader(http.StatusNotFound)
-// 		} else {
-// 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-// 			w.WriteHeader(http.StatusOK)
-// 		}
-// 	}
-// }
+	usuarioToken, _, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	verif := !admin || !usuarioDB.Administrador
+	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Somente administradores podem usar essa rota"))
+	if err != nil {
+		return
+	}
+
+	verif = usuarioToken == usuarioRemocao
+	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, fmt.Errorf("O usuário %s não pode remover a si mesmo", usuarioToken))
+	if err != nil {
+		return
+	}
+
+	err = dao.RemovePessoaPorUsuario(db, usuarioRemocao)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	status = http.StatusOK // 200
+	funcao := "PessoaRemove"
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJson,
+		status,
+		usuarioRemocao,
+		funcao,
+		fmt.Sprintf("Removido pessoa '%s'", usuarioRemocao),
+		fmt.Sprintf("Enviando resposta de remoção de pessoa '%s'", usuarioRemocao))
+
+}
 
 // func UsuarioAlter(w http.ResponseWriter, r *http.Request) {
 // 	vars := mux.Vars(r)

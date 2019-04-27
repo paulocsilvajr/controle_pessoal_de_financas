@@ -75,6 +75,22 @@ WHERE {{.cpf}} = $1
 	return
 }
 
+func RemovePessoaPorUsuario(db *sql.DB, usuario string) (err error) {
+	sql := `
+DELETE FROM
+	{{.tabela}}
+WHERE {{.usuario}} = $1
+`
+	query := getTemplateQuery("RemovePessoaPorUsuario", pessoaDB, sql)
+
+	p, err := ProcuraPessoaPorUsuario(db, usuario)
+	if p != nil {
+		err = remove(db, p.Usuario, query)
+	}
+
+	return
+}
+
 func ProcuraPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
 	sql := `
 SELECT

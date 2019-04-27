@@ -36,7 +36,15 @@ FROM
 }
 
 func AdicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
-	p, err = pessoa.NewPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
+	return adicionaPessoaBase(db, novaPessoa, pessoa.NewPessoa)
+}
+
+func AdicionaPessoaAdmin(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+	return adicionaPessoaBase(db, novaPessoa, pessoa.NewPessoaAdmin)
+}
+
+func adicionaPessoaBase(db *sql.DB, novaPessoa *pessoa.Pessoa, newPessoa func(string, string, string, string, string) (*pessoa.Pessoa, error)) (p *pessoa.Pessoa, err error) {
+	p, err = newPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
 	if err != nil {
 		return
 	}

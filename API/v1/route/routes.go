@@ -59,13 +59,13 @@ var MyRoutes = Routes{
 		controller.PessoaShowAdmin,
 		true,
 	},
-	// Route{
-	// 	"PessoaCreate",
-	// 	"POST",
-	// 	"/pessoas",
-	// 	controller.PessoaCreate,
-	// 	true,
-	// },
+	Route{
+		"PessoaCreate",
+		config.Rotas["PessoaCreate"].Tipo,
+		config.Rotas["PessoaCreate"].Rota,
+		controller.PessoaCreate,
+		true,
+	},
 	// Route{
 	// 	"PessoaRemove",
 	// 	"DELETE",

@@ -51,6 +51,11 @@ var Rotas = rotas{
 		"/pessoas/{usuarioAdmin}/{usuario}",
 		"",
 	},
+	"PessoaCreate": rota{
+		"POST",
+		"/pessoas",
+		"",
+	},
 }
 
 type Configuracoes map[string]string

@@ -28,6 +28,10 @@ Should ever be forgot.`)
 	db = dao.GetDB()
 )
 
+// LimitData define a quantidade máxima de bytes que o body de uma requisição suporta.
+// Padrão: 1048576 Bytes == 1 MegaByte
+const LimitData int64 = 1048576
+
 type ReturnJson struct {
 	StatusCode int    `json:"status"`
 	Message    string `json:"message"`
@@ -69,7 +73,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	nomeUsuario := vars["usuario"]
 
 	var usuarioInformado pessoa.Pessoa
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, LimitData))
 	if err != nil {
 		log.Println(err)
 	}

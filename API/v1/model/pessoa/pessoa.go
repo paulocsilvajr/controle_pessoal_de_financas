@@ -18,7 +18,7 @@ type Pessoa struct {
 	DataCriacao     time.Time `json:"data_criacao"`
 	DataModificacao time.Time `json:"data_modificacao"`
 	Estado          bool      `json:"estado"`
-	Administrador   bool      `json:administrador`
+	Administrador   bool      `json:"administrador"`
 }
 
 const (

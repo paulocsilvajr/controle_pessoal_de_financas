@@ -29,7 +29,7 @@ var Rotas = rotas{
 	"Login": rota{
 		"POST",
 		"/login/{usuario}",
-		"",
+		`Body: {"usuario":"?",  "senha":"?"}`,
 	},
 	"TokenValido": rota{
 		"GET",
@@ -54,6 +54,11 @@ var Rotas = rotas{
 	"PessoaCreate": rota{
 		"POST",
 		"/pessoas",
+		`Body: {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"[, "administrador": ?]}`,
+	},
+	"PessoaRemove": rota{
+		"DELETE",
+		"/pessoas/{usuario}",
 		"",
 	},
 }

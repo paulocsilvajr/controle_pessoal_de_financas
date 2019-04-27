@@ -49,13 +49,18 @@ type Dados interface {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	SetHeaderJson(w)
-
 	status := http.StatusOK
-	msg := "Rotas de API"
 	rotas := config.Rotas
 
-	retornoData(w, status, msg, len(rotas), rotas)
+	funcao := "Index"
+	DefineHeaderRetornoDados(
+		w,
+		SetHeaderJson,
+		status,
+		rotas,
+		funcao,
+		"Rotas de API",
+		"Enviando rotas de API")
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {

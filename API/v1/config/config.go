@@ -14,7 +14,13 @@ type rota struct {
 	Tipo, Rota, Descricao string
 }
 
-var Rotas = map[string]rota{
+type rotas map[string]rota
+
+func (r rotas) Len() int {
+	return len(r)
+}
+
+var Rotas = rotas{
 	"Index": rota{
 		"GET",
 		"/",

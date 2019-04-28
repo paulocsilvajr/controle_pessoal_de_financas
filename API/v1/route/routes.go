@@ -73,11 +73,11 @@ var MyRoutes = Routes{
 		controller.PessoaRemove,
 		true,
 	},
-	// Route{
-	// 	"PessoaAlter",
-	// 	"PUT",
-	// 	"/pessoas/{usuario}",
-	// 	controller.PessoaAlter,
-	// 	true,
-	// },
+	Route{
+		"PessoaAlter",
+		config.Rotas["PessoaAlter"].Tipo,
+		config.Rotas["PessoaAlter"].Rota,
+		controller.PessoaAlter,
+		true,
+	},
 }

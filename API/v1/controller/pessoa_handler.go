@@ -141,7 +141,7 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	verif = !admin || !usuarioDB.Administrador
+	verif = !(admin && usuarioDB.Administrador)
 	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Somente administradores podem usar essa rota"))
 	if err != nil {
 		return
@@ -189,7 +189,7 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	verif := !admin || !usuarioDB.Administrador
+	verif := !(admin && usuarioDB.Administrador)
 	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Somente administradores podem usar essa rota"))
 	if err != nil {
 		return
@@ -269,7 +269,7 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	verif := !admin || !usuarioDB.Administrador
+	verif := !(admin && usuarioDB.Administrador)
 	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Somente administradores podem usar essa rota"))
 	if err != nil {
 		return
@@ -300,50 +300,71 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func UsuarioAlter(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	nomeUsuario := vars["usuarioNome"]
+func PessoaAlter(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError // 500
+	var pessoaFromJson pessoa.Pessoa
 
-// 	var novoUsuario usuario.Usuario
+	vars := mux.Vars(r)
+	usuarioAlteracao := vars["usuario"]
 
-// 	token := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, MySigningKey)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
 
-// 	admin, usuarioToken, err := helper.GetClaims(token)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
+	usuarioToken, _, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
 
-// 	if admin || nomeUsuario == usuarioToken {
-// 		// io.LimitReader define limite para o tamanho do json
-// 		body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
 
-// 		if err != nil {
-// 			log.Println(err)
-// 		}
+	verif := !(admin && usuarioDB.Administrador || usuarioToken == usuarioAlteracao)
+	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Somente administradores ou o próprio usuário pode alterar seus dados"))
+	if err != nil {
+		return
+	}
 
-// 		if err := r.Body.Close(); err != nil {
-// 			log.Println(err)
-// 		}
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, LimitData))
+	if err != nil {
+		log.Println(err)
+	}
 
-// 		if err := json.Unmarshal(body, &novoUsuario); err != nil {
-// 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-// 			w.WriteHeader(422) // unprocessable entity
-// 			if err := json.NewEncoder(w).Encode(err); err != nil {
-// 				log.Println(err)
-// 			}
-// 		}
+	if err := r.Body.Close(); err != nil {
+		log.Println(err)
+	}
 
-// 		u, err := usuario.DaoAlteraUsuario(nomeUsuario, novoUsuario)
-// 		if err != nil {
-// 			log.Println(err)
-// 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-// 			w.WriteHeader(http.StatusNotModified)
-// 		} else {
-// 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-// 			w.WriteHeader(http.StatusOK)
-// 			if err := json.NewEncoder(w).Encode(u); err != nil {
-// 				log.Println(err)
-// 			}
-// 		}
-// 	}
-// }
+	err = json.Unmarshal(body, &pessoaFromJson)
+	status = http.StatusUnprocessableEntity // 422
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	p, err := dao.AlteraPessoa(
+		db,
+		pessoaFromJson.Cpf,
+		&pessoaFromJson)
+	status = http.StatusNotModified // 304
+	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	status = http.StatusOK // 200
+	funcao := "PessoaCreate"
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJson,
+		status,
+		p,
+		funcao,
+		fmt.Sprintf("Novos dados de pessoa '%s'", p.Usuario),
+		fmt.Sprintf("Enviando novos dados de pessoa '%s'", p.Usuario))
+}

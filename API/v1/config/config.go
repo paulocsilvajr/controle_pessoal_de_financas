@@ -61,6 +61,11 @@ var Rotas = rotas{
 		"/pessoas/{usuario}",
 		"",
 	},
+	"PessoaAlter": rota{
+		"PUT",
+		"/pessoas/{usuario}",
+		`Body: {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"}`,
+	},
 }
 
 type Configuracoes map[string]string

@@ -198,7 +198,7 @@ func TestProcuraPessoaPorUsuario(t *testing.T) {
 		t.Error(err, p3i)
 	}
 
-	p3 := p3i.(Pessoa)
+	p3 := p3i.(*Pessoa)
 	if p3.Email != "teste02@email.com" {
 		t.Error("Recuperado pelo método Pessoas.ProcuraPessoaPorUsuario() uma Pessoa com email diferente do informado na sua criação", p3)
 	}

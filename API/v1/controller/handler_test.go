@@ -80,6 +80,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestTokenValido(t *testing.T) {
+	// token válido
 	rota := "/token"
 	res, body, err := get(rota, TokenTest)
 	if err != nil {
@@ -89,6 +90,14 @@ func TestTokenValido(t *testing.T) {
 
 	status := res.StatusCode
 	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// token inválido
+	tokenTestInvalido := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZW1haWwiOiJ0ZXN0ZTAxQGdtYWlsLmNvbSIsImV4cCI6MTU1NjcxNjM3MiwidXN1YXJpbyI6InRlc3RlMDEifQ.pT6ljh_Ykw3FIEop9CTTuXlI1R1QpsplRBwa-LujiH8"
+	res, body, _ = get(rota, tokenTestInvalido)
+	status = res.StatusCode
+	if status != 401 {
 		t.Error(res, string(body))
 	}
 }

@@ -49,10 +49,9 @@ func GetClaims(token *jwt.Token) (usuario string, email string, admin bool, err 
 		email = claims["email"].(string)
 		admin = claims["admin"].(bool)
 		return
-	} else {
-		err = errors.New("Token vazio/inválido, sem claims")
-		return
 	}
+	err = errors.New("Token vazio/inválido, sem claims")
+	return
 
 }
 

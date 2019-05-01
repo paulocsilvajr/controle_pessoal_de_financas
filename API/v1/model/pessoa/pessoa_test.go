@@ -45,7 +45,6 @@ func TestMakePessoaAdmin(t *testing.T) {
 	if !p2.Administrador {
 		t.Error("Função SetAdmin(true) não está definindo como Administrador uma Pessoa", p1, err)
 	}
-
 }
 
 func TestVerificaAtributosPessoa(t *testing.T) {
@@ -194,11 +193,12 @@ func TestProcuraPessoaPorUsuario(t *testing.T) {
 
 	pessoas := Pessoas{p1, p2}
 
-	p3, err := pessoas.ProcuraPessoaPorUsuario("teste02")
+	p3i, err := pessoas.ProcuraPessoaPorUsuario("teste02")
 	if err != nil {
-		t.Error(err, p3)
+		t.Error(err, p3i)
 	}
 
+	p3 := p3i.(Pessoa)
 	if p3.Email != "teste02@email.com" {
 		t.Error("Recuperado pelo método Pessoas.ProcuraPessoaPorUsuario() uma Pessoa com email diferente do informado na sua criação", p3)
 	}

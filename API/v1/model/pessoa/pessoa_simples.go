@@ -13,7 +13,7 @@ type PessoaSimples struct {
 	DataModificacao time.Time `json:"data_modificacao"`
 }
 
-func (p PessoaSimples) GetEmail() string {
+func (p *PessoaSimples) GetEmail() string {
 	return p.Email
 }
 

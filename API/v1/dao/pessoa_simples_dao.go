@@ -29,7 +29,6 @@ func carregaPessoasSimples(db *sql.DB, query string, args ...interface{}) (pesso
 
 func converteEmPessoasSimples(registros []interface{}) (pessoas pessoa.PessoasSimples) {
 	for _, r := range registros {
-		// fmt.Printf(">>> %T\n", r)
 		p, ok := r.(*pessoa.PessoaSimples)
 		if ok {
 			pessoas = append(pessoas, p)

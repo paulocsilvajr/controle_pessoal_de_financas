@@ -164,3 +164,24 @@ func requisicao(tipo, urlRota, json, token string) (*http.Response, []byte, erro
 
 	return res, body, nil
 }
+
+func getToken(usuario, senha string) (string, error) {
+	rota := fmt.Sprintf("/login/%s", usuario)
+	jsonPost := fmt.Sprintf(`{"usuario":"%s", "senha":"%s"}`, usuario, senha)
+
+	res, body, err := post(rota, jsonPost, "")
+	if err != nil {
+		return "", err
+	}
+
+	status := res.StatusCode
+	if status == 200 {
+		retorno := ReturnTokenJson{}
+		json.Unmarshal(body, &retorno)
+		TokenTest = retorno.Token
+
+		return TokenTest, nil
+	}
+
+	return "", fmt.Errorf("%v %s", res, string(body))
+}

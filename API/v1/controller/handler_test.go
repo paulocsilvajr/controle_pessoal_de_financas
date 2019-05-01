@@ -10,67 +10,121 @@ import (
 	"testing"
 )
 
-const URLBaseTest string = "https://localhost:8085/"
+const URLBaseTest string = "https://localhost:8085"
 
 var (
 	TokenTest string
 )
 
 func TestLogin(t *testing.T) {
-	// url := URLBaseTest + "login/teste01"
-
-	// payload := strings.NewReader(`{"usuario":"teste01",  "senha":"123456"}`)
-
-	// req, _ := http.NewRequest("POST", url, payload)
-
-	// req.Header.Add("Content-Type", "application/json")
-
-	// // Desativa segurança para não barrar o certificado auto-assinado
-	// tr := &http.Transport{
-	// 	TLSClientConfig: &tls.Config{
-	// 		InsecureSkipVerify: true,
-	// 	},
-	// }
-	// client := &http.Client{Transport: tr}
-	// res, _ := client.Do(req)
-
-	// body, _ := ioutil.ReadAll(res.Body)
-
-	// if res.StatusCode == 200 {
-	// 	t.Error(res)
-	// 	t.Error(string(body))
-	// }
-
-	// res.Body.Close()
-
+	// status OK - 200
 	usuario := "teste01"
 	senha := "123456"
-	jsonPost := fmt.Sprintf(`{"usuario":"%s",  "senha":"%s"}`, usuario, senha)
+	rota := fmt.Sprintf("/login/%s", usuario)
+	jsonPost := fmt.Sprintf(`{"usuario":"%s", "senha":"%s"}`, usuario, senha)
 
-	res, body := post("login/teste01", jsonPost, "")
+	res, body, err := post(rota, jsonPost, "")
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
-	if res.StatusCode == 200 {
+	status := res.StatusCode
+	if status == 200 {
 		retorno := ReturnTokenJson{}
 		json.Unmarshal(body, &retorno)
 		TokenTest = retorno.Token
 	} else {
-		t.Error(res, body)
+		t.Error(res, string(body))
+	}
+
+	// não pode processar o json - 422
+	res, body, _ = post("/login/teste01", "", "")
+	status = res.StatusCode
+	if status != 422 {
+		t.Error(res, string(body))
+	}
+
+	// não foi encontrado um registro com o usuário - 406
+	usuario = "teste99"
+	senha = "123"
+	rota = fmt.Sprintf("/login/%s", usuario)
+	jsonPost = fmt.Sprintf(`{"usuario":"%s", "senha":"%s"}`, usuario, senha)
+	res, body, _ = post(rota, jsonPost, "")
+	status = res.StatusCode
+	if status != 406 {
+		t.Error(res, string(body))
+	}
+
+	// usuário inativo - 404
+	usuario = "joao02"
+	senha = "123456"
+	rota = fmt.Sprintf("/login/%s", usuario)
+	jsonPost = fmt.Sprintf(`{"usuario":"%s",  "senha":"%s"}`, usuario, senha)
+	res, body, _ = post(rota, jsonPost, "")
+	status = res.StatusCode
+	if status != 404 {
+		t.Error(res, string(body))
+	}
+
+	// usuário ou senha inválida - 406
+	usuario = "teste01"
+	senha = "12345"
+	rota = fmt.Sprintf("/login/%s", usuario)
+	jsonPost = fmt.Sprintf(`{"usuario":"%s",  "senha":"%s"}`, usuario, senha)
+	res, body, _ = post(rota, jsonPost, "")
+	status = res.StatusCode
+	if status != 406 {
+		t.Error(res, string(body))
 	}
 }
 
-func post(urlRota, json, token string) (*http.Response, []byte) {
+func TestTokenValido(t *testing.T) {
+	rota := "/token"
+	res, body, err := get(rota, TokenTest)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	status := res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+}
+
+func TestIndex(t *testing.T) {
+	rota := "/"
+	res, body, err := get(rota, TokenTest)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	status := res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+}
+
+func post(urlRota, json, token string) (*http.Response, []byte, error) {
 	return requisicao("POST", urlRota, json, token)
 }
 
-func requisicao(tipo, urlRota, json, token string) (*http.Response, []byte) {
+func get(urlRota, token string) (*http.Response, []byte, error) {
+	return requisicao("GET", urlRota, "", token)
+}
+
+func requisicao(tipo, urlRota, json, token string) (*http.Response, []byte, error) {
 	url := URLBaseTest + urlRota
 
 	payload := strings.NewReader(json)
-	if tipo == "GET" || tipo == "DELETE" {
-		payload = nil
+	var req *http.Request
+	if len(json) != 0 {
+		req, _ = http.NewRequest(tipo, url, payload)
+	} else {
+		req, _ = http.NewRequest(tipo, url, nil)
 	}
-
-	req, _ := http.NewRequest(tipo, url, payload)
 
 	if tipo == "POST" || tipo == "PUT" {
 		req.Header.Add("Content-Type", "application/json")
@@ -91,10 +145,13 @@ func requisicao(tipo, urlRota, json, token string) (*http.Response, []byte) {
 		},
 	}
 	client := &http.Client{Transport: tr}
-	res, _ := client.Do(req)
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
 	defer res.Body.Close()
 
 	body, _ := ioutil.ReadAll(res.Body)
 
-	return res, body
+	return res, body, nil
 }

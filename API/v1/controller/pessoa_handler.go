@@ -15,6 +15,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// PessoaIndex é um handler/controller que responde a rota '[GET] /pessoas' e retorna StatusOK(200) e uma listagem de pessoas de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError
 
@@ -68,6 +69,7 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 		"Enviando listagem de pessoas")
 }
 
+// PessoaShow é um handler/controller que responde a rota '[GET] /pessoas/{usuario}' e retorna StatusOK(200) e os dados do usuário solicitado caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB e igual ao usuário da rota. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaShow(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError
 
@@ -110,6 +112,7 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando dados de pessoa '%s'", pessoaEncontrada.Usuario))
 }
 
+// PessoaShowAdmin é um handler/controller que responde a rota '[GET] /pessoas/{usuarioAdmin}/{usuario}' e retorna StatusOK(200) e os dados do usuário solicitado caso o TOKEN informado for válido e o usuário administrador associado ao token for cadastrado na API/DB e igual ao usuário admin da rota. Caso não for encontrado o usuário informado no BD, retorna StatusNotFound(404). Para os outros erros, retorna StatusInternalServerError(500)
 func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError
 
@@ -166,6 +169,7 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando dados de pessoa '%s'", pessoaEncontrada.Usuario))
 }
 
+// PessoaCreate é um handler/controller que responde a rota '[POST] /pessoas' e retorna StatusCreated(201) e os dados da pessoa criada através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"[, "administrador": ?]}
 func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError
 	var pessoaFromJson pessoa.Pessoa
@@ -245,6 +249,7 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando dados de pessoa '%s'", p.Usuario))
 }
 
+// PessoaRemove é um handler/controller que responde a rota '[DELETE] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que o usuário informado na rota seja diferente ao do token e seja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 
@@ -300,6 +305,7 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// PessoaAlter é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB, o usuário informado na rota existir. Somente usuários administradores podem alterar qualquer usuário. Um usuário comum somente pode alterar a si mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"} ou StatusNotModified(304) caso ocorra algum erro na alteração do BD
 func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 	var pessoaFromJson pessoa.Pessoa

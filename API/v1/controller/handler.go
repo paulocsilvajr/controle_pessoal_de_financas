@@ -73,7 +73,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		"Enviando rotas de API")
 }
 
-// Login é um handler/controller que responde a rota '[GET] /login/{usuario}' e retorna StatusOK(200) e o token em string(com dados: usuário, email, tipo e validade codificados) caso o usuário e senha informados via JSON(body) estiverem corretos. Não é necessário ter um token válido para consultar essa rota
+// Login é um handler/controller que responde a rota '[POST] /login/{usuario}' e retorna StatusOK(200) e o token em string(com dados: usuário, email, tipo e validade codificados) caso o usuário e senha informados via JSON(body) estiverem corretos. Não é necessário ter um token válido para consultar essa rota. Retorna StatusUnprocessableEntity(422) caso o JSON(body) for inválido, StatusNotAcceptable(406) caso o usuário/senha informado estiver incorreto ou não existir, StatusNotFound(404) caso o usuário estiver inativo
 func Login(w http.ResponseWriter, r *http.Request) {
 	var status int
 	vars := mux.Vars(r)

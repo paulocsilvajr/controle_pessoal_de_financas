@@ -20,6 +20,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// MySigningKey é a chave usada para assinar o token da API
 var (
 	MySigningKey = []byte(`Remember, remember, the 5th of November.
 The gunpowder treason and plot;
@@ -32,26 +33,31 @@ Should ever be forgot.`)
 // Padrão: 1048576 Bytes == 1 MegaByte
 const LimitData int64 = 1048576
 
-type ReturnJson struct {
+// ReturnJSON é a struct base para o retorno em formato JSON
+type ReturnJSON struct {
 	StatusCode int    `json:"status"`
 	Message    string `json:"message"`
 }
 
-type ReturnTokenJson struct {
-	ReturnJson
+// ReturnTokenJSON é uma struct baseada em ReturnJSON com um campo para o token em string
+type ReturnTokenJSON struct {
+	ReturnJSON
 	Token string `json:"token"`
 }
 
+// ReturnData é uma struct baseada em ReturnJSON com dois campos adicionais: Count, para a quantidade de registros, e Data, para dados em uma interface
 type ReturnData struct {
-	ReturnJson
+	ReturnJSON
 	Count int         `json:"count"`
 	Data  interface{} `json:"data"`
 }
 
+// Dados é uma interface que obriga a criação do método Len() para obter a quantidade de elementos contidos dentro do slice
 type Dados interface {
 	Len() int
 }
 
+// Index é um handler/controller que responde a rota '[GET] /' e retorna StatusOK(200) e as rotas da API em um JSON, somente se o token informado no header for válido
 func Index(w http.ResponseWriter, r *http.Request) {
 	status := http.StatusOK
 	rotas := config.Rotas
@@ -59,7 +65,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	funcao := "Index"
 	DefineHeaderRetornoDados(
 		w,
-		SetHeaderJson,
+		SetHeaderJSON,
 		status,
 		rotas,
 		funcao,
@@ -67,6 +73,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		"Enviando rotas de API")
 }
 
+// Login é um handler/controller que responde a rota '[GET] /login/{usuario}' e retorna StatusOK(200) e o token em string(com dados: usuário, email, tipo e validade codificados) caso o usuário e senha informados via JSON(body) estiverem corretos. Não é necessário ter um token válido para consultar essa rota
 func Login(w http.ResponseWriter, r *http.Request) {
 	var status int
 	vars := mux.Vars(r)
@@ -84,21 +91,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(body, &usuarioInformado)
 	status = http.StatusUnprocessableEntity // 422
-	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
 	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, nomeUsuario)
 	status = http.StatusNotAcceptable // 406
-	err = DefineHeaderRetorno(w, SetHeaderJson, err != nil, status, err)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
 	status = http.StatusNotFound // 404
 	verif := usuarioEncontrado.Estado == false
-	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Usuário inativo"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário inativo"))
 	if err != nil {
 		return
 	}
@@ -108,7 +115,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	usuarioBD := usuarioEncontrado.Usuario
 	verif = senhaHash != senhaInformadaHash || usuarioBD != usuarioInformado.Usuario
 	status = http.StatusNotAcceptable // 406
-	err = DefineHeaderRetorno(w, SetHeaderJson, verif, status, errors.New("Usuário ou Senha inválida"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário ou Senha inválida"))
 	if err != nil {
 		return
 	}
@@ -132,21 +139,35 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, _ := token.SignedString(MySigningKey)
 
-	SetHeaderJson(w)
+	SetHeaderJSON(w)
 	status = http.StatusOK
 	funcao := "Login"
 	msg := fmt.Sprintf("%s: Token com duração de %d segundos", funcao, intSegundos)
 	defineStatusETokenEmRetornoELog(w, status, msg, tokenString)
 }
 
+// TokenValido é um handler/controller que responde a rota '[GET] /token' e retorna StatusOK(200) e uma mensagem caso o token passado no cabeçalho da requisição seja válido(dentro do período de validade). Usado principalmente para requisitar um novo token no cliente caso esteja vencido
 func TokenValido(w http.ResponseWriter, r *http.Request) {
-	SetHeaderJson(w)
+	SetHeaderJSON(w)
 
 	funcao := "TokenValido"
 	msg := fmt.Sprintf("%s: Token válido", funcao)
 	defineStatusEMensagemEmRetornoELog(w, http.StatusOK, msg)
 }
 
+// API é um handler/controller que responde a rota '[GET] /API' e retorna StatusOK(200) e uma mensagem informado a quantidade de rotas disponíveis na API e outros detalhes. Não é necessário ter um token válido para consultar essa rota
+func API(w http.ResponseWriter, r *http.Request) {
+	status := http.StatusOK
+	DefineHeaderRetornoDado(w,
+		SetHeaderJSON,
+		status,
+		map[string]string{"API OnLine": fmt.Sprintf("%.2d rota(s) cadastrada(s)", len(config.Rotas))},
+		"API",
+		"API Online, faça o login pela rota [GET] '/login/{usuario}' e consulte todas as rotas em [GET] '/'",
+		"API Online")
+}
+
+// DefineHeaderRetorno define o header(de acordo com função informada), o retorno(StatusCode) e um erro, caso a verif(verificação boleana informada) seja verdadeira. Retorna erro=nil somente se a verificação seja falsa. Usado para parar a execução de um handler caso ocorra um erro e necessite dar retorno ao cliente da API. Gera o retorno para o cliente da API e o log do sistema(tela e arquivo)
 func DefineHeaderRetorno(w http.ResponseWriter, header func(w http.ResponseWriter), verif bool, status int, err error) error {
 	if verif {
 		header(w)
@@ -158,6 +179,7 @@ func DefineHeaderRetorno(w http.ResponseWriter, header func(w http.ResponseWrite
 	return nil
 }
 
+// DefineHeaderRetornoDados define o header(de acordo com função informada), retorno(StatusCode), dados para o retorno(que implemente a interface Dados), o nome da função que o invocou, a mensagem de retorno e de log. Retorno um erro caso ocorra algum problema no processo de gerar o log e retorno. Gera o retorno para o cliente da API e o log do sistema(tela e arquivo). Usado geralmente no final dos handler para enviar vários registros para o cliente da API
 func DefineHeaderRetornoDados(
 	w http.ResponseWriter,
 	header func(w http.ResponseWriter),
@@ -186,6 +208,7 @@ func DefineHeaderRetornoDados(
 	return err
 }
 
+// DefineHeaderRetornoDado define o header(de acordo com função informada), retorno(StatusCode), um único dado para o retorno(tipo genérico interface{}), o nome da função que o invocou, a mensagem de retorno e de log. Retorno um erro caso ocorra algum problema no processo de gerar o log e retorno. Gera o retorno para o cliente da API e o log do sistema(tela e arquivo). Usado geralmente no final dos handler para enviar um único registro para o cliente da API
 func DefineHeaderRetornoDado(
 	w http.ResponseWriter,
 	header func(w http.ResponseWriter),
@@ -221,7 +244,7 @@ func retornoStatus(w http.ResponseWriter, status int) {
 }
 
 func retornoStatusMsg(w http.ResponseWriter, status int, msg string) error {
-	retorno := &ReturnJson{
+	retorno := &ReturnJSON{
 		StatusCode: status,
 		Message:    msg,
 	}
@@ -230,7 +253,7 @@ func retornoStatusMsg(w http.ResponseWriter, status int, msg string) error {
 }
 
 func retornoStatusMsgToken(w http.ResponseWriter, status int, msg, token string) error {
-	retorno := new(ReturnTokenJson)
+	retorno := new(ReturnTokenJSON)
 	retorno.StatusCode = status
 	retorno.Message = msg
 	retorno.Token = token

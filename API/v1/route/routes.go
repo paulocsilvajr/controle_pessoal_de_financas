@@ -18,6 +18,13 @@ type Routes []Route
 
 var MyRoutes = Routes{
 	Route{
+		"API",
+		config.Rotas["API"].Tipo,
+		config.Rotas["API"].Rota,
+		controller.API,
+		false,
+	},
+	Route{
 		"Index",
 		config.Rotas["Index"].Tipo,
 		config.Rotas["Index"].Rota,

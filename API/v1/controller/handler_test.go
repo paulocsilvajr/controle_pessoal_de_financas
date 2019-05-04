@@ -31,7 +31,7 @@ func TestLogin(t *testing.T) {
 
 	status := res.StatusCode
 	if status == 200 {
-		retorno := ReturnTokenJson{}
+		retorno := ReturnTokenJSON{}
 		json.Unmarshal(body, &retorno)
 		TokenTest = retorno.Token
 	} else {
@@ -102,6 +102,7 @@ func TestTokenValido(t *testing.T) {
 	}
 }
 
+// TestIndex verifica se a rota /, que retorna as rotas cadastradas, está tendo um StatusCode diferente de 200
 func TestIndex(t *testing.T) {
 	rota := "/"
 	res, body, err := get(rota, TokenTest)
@@ -122,6 +123,14 @@ func post(urlRota, json, token string) (*http.Response, []byte, error) {
 
 func get(urlRota, token string) (*http.Response, []byte, error) {
 	return requisicao("GET", urlRota, "", token)
+}
+
+func delete(urlRota, token string) (*http.Response, []byte, error) {
+	return requisicao("DELETE", urlRota, "", token)
+}
+
+func put(urlRota, json, token string) (*http.Response, []byte, error) {
+	return requisicao("PUT", urlRota, json, token)
 }
 
 func requisicao(tipo, urlRota, json, token string) (*http.Response, []byte, error) {
@@ -176,7 +185,7 @@ func getToken(usuario, senha string) (string, error) {
 
 	status := res.StatusCode
 	if status == 200 {
-		retorno := ReturnTokenJson{}
+		retorno := ReturnTokenJSON{}
 		json.Unmarshal(body, &retorno)
 		TokenTest = retorno.Token
 

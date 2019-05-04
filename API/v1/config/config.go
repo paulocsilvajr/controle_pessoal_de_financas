@@ -21,6 +21,11 @@ func (r rotas) Len() int {
 }
 
 var Rotas = rotas{
+	"API": rota{
+		"GET",
+		"/API",
+		"",
+	},
 	"Index": rota{
 		"GET",
 		"/",

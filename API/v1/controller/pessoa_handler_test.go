@@ -6,6 +6,7 @@ import (
 )
 
 func TestPessoaIndex(t *testing.T) {
+	// retorno de dados das pessoas cadastradas como administrador - 200
 	tokenPessoaAdmin, _ := getToken("teste01", "123456")
 	rota := "/pessoas"
 	res, body, err := get(rota, tokenPessoaAdmin)
@@ -19,6 +20,7 @@ func TestPessoaIndex(t *testing.T) {
 		t.Error(res, string(body))
 	}
 
+	// retorno de dados das pessoas cadastradas como usuário comum - 200
 	tokenPessoaComum, _ := getToken("paulo", "123456")
 	res, body, _ = get(rota, tokenPessoaComum)
 	status = res.StatusCode
@@ -78,6 +80,17 @@ func TestPessoaShowAdmin(t *testing.T) {
 
 	status := res.StatusCode
 	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// retorno de caso pessoa informada não seja cadastrada no BD - 404
+	admin = "teste01"
+	usuario = "joao03"
+	tokenPessoaAdmin, _ = getToken(admin, "123456")
+	rota = fmt.Sprintf("/pessoas/%s/%s", admin, usuario)
+	res, body, _ = get(rota, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 404 {
 		t.Error(res, string(body))
 	}
 

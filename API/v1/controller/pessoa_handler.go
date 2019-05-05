@@ -17,7 +17,7 @@ import (
 
 // PessoaIndex é um handler/controller que responde a rota '[GET] /pessoas' e retorna StatusOK(200) e uma listagem de pessoas de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
-	var status = http.StatusInternalServerError
+	var status = http.StatusInternalServerError // 500
 
 	token, err := helper.GetToken(r, MySigningKey)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
@@ -57,7 +57,7 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status = http.StatusOK
+	status = http.StatusOK // 200
 	funcao := "PessoaIndex"
 	DefineHeaderRetornoDados(
 		w,
@@ -69,9 +69,9 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 		"Enviando listagem de pessoas")
 }
 
-// PessoaShow é um handler/controller que responde a rota '[GET] /pessoas/{usuario}' e retorna StatusOK(200) e os dados do usuário solicitado caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB e igual ao usuário da rota. Caso ocorra algum erro, retorna StatusInternalServerError(500)
+// PessoaShow é um handler/controller que responde a rota '[GET] /pessoas/{usuario}' e retorna StatusOK(200) e os dados da pessoa(usuário) solicitada caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB e igual ao usuário da rota. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaShow(w http.ResponseWriter, r *http.Request) {
-	var status = http.StatusInternalServerError
+	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
 	usuarioRota := vars["usuario"]
@@ -100,7 +100,7 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status = http.StatusOK
+	status = http.StatusOK // 200
 	funcao := "PessoaShow"
 	DefineHeaderRetornoDado(
 		w,
@@ -112,9 +112,9 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando dados de pessoa '%s'", pessoaEncontrada.Usuario))
 }
 
-// PessoaShowAdmin é um handler/controller que responde a rota '[GET] /pessoas/{usuarioAdmin}/{usuario}' e retorna StatusOK(200) e os dados do usuário solicitado caso o TOKEN informado for válido e o usuário administrador associado ao token for cadastrado na API/DB e igual ao usuário admin da rota. Caso não for encontrado o usuário informado no BD, retorna StatusNotFound(404). Para os outros erros, retorna StatusInternalServerError(500)
+// PessoaShowAdmin é um handler/controller que responde a rota '[GET] /pessoas/{usuarioAdmin}/{usuario}' e retorna StatusOK(200) e os dados da pessoa(usuário) solicitada caso o TOKEN informado for válido e o usuário administrador associado ao token for cadastrado na API/DB e igual ao usuário admin da rota. Caso não for encontrado o usuário informado no BD, retorna StatusNotFound(404). Para os outros erros, retorna StatusInternalServerError(500)
 func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
-	var status = http.StatusInternalServerError
+	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
 	usuarioAdmin := vars["usuarioAdmin"]
@@ -150,14 +150,14 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status = http.StatusNotFound
+	status = http.StatusNotFound // 404
 	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario(db, usuario)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	status = http.StatusOK
+	status = http.StatusOK // 200
 	funcao := "PessoaShowAdmin"
 	DefineHeaderRetornoDado(
 		w,
@@ -172,7 +172,7 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 // PessoaCreate é um handler/controller que responde a rota '[POST] /pessoas' e retorna StatusCreated(201) e os dados da pessoa criada através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"[, "administrador": ?]}
 func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError
-	var pessoaFromJson pessoa.Pessoa
+	var pessoaFromJSON pessoa.Pessoa
 	var novaPessoa *pessoa.Pessoa
 
 	token, err := helper.GetToken(r, MySigningKey)
@@ -208,7 +208,7 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	err = json.Unmarshal(body, &pessoaFromJson)
+	err = json.Unmarshal(body, &pessoaFromJSON)
 	status = http.StatusUnprocessableEntity // 422
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -216,17 +216,17 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	novaPessoa, err = pessoa.NewPessoa(
-		pessoaFromJson.Cpf,
-		pessoaFromJson.NomeCompleto,
-		pessoaFromJson.Usuario,
-		pessoaFromJson.Senha,
-		pessoaFromJson.Email)
+		pessoaFromJSON.Cpf,
+		pessoaFromJSON.NomeCompleto,
+		pessoaFromJSON.Usuario,
+		pessoaFromJSON.Senha,
+		pessoaFromJSON.Email)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 	adicionaPessoa := dao.AdicionaPessoa
-	if pessoaFromJson.Administrador {
+	if pessoaFromJSON.Administrador {
 		adicionaPessoa = dao.AdicionaPessoaAdmin
 	}
 
@@ -305,7 +305,7 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// PessoaAlter é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB, o usuário informado na rota existir. Somente usuários administradores podem alterar qualquer usuário. Um usuário comum somente pode alterar a si mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"} ou StatusNotModified(304) caso ocorra algum erro na alteração do BD
+// PessoaAlter é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar qualquer usuário. Um usuário comum somente pode alterar a si mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"} ou StatusNotModified(304) caso ocorra algum erro na alteração do BD
 func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 	var pessoaFromJson pessoa.Pessoa

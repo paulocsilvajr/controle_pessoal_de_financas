@@ -71,6 +71,16 @@ var Rotas = rotas{
 		"/pessoas/{usuario}",
 		`Body: {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"}`,
 	},
+	"PessoaEstado": rota{
+		"PUT",
+		"/pessoas/{usuario}/estado",
+		`Body: {"estado":"?"}`,
+	},
+	"PessoaAdmin": rota{
+		"PUT",
+		"/pessoas/{usuario}/admin",
+		`Body: {"administrador":"?"}`,
+	},
 }
 
 type Configuracoes map[string]string

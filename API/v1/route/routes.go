@@ -87,4 +87,18 @@ var MyRoutes = Routes{
 		controller.PessoaAlter,
 		true,
 	},
+	Route{
+		"PessoaEstado",
+		config.Rotas["PessoaEstado"].Tipo,
+		config.Rotas["PessoaEstado"].Rota,
+		controller.PessoaEstado,
+		true,
+	},
+	Route{
+		"PessoaAdmin",
+		config.Rotas["PessoaAdmin"].Tipo,
+		config.Rotas["PessoaAdmin"].Rota,
+		controller.PessoaAdmin,
+		true,
+	},
 }

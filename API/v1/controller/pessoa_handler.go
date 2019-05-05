@@ -4,6 +4,7 @@ import (
 	"controle_pessoal_de_financas/API/v1/dao"
 	"controle_pessoal_de_financas/API/v1/helper"
 	"controle_pessoal_de_financas/API/v1/model/pessoa"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -364,7 +365,167 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status = http.StatusOK // 200
-	funcao := "PessoaCreate"
+	funcao := "PessoaAlter"
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJSON,
+		status,
+		p,
+		funcao,
+		fmt.Sprintf("Novos dados de pessoa '%s'", p.Usuario),
+		fmt.Sprintf("Enviando novos dados de pessoa '%s'", p.Usuario))
+}
+
+// PessoaEstado é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar o estado de usuários, mas não pode alterar o próprio estado. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado":"?"}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
+func PessoaEstado(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError // 500
+	type estado struct {
+		Estado bool `json:"estado"`
+	}
+	var estadoPessoa estado
+
+	vars := mux.Vars(r)
+	usuarioAlteracao := vars["usuario"]
+
+	token, err := helper.GetToken(r, MySigningKey)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioToken, _, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	verif := !(admin && usuarioDB.Administrador && usuarioToken != usuarioAlteracao)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem alterar o estado de pessoas que sejam diferentes do próprio administrador"))
+	if err != nil {
+		return
+	}
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, LimitData))
+	if err != nil {
+		log.Println(err)
+	}
+
+	if err := r.Body.Close(); err != nil {
+		log.Println(err)
+	}
+
+	err = json.Unmarshal(body, &estadoPessoa)
+	status = http.StatusUnprocessableEntity // 422
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	status = http.StatusNotFound // 404
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	var alteraEstado func(*sql.DB, string) (*pessoa.Pessoa, error)
+	if estadoPessoa.Estado {
+		alteraEstado = dao.AtivaPessoa
+	} else {
+		alteraEstado = dao.InativaPessoa
+	}
+	p, err := alteraEstado(db, usuarioDBAlteracao.Cpf)
+	status = http.StatusNotModified // 304
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	status = http.StatusOK // 200
+	funcao := "PessoaEstado"
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJSON,
+		status,
+		p,
+		funcao,
+		fmt.Sprintf("Novos dados de pessoa '%s'", p.Usuario),
+		fmt.Sprintf("Enviando novos dados de pessoa '%s'", p.Usuario))
+}
+
+// PessoaAdmin é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/admin' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem redefinir usuários como administrador, mas não pode alterar a sí mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"adminstrador":"?"}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
+func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError // 500
+	type administrador struct {
+		Administrador bool `json:"administrador"`
+	}
+	var adminPessoa administrador
+
+	vars := mux.Vars(r)
+	usuarioAlteracao := vars["usuario"]
+
+	token, err := helper.GetToken(r, MySigningKey)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioToken, _, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	verif := !(admin && usuarioDB.Administrador && usuarioToken != usuarioAlteracao)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem redefinir como administrador pessoas que sejam diferentes do próprio administrador"))
+	if err != nil {
+		return
+	}
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, LimitData))
+	if err != nil {
+		log.Println(err)
+	}
+
+	if err := r.Body.Close(); err != nil {
+		log.Println(err)
+	}
+
+	err = json.Unmarshal(body, &adminPessoa)
+	status = http.StatusUnprocessableEntity // 422
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	status = http.StatusNotFound // 404
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	p, err := dao.SetAdministrador(db, usuarioDBAlteracao.Cpf, adminPessoa.Administrador)
+	status = http.StatusNotModified // 304
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	status = http.StatusOK // 200
+	funcao := "PessoaAdmin"
 	DefineHeaderRetornoDado(
 		w,
 		SetHeaderJSON,

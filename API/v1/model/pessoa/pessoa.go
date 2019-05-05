@@ -47,6 +47,19 @@ type PessoasI interface {
 	Len() int
 }
 
+func New(cpf, nome, usuario, senha, email string) *Pessoa {
+	return &Pessoa{
+		Cpf:             cpf,
+		NomeCompleto:    nome,
+		Usuario:         usuario,
+		Senha:           senha,
+		Email:           email,
+		DataCriacao:     time.Now().Local(),
+		DataModificacao: time.Now().Local(),
+		Estado:          true,
+		Administrador:   false}
+}
+
 func NewPessoa(cpf, nome, usuario, senha, email string) (*Pessoa, error) {
 	return newPessoa(cpf, nome, usuario, senha, email, false)
 }

@@ -113,7 +113,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	senhaHash := usuarioEncontrado.Senha
 	senhaInformadaHash := helper.GetSenhaSha256(usuarioInformado.Senha)
 	usuarioBD := usuarioEncontrado.Usuario
-	verif = senhaHash != senhaInformadaHash || usuarioBD != usuarioInformado.Usuario
+	verif = !(senhaHash == senhaInformadaHash && usuarioBD == usuarioInformado.Usuario)
 	status = http.StatusNotAcceptable // 406
 	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário ou Senha inválida"))
 	if err != nil {

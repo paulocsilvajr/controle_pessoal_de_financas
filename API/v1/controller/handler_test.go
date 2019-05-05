@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"controle_pessoal_de_financas/API/v1/dao"
+	"controle_pessoal_de_financas/API/v1/model/pessoa"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -15,6 +17,23 @@ const URLBaseTest string = "https://localhost:8085"
 var (
 	TokenTest string
 )
+
+func init() {
+	// Criação no BD das pessoas para o teste em handlers
+	db := dao.GetDB()
+
+	p1 := pessoa.New("11111111111", "teste 01", "teste01", "123456", "teste01@gmail.com")
+	p2 := pessoa.New("12345678910", "Paulo C Silva Jr", "paulo", "123456", "pauluscave@gmail.com")
+	p3 := pessoa.New("33333333333", "João Alcântara", "joao02", "123456", "joaoa@gmail.com")
+
+	pessoas := pessoa.Pessoas{p1, p2, p3}
+
+	for _, p := range pessoas {
+		dao.AdicionaPessoa(db, p)
+	}
+	dao.SetAdministrador(db, p1.Cpf, true)
+	dao.InativaPessoa(db, p3.Cpf)
+}
 
 func TestLogin(t *testing.T) {
 	// status OK - 200

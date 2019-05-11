@@ -177,18 +177,51 @@ func TestPessoaCreate(t *testing.T) {
 }
 
 func TestPessoaRemove(t *testing.T) {
-	// remove pessoa1 como administrador - 200
-	admin := "teste01"
+	// remove pessoa1 como usuário comum - 500
+	admin := "paulo"
 	tokenPessoaAdmin, _ := getToken(admin, "123456")
 	usuario := "teste20"
 	rota := fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ := delete(rota, tokenPessoaAdmin)
+	status := res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// remove pessoa com usuário desta mesma pessoa - 500
+	admin = "teste01"
+	tokenPessoaAdmin, _ = getToken(admin, "123456")
+	usuario = "teste01"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ = delete(rota, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// remove pessoa não cadastrada com usuário admin - 500
+	admin = "teste01"
+	tokenPessoaAdmin, _ = getToken(admin, "123456")
+	usuario = "testeABC"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ = delete(rota, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// remove pessoa1 como administrador - 200
+	admin = "teste01"
+	tokenPessoaAdmin, _ = getToken(admin, "123456")
+	usuario = "teste20"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
 	res, body, err := delete(rota, tokenPessoaAdmin)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	status := res.StatusCode
+	status = res.StatusCode
 	if status != 200 {
 		t.Error(res, string(body))
 	}

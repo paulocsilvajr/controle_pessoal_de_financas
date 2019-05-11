@@ -218,6 +218,8 @@ func DefineHeaderRetornoDado(
 
 	header(w)
 
+	w.WriteHeader(status)
+
 	err := retornoData(
 		w,
 		status,

@@ -115,3 +115,99 @@ func TestPessoaShowAdmin(t *testing.T) {
 		t.Error(res, string(body))
 	}
 }
+
+func TestPessoaCreate(t *testing.T) {
+	// criar pessoa como administrador - 201
+	admin := "teste01"
+	tokenPessoaAdmin, _ := getToken(admin, "123456")
+	rota := fmt.Sprintf("/pessoas")
+	res, body, err := post(rota, `{"cpf":"00000002000",  "nome_completo":"Teste 20", "usuario":"teste20", "senha":"20123456", "email":"teste20@email.com"}`, tokenPessoaAdmin)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	status := res.StatusCode
+	if status != 201 {
+		t.Error(res, string(body))
+	}
+
+	// chave duplicada na inclusão de pessoa como admin - 500
+	res, body, _ = post(rota, `{"cpf":"00000002000",  "nome_completo":"Teste 20", "usuario":"teste20", "senha":"20123456", "email":"teste20@email.com"}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// criar pessoa2 como administrador - 201
+	rota = fmt.Sprintf("/pessoas")
+	res, body, _ = post(rota, `{"cpf":"00000003000",  "nome_completo":"Teste 30", "usuario":"teste30", "senha":"30123456", "email":"teste30@email.com"}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 201 {
+		t.Error(res, string(body))
+	}
+
+	// criar pessoa3 como administrador - 201
+	rota = fmt.Sprintf("/pessoas")
+	res, body, _ = post(rota, `{"cpf":"00000004000",  "nome_completo":"Teste 40", "usuario":"teste40", "senha":"40123456", "email":"teste40@email.com"}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 201 {
+		t.Error(res, string(body))
+	}
+
+	// criar pessoa como usuário comum - 500
+	admin = "paulo"
+	tokenPessoaAdmin, _ = getToken(admin, "123456")
+	rota = fmt.Sprintf("/pessoas")
+	res, body, _ = post(rota, `{"cpf":"00000005000",  "nome_completo":"Teste 50", "usuario":"teste50", "senha":"50123456", "email":"teste50@email.com"}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// erro ao criar pessoa com json inválido - 422
+	admin = "teste01"
+	tokenPessoaAdmin, _ = getToken(admin, "123456")
+	rota = fmt.Sprintf("/pessoas")
+	res, body, _ = post(rota, "", tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 422 {
+		t.Error(res, string(body))
+	}
+}
+
+func TestPessoaRemove(t *testing.T) {
+	// remove pessoa1 como administrador - 200
+	admin := "teste01"
+	tokenPessoaAdmin, _ := getToken(admin, "123456")
+	usuario := "teste20"
+	rota := fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, err := delete(rota, tokenPessoaAdmin)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	status := res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// remove pessoa2 como administrador - 200
+	usuario = "teste30"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ = delete(rota, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// remove pessoa3 como administrador - 200
+	usuario = "teste40"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ = delete(rota, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+}

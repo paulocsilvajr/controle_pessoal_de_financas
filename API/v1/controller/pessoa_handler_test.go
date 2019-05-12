@@ -215,7 +215,7 @@ func TestPessoaAlter(t *testing.T) {
 		t.Error(res, string(body))
 	}
 
-	// pessoa não pôde ser alterada por não existir no BD(teste99) - 304
+	// pessoa(teste99) não pôde ser alterada por não existir no BD - 304
 	admin = "teste01"
 	tokenPessoaAdmin, _ = getToken(admin, "123456")
 	usuario = "teste99"
@@ -223,6 +223,109 @@ func TestPessoaAlter(t *testing.T) {
 	res, body, _ = put(rota, `{"cpf":"00000002020",  "nome_completo":"Teste 20", "usuario":"teste20", "senha":"2020123456", "email":"teste2020@email.com"}`, tokenPessoaAdmin)
 	status = res.StatusCode
 	if status != 304 {
+		t.Error(res, string(body))
+	}
+
+	// Dados em JSON não podem ser processados - 422
+	admin = "teste01"
+	tokenPessoaAdmin, _ = getToken(admin, "123456")
+	usuario = "teste20"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ = put(rota, "", tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 422 {
+		t.Error(res, string(body))
+	}
+}
+
+func TestPessoaEstado(t *testing.T) {
+	// Ativa pessoa(teste20) com usuário administrador(teste01) - 200
+	admin := "teste01"
+	tokenPessoaAdmin, _ := getToken(admin, "123456")
+	usuario := "teste20"
+	rota := fmt.Sprintf("/pessoas/%s/estado", usuario)
+	res, body, err := put(rota, `{"estado": true}`, tokenPessoaAdmin)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	status := res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// Inativa pessoa(teste20) com usuário administrador(teste01) - 200
+	usuario = "teste20"
+	rota = fmt.Sprintf("/pessoas/%s/estado", usuario)
+	res, body, _ = put(rota, `{"estado": false}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// Ativa pessoa(teste01) com usuário seu próprio usuário - 500
+	usuario = "teste01"
+	rota = fmt.Sprintf("/pessoas/%s/estado", usuario)
+	res, body, _ = put(rota, `{"estado": true}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// Erro ao ativa pessoa(teste99) que não exista no DB - 404
+	usuario = "teste99"
+	rota = fmt.Sprintf("/pessoas/%s/estado", usuario)
+	res, body, _ = put(rota, `{"estado": true}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 404 {
+		t.Error(res, string(body))
+	}
+}
+
+func TestPessoaAdmin(t *testing.T) {
+	// Define como administrador a pessoa(teste20) com usuário administrador(teste01) - 200
+	admin := "teste01"
+	tokenPessoaAdmin, _ := getToken(admin, "123456")
+	usuario := "teste20"
+	rota := fmt.Sprintf("/pessoas/%s/admin", usuario)
+	res, body, err := put(rota, `{"adminstrador": true}`, tokenPessoaAdmin)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	status := res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// Retira privilégio de administrador para a pessoa(teste20) com usuário administrador(teste01) - 200
+	usuario = "teste20"
+	rota = fmt.Sprintf("/pessoas/%s/admin", usuario)
+	res, body, err = put(rota, `{"adminstrador": false}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// Retira privilégio de administrador para a pessoa(teste01) com o próprio usuário - 500
+	usuario = "teste01"
+	rota = fmt.Sprintf("/pessoas/%s/admin", usuario)
+	res, body, err = put(rota, `{"adminstrador": false}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// Define como administrador a pessoa(teste01) com usuário comum(teste20) - 500
+	comum := "paulo"
+	tokenPessoaComum, _ := getToken(comum, "123456")
+	usuario = "teste40"
+	rota = fmt.Sprintf("/pessoas/%s/admin", usuario)
+	res, body, _ = put(rota, `{"adminstrador": true}`, tokenPessoaComum)
+	status = res.StatusCode
+	if status != 500 {
 		t.Error(res, string(body))
 	}
 }

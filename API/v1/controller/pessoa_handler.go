@@ -376,7 +376,7 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando novos dados de pessoa '%s'", p.Usuario))
 }
 
-// PessoaEstado é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar o estado de usuários, mas não pode alterar o próprio estado. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado":"?"}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
+// PessoaEstado é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar o estado de usuários, mas não pode alterar o próprio estado. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
 func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 	type estado struct {
@@ -459,7 +459,7 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando novos dados de pessoa '%s'", p.Usuario))
 }
 
-// PessoaAdmin é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/admin' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem redefinir usuários como administrador, mas não pode alterar a sí mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"adminstrador":"?"}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
+// PessoaAdmin é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/admin' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem redefinir usuários como administrador, mas não pode alterar a sí mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"adminstrador": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
 func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 	type administrador struct {

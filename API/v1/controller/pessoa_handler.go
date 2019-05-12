@@ -354,9 +354,9 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, err := dao.AlteraPessoa(
+	p, err := dao.AlteraPessoaPorUsuario(
 		db,
-		pessoaFromJSON.Cpf,
+		usuarioAlteracao,
 		&pessoaFromJSON)
 	status = http.StatusNotModified // 304
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)

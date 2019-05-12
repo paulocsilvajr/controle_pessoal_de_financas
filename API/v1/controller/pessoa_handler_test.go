@@ -176,6 +176,57 @@ func TestPessoaCreate(t *testing.T) {
 	}
 }
 
+func TestPessoaAlter(t *testing.T) {
+	// alterar pessoa(teste20) com usuário administrador(teste01) - 200
+	admin := "teste01"
+	tokenPessoaAdmin, _ := getToken(admin, "123456")
+	usuario := "teste20"
+	rota := fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, err := put(rota, `{"cpf":"00000002000",  "nome_completo":"Teste 20", "usuario":"teste20", "senha":"123456", "email":"teste2020@email.com"}`, tokenPessoaAdmin)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	status := res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// alterar o dados do próprio usuário comum(teste20) - 200
+	comum := "teste20"
+	tokenPessoaAdmin, _ = getToken(comum, "123456")
+	usuario = "teste20"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ = put(rota, `{"cpf":"00000002000",  "nome_completo":"Teste 20 alterado por ele mesmo", "usuario":"teste20", "senha":"123456", "email":"teste20@email.com"}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// alterar pessoa como usuário comum(teste20) diferente dele mesmo(teste30) - 500
+	comum = "teste20"
+	tokenPessoaAdmin, _ = getToken(comum, "123456")
+	usuario = "teste30"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ = put(rota, `{"cpf":"00000009900",  "nome_completo":"Teste alteração", "usuario":"testeNaoExiste", "senha":"99123456", "email":"teste99@email.com"}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// pessoa não pôde ser alterada por não existir no BD(teste99) - 304
+	admin = "teste01"
+	tokenPessoaAdmin, _ = getToken(admin, "123456")
+	usuario = "teste99"
+	rota = fmt.Sprintf("/pessoas/%s", usuario)
+	res, body, _ = put(rota, `{"cpf":"00000002020",  "nome_completo":"Teste 20", "usuario":"teste20", "senha":"2020123456", "email":"teste2020@email.com"}`, tokenPessoaAdmin)
+	status = res.StatusCode
+	if status != 304 {
+		t.Error(res, string(body))
+	}
+}
+
 func TestPessoaRemove(t *testing.T) {
 	// remove pessoa1 como usuário comum - 500
 	admin := "paulo"

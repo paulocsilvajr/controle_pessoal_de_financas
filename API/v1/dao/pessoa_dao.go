@@ -131,8 +131,7 @@ WHERE {{.usuario}} = $1
 	return
 }
 
-// AlteraPessoa altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa.
-// Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
+// AlteraPessoa altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa. Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
 func AlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
 	pessoaBanco, err := ProcuraPessoa(db, cpf)
 	if err != nil {
@@ -153,6 +152,29 @@ WHERE {{.cpf}} = $6
 	query := getTemplateQuery("AlteraPessoa", pessoaDB, sql)
 
 	return alteraPessoa(db, pessoaBanco, query, cpf)
+}
+
+// AlteraPessoaPorUsuario altera uma pessoa com o usuário(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa. Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
+func AlteraPessoaPorUsuario(db *sql.DB, usuario string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := ProcuraPessoaPorUsuario(db, usuario)
+	if err != nil {
+		return
+	}
+
+	err = pessoaBanco.Altera(pessoaAlteracao.Cpf, pessoaAlteracao.NomeCompleto, pessoaAlteracao.Usuario, pessoaAlteracao.Senha, pessoaAlteracao.Email)
+	if err != nil {
+		return
+	}
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.nomeCompleto}} = $1, {{.usuario}} = $2, {{.senha}} = $3, {{.email}} = $4, {{.dataModificacao}} = $5
+WHERE {{.cpf}} = $6
+`
+
+	query := getTemplateQuery("AlteraPessoa", pessoaDB, sql)
+
+	return alteraPessoa(db, pessoaBanco, query, pessoaBanco.Cpf)
 }
 
 func AtivaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {

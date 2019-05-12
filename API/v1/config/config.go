@@ -74,12 +74,12 @@ var Rotas = rotas{
 	"PessoaEstado": rota{
 		"PUT",
 		"/pessoas/{usuario}/estado",
-		`Body: {"estado":"?"}`,
+		`Body: {"estado": ?}`,
 	},
 	"PessoaAdmin": rota{
 		"PUT",
 		"/pessoas/{usuario}/admin",
-		`Body: {"administrador":"?"}`,
+		`Body: {"administrador": ?}`,
 	},
 }
 

@@ -20,7 +20,7 @@ import (
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 
-	token, err := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, GetMySigningKey())
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -77,7 +77,7 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	usuarioRota := vars["usuario"]
 
-	token, err := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, GetMySigningKey())
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -121,7 +121,7 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 	usuarioAdmin := vars["usuarioAdmin"]
 	usuario := vars["usuario"]
 
-	token, err := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, GetMySigningKey())
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -176,7 +176,7 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 	var pessoaFromJSON pessoa.Pessoa
 	var novaPessoa *pessoa.Pessoa
 
-	token, err := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, GetMySigningKey())
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -257,7 +257,7 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	usuarioRemocao := vars["usuario"]
 
-	token, err := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, GetMySigningKey())
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -309,12 +309,12 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 // PessoaAlter é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar qualquer usuário. Um usuário comum somente pode alterar a si mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"} ou StatusNotModified(304) caso ocorra algum erro na alteração do BD
 func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
-	var pessoaFromJson pessoa.Pessoa
+	var pessoaFromJSON pessoa.Pessoa
 
 	vars := mux.Vars(r)
 	usuarioAlteracao := vars["usuario"]
 
-	token, err := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, GetMySigningKey())
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -347,7 +347,7 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	err = json.Unmarshal(body, &pessoaFromJson)
+	err = json.Unmarshal(body, &pessoaFromJSON)
 	status = http.StatusUnprocessableEntity // 422
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -356,8 +356,8 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 
 	p, err := dao.AlteraPessoa(
 		db,
-		pessoaFromJson.Cpf,
-		&pessoaFromJson)
+		pessoaFromJSON.Cpf,
+		&pessoaFromJSON)
 	status = http.StatusNotModified // 304
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -387,7 +387,7 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	usuarioAlteracao := vars["usuario"]
 
-	token, err := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, GetMySigningKey())
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -470,7 +470,7 @@ func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	usuarioAlteracao := vars["usuario"]
 
-	token, err := helper.GetToken(r, MySigningKey)
+	token, err := helper.GetToken(r, GetMySigningKey())
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return

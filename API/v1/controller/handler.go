@@ -20,14 +20,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// MySigningKey é a chave usada para assinar o token da API
 var (
-	MySigningKey = []byte(`Remember, remember, the 5th of November.
+	mySigningKey = []byte(`Remember, remember, the 5th of November.
 The gunpowder treason and plot;
 I know of no reason why the gunpowder treason
 Should ever be forgot.`)
 	db = dao.GetDB()
 )
+
+// GetMySigningKey é um método para retornar a chave usada para assinar o token da API
+func GetMySigningKey() []byte {
+	return mySigningKey
+}
 
 // LimitData define a quantidade máxima de bytes que o body de uma requisição suporta.
 // Padrão: 1048576 Bytes == 1 MegaByte
@@ -137,7 +141,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		usuarioEncontrado.Email,
 		usuarioEncontrado.Administrador)
 
-	tokenString, _ := token.SignedString(MySigningKey)
+	tokenString, _ := token.SignedString(GetMySigningKey())
 
 	SetHeaderJSON(w)
 	status = http.StatusOK

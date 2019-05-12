@@ -12,7 +12,7 @@ import (
 
 var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		return controller.MySigningKey, nil
+		return controller.GetMySigningKey(), nil
 	},
 	SigningMethod: jwt.SigningMethodHS256,
 })

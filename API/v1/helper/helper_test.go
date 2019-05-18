@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -20,5 +21,21 @@ func TestDataFormatada(t *testing.T) {
 
 	if DataFormatada(data) != dataString {
 		t.Error("Retorno de DataFormatada inválida")
+	}
+}
+
+func TestFormatarPorta(t *testing.T) {
+	porta := "8080"
+	portaFormatada := FormatarPorta(porta)
+
+	if portaFormatada != fmt.Sprintf(":%s", porta) {
+		t.Error("Retorno de função For")
+	}
+}
+
+func TestGetDiretorioAbs(t *testing.T) {
+	diretorio, err := GetDiretorioAbs()
+	if err != nil {
+		t.Error(err, diretorio)
 	}
 }

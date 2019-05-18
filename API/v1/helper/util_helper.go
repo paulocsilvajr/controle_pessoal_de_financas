@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	jwtreq "github.com/dgrijalva/jwt-go/request"
 )
 
+// GetSenhaSha256 retorna uma string hasheada(sha256) da senha informada no parâmetro senha
 func GetSenhaSha256(senha string) string {
 	senhaSha256 := sha256.Sum256([]byte(senha))
 
@@ -24,7 +26,8 @@ func GetSenhaSha256(senha string) string {
 	return string(dst[:len(dst)])
 }
 
-func GetToken(r *http.Request, secret_key []byte) (token *jwt.Token, err error) {
+// GetToken obtem o token da requisição http informada ao parâmetro r através da chave secreta contida no parâmetro secret_key. Se ocorrer um erro, retorna uma como token NIL e um erro
+func GetToken(r *http.Request, secretKey []byte) (token *jwt.Token, err error) {
 	tokenString, err := jwtreq.HeaderExtractor{"Authorization"}.ExtractToken(r)
 	if err != nil {
 		return
@@ -36,7 +39,7 @@ func GetToken(r *http.Request, secret_key []byte) (token *jwt.Token, err error) 
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return secret_key, nil
+		return secretKey, nil
 	})
 
 	return
@@ -55,6 +58,7 @@ func GetClaims(token *jwt.Token) (usuario string, email string, admin bool, err 
 
 }
 
+// SetClaims define os Clains ao token informado no primeiro parâmetro de acordo com os valores passados nos outros parâmetros(duracaoSegundos, usuario, email, admin)
 func SetClaims(token *jwt.Token, duracaoSegundos time.Duration, usuario, email string, admin bool) (claims jwt.MapClaims) {
 	claims = token.Claims.(jwt.MapClaims)
 	claims["usuario"] = usuario
@@ -65,6 +69,7 @@ func SetClaims(token *jwt.Token, duracaoSegundos time.Duration, usuario, email s
 	return
 }
 
+// CriarDiretorioSeNaoExistir cria o diretório informado no parâmetro nomeDiretorio se ele não existir
 func CriarDiretorioSeNaoExistir(nomeDiretorio string) (err error) {
 	if _, err = os.Stat(nomeDiretorio); os.IsNotExist(err) {
 		err = os.MkdirAll(nomeDiretorio, os.ModePerm)
@@ -75,6 +80,7 @@ func CriarDiretorioSeNaoExistir(nomeDiretorio string) (err error) {
 	return
 }
 
+// GetLocalIP retorna uma string contendo o endereço IP local do PC. Usado para exibir o endereço na inicialização da API. Fonte: https://stackoverflow.com/questions/23558425/how-do-i-get-the-local-ip-address-in-go
 func GetLocalIP() string {
 	// Fonte: https://stackoverflow.com/questions/23558425/how-do-i-get-the-local-ip-address-in-go
 	addrs, err := net.InterfaceAddrs()
@@ -90,4 +96,14 @@ func GetLocalIP() string {
 		}
 	}
 	return ""
+}
+
+// FormatarPorta recebe uma string representando a porta e deixa no formato :porta
+func FormatarPorta(porta string) string {
+	return fmt.Sprintf(":%s", porta)
+}
+
+// GetDiretorioAbs retorna uma string como diretório absoluto de executável. Se erro != nil, retorna um erro. Fonte: https://stackoverflow.com/questions/18537257/how-to-get-the-directory-of-the-currently-running-file
+func GetDiretorioAbs() (string, error) {
+	return filepath.Abs(filepath.Dir(os.Args[0]))
 }

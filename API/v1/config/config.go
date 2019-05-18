@@ -1,14 +1,18 @@
 package config
 
 import (
+	"controle_pessoal_de_financas/API/v1/helper"
+	"controle_pessoal_de_financas/API/v1/logger"
 	"encoding/json"
-	"log"
+	"fmt"
 	"os"
+	"time"
 )
 
 // https://play.golang.org/p/6dX5SMdVtr
 
-const arquivo = "config/config.json"
+const diretorioLog = "config"
+const arquivoLog = "config.json"
 
 type rota struct {
 	Tipo, Rota, Descricao string
@@ -20,6 +24,7 @@ func (r rotas) Len() int {
 	return len(r)
 }
 
+// Rotas é uma variável que guarda todas as rotas definidas da API. Usa o tipo interno rota{Tipo, Rota, Descricao} em cada elemento desse hashMap rotas map[string]rota
 var Rotas = rotas{
 	"API": rota{
 		"GET",
@@ -83,16 +88,22 @@ var Rotas = rotas{
 	},
 }
 
+// Configuracoes é a representação de um hashMap das configurações da API
 type Configuracoes map[string]string
 
+// AbrirConfiguracoes carrega as configurações no retorno da função do tipo Configuracoes. Se o arquivo não existir, cria o arquivo de configuração com os dados padrões definidos na função interna criarConfigPadrao
 func AbrirConfiguracoes() Configuracoes {
-	decodeFile, err := os.Open(arquivo)
+	decodeFile, err := os.Open(getArquivoLog())
 	if err != nil {
-		criarConfigPadrao()
-
-		decodeFile, err = os.Open(arquivo)
+		err = criarConfigPadrao()
 		if err != nil {
-			log.Println(err)
+			panic(fmt.Errorf("Erro(1) ao abrir arquivo de configurações[%s]", err))
+
+		}
+
+		decodeFile, err = os.Open(getArquivoLog())
+		if err != nil {
+			panic(fmt.Errorf("Erro(2) ao abrir arquivo de configurações[%s]", err))
 		}
 	}
 	defer decodeFile.Close()
@@ -106,22 +117,42 @@ func AbrirConfiguracoes() Configuracoes {
 	return configuracoes
 }
 
-func criarConfigPadrao() {
+func getArquivoLog() string {
+	dirBase, _ := helper.GetDiretorioAbs()
+	dirBaseLog := fmt.Sprintf("%s/%s", dirBase, diretorioLog)
+	os.MkdirAll(dirBaseLog, os.ModePerm) // cria o diretório config caso não exista
+
+	return fmt.Sprintf("%s/%s", dirBaseLog, arquivoLog)
+}
+
+func criarConfigPadrao() error {
+	arq := getArquivoLog()
+
 	configuracoes := make(Configuracoes)
 	configuracoes["porta"] = "8085"
 	configuracoes["host"] = "localhost"
 	configuracoes["duracao_token"] = "3600"
 	configuracoes["protocolo"] = "https"
+	configuracoes["DB"] = "postgres"
+	configuracoes["DBhost"] = "localhost"
+	configuracoes["DBporta"] = "15432"
+	configuracoes["DBnome"] = "controle_pessoal_financas"
+	configuracoes["DBusuario"] = "postgres"
+	configuracoes["DBsenha"] = "Postgres2019!"
 
-	encodeFile, err := os.Create(arquivo)
+	encodeFile, err := os.Create(arq)
+	defer encodeFile.Close()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	encoder := json.NewEncoder(encodeFile)
 
 	if err := encoder.Encode(configuracoes); err != nil {
-		log.Println(err)
+		return err
 	}
-	encodeFile.Close()
+
+	logger.GeraLogFS(fmt.Sprintf("Criado arquivo de log '%s'", arq), time.Now())
+
+	return nil
 }

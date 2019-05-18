@@ -20,6 +20,7 @@ var (
 		"administrador":   "administrador"}
 )
 
+// CarregaPessoas retorna uma listagem de pessoas(pessoa.Pessoas) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaPessoas(db *sql.DB) (pessoas pessoa.Pessoas, err error) {
 	sql := `
 SELECT
@@ -35,30 +36,17 @@ FROM
 	return carregaPessoas(db, query)
 }
 
+// AdicionaPessoa adiciona uma pessoa comum ao BD e retorna a pessoa incluída(*Pessoa) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma pessoa(*Pessoa)
 func AdicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
 	return adicionaPessoaBase(db, novaPessoa, pessoa.NewPessoa)
 }
 
+// AdicionaPessoaAdmin adiciona uma pessoa administradora ao BD e retorna a pessoa incluída(*Pessoa) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma pessoa(*Pessoa)
 func AdicionaPessoaAdmin(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
 	return adicionaPessoaBase(db, novaPessoa, pessoa.NewPessoaAdmin)
 }
 
-func adicionaPessoaBase(db *sql.DB, novaPessoa *pessoa.Pessoa, newPessoa func(string, string, string, string, string) (*pessoa.Pessoa, error)) (p *pessoa.Pessoa, err error) {
-	p, err = newPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
-	if err != nil {
-		return
-	}
-
-	sql := `
-INSERT INTO {{.tabela}}(
-	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}})
-VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-`
-	query := getTemplateQuery("AdicionaPessoa", pessoaDB, sql)
-
-	return adicionaPessoa(db, p, query)
-}
-
+// RemovePessoa remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma string contendo o CPF da pessoa desejada
 func RemovePessoa(db *sql.DB, cpf string) (err error) {
 	sql := `
 DELETE FROM
@@ -75,6 +63,7 @@ WHERE {{.cpf}} = $1
 	return
 }
 
+// RemovePessoaPorUsuario remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma string contendo o USUÁRIO da pessoa desejada
 func RemovePessoaPorUsuario(db *sql.DB, usuario string) (err error) {
 	sql := `
 DELETE FROM
@@ -91,6 +80,7 @@ WHERE {{.usuario}} = $1
 	return
 }
 
+// ProcuraPessoa localiza uma pessoa no BD e retorna a pessoa procurada(*Pessoa). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um CPF da pessoa desejada
 func ProcuraPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
 	sql := `
 SELECT
@@ -111,6 +101,7 @@ WHERE {{.cpf}} = $1
 	return
 }
 
+// ProcuraPessoaPorUsuario localiza uma pessoa no BD e retorna a pessoa procurada(*Pessoa). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma string contendo o USUÁRIO da pessoa desejada
 func ProcuraPessoaPorUsuario(db *sql.DB, usuario string) (p *pessoa.Pessoa, err error) {
 	sql := `
 SELECT
@@ -177,6 +168,7 @@ WHERE {{.cpf}} = $6
 	return alteraPessoa(db, pessoaBanco, query, pessoaBanco.Cpf)
 }
 
+// AtivaPessoa ativa uma pessoa no BD e retorna a pessoa(*Pessoa) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um CPF da pessoa desejada
 func AtivaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
 	pessoaBanco, err := ProcuraPessoa(db, cpf)
 	if err != nil {
@@ -196,6 +188,7 @@ WHERE {{.cpf}} = $3
 	return estadoPessoa(db, pessoaBanco, query, cpf)
 }
 
+// InativaPessoa inativa uma pessoa no BD e retorna a pessoa(*Pessoa) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um CPF da pessoa desejada
 func InativaPessoa(db *sql.DB, cpf string) (p *pessoa.Pessoa, err error) {
 	pessoaBanco, err := ProcuraPessoa(db, cpf)
 	if err != nil {
@@ -215,6 +208,7 @@ WHERE {{.cpf}} = $3
 	return estadoPessoa(db, pessoaBanco, query, cpf)
 }
 
+// SetAdministrador define com administrador de acordo com parâmetro boleado admin informado e retorna a pessoa com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório, um CPF da pessoa desejada e o valor boleano no parâmetro admin
 func SetAdministrador(db *sql.DB, cpf string, admin bool) (p *pessoa.Pessoa, err error) {
 	pessoaBanco, err := ProcuraPessoa(db, cpf)
 	if err != nil {
@@ -232,6 +226,22 @@ WHERE {{.cpf}} = $3
 	query := getTemplateQuery("SetAdministrador", pessoaDB, sql)
 
 	return setAdminPessoa(db, pessoaBanco, query, cpf)
+}
+
+func adicionaPessoaBase(db *sql.DB, novaPessoa *pessoa.Pessoa, newPessoa func(string, string, string, string, string) (*pessoa.Pessoa, error)) (p *pessoa.Pessoa, err error) {
+	p, err = newPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
+	if err != nil {
+		return
+	}
+
+	sql := `
+INSERT INTO {{.tabela}}(
+	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}})
+VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+`
+	query := getTemplateQuery("AdicionaPessoa", pessoaDB, sql)
+
+	return adicionaPessoa(db, p, query)
 }
 
 func setAdminPessoa(db *sql.DB, pessoaBanco *pessoa.Pessoa, query, chave string) (p *pessoa.Pessoa, err error) {

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 )
 
+// CarregaPessoasSimples retorna uma listagem de pessoas(pessoa.PessoasSimples) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaPessoasSimples(db *sql.DB) (pessoas pessoa.PessoasSimples, err error) {
 	sql := `
 SELECT

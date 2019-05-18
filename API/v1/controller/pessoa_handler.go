@@ -32,7 +32,7 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var listaPessoas pessoa.PessoasI
+	var listaPessoas pessoa.IPessoas
 	if admin {
 		listaPessoas, err = dao.CarregaPessoas(db)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)

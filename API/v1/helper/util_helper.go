@@ -110,13 +110,13 @@ func GetDiretorioAbs() (string, error) {
 }
 
 // CriarDiretorioAbs cria o diretório informado em parâmetro string dirLOG
-func CriarDiretorioAbs(dirLOG string) (err error) {
+func CriarDiretorioAbs(dirLOG string) (diretorio string) {
 	dirBase, _ := GetDiretorioAbs()
 	dirBaseLog := path.Join(dirBase, dirLOG)
-	err = CriarDiretorioSeNaoExistir(dirBaseLog)
+	err := CriarDiretorioSeNaoExistir(dirBaseLog)
 	if err != nil {
-		return err
+		return ""
 	}
 
-	return
+	return dirBaseLog
 }

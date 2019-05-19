@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// Route é uma estrutura que representa cada rota do sistema. É composto por Name(nome), Method(método-POST, GET,...), Pattern(Padrão da rota, ex: /login/{usuario}), HandlerFunc(handler de pacote controller para a rota, com as regras e retornos específicos), Auth(Verdadeiro se na rota será obrigatório a passagem de TOKEN em anexo para acessá-la)
 type Route struct {
 	Name        string
 	Method      string
@@ -14,8 +15,10 @@ type Route struct {
 	Auth        bool
 }
 
+// Routes é um tipo que especifica o conjunto/lista de rotas no sistema(slice de Rotas)
 type Routes []Route
 
+// MyRoutes é uma variável que representa todas as rotas da API. Deve ser incluídas novas rotas caso necessário. Para informar o Method e o Pattern, deve ser alimentado primeiramente a variável Rotas em pacote config
 var MyRoutes = Routes{
 	Route{
 		"API",

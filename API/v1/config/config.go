@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"time"
 )
 
@@ -119,8 +120,8 @@ func AbrirConfiguracoes() Configuracoes {
 
 func getArquivoLog() string {
 	dirBase, _ := helper.GetDiretorioAbs()
-	dirBaseLog := fmt.Sprintf("%s/%s", dirBase, diretorioLog)
-	os.MkdirAll(dirBaseLog, os.ModePerm) // cria o diretório config caso não exista
+	dirBaseLog := path.Join(dirBase, diretorioLog)
+	helper.CriarDiretorioAbs(diretorioLog)
 
 	return fmt.Sprintf("%s/%s", dirBaseLog, arquivoLog)
 }
@@ -152,7 +153,7 @@ func criarConfigPadrao() error {
 		return err
 	}
 
-	logger.GeraLogFS(fmt.Sprintf("Criado arquivo de log '%s'", arq), time.Now())
+	logger.GeraLogFS(fmt.Sprintf("Criado arquivo de config '%s'", arq), time.Now())
 
 	return nil
 }

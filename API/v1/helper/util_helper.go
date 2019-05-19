@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -106,4 +107,16 @@ func FormatarPorta(porta string) string {
 // GetDiretorioAbs retorna uma string como diretório absoluto de executável. Se erro != nil, retorna um erro. Fonte: https://stackoverflow.com/questions/18537257/how-to-get-the-directory-of-the-currently-running-file
 func GetDiretorioAbs() (string, error) {
 	return filepath.Abs(filepath.Dir(os.Args[0]))
+}
+
+// CriarDiretorioAbs cria o diretório informado em parâmetro string dirLOG
+func CriarDiretorioAbs(dirLOG string) (err error) {
+	dirBase, _ := GetDiretorioAbs()
+	dirBaseLog := path.Join(dirBase, dirLOG)
+	err = CriarDiretorioSeNaoExistir(dirBaseLog)
+	if err != nil {
+		return err
+	}
+
+	return
 }

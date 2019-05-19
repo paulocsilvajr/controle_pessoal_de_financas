@@ -24,7 +24,7 @@ func NewRouter() *mux.Router {
 		var handler http.Handler
 
 		handler = route.HandlerFunc
-		handler = logger.ServeHttpAndLog(handler, route.Name)
+		handler = logger.ServeHTTPAndLog(handler, route.Name)
 		if route.Auth {
 			handler = jwtMiddleware.Handler(handler)
 		}

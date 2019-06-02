@@ -39,3 +39,12 @@ func TestGetDiretorioAbs(t *testing.T) {
 		t.Error(err, diretorio)
 	}
 }
+
+func TestGetEstado(t *testing.T) {
+	verdadeiroEmString := GetEstado(true)
+	falsoEmString := GetEstado(false)
+
+	if verdadeiroEmString != "ativo" || falsoEmString != "inativo" {
+		t.Error("Retorno de função GetEstado está retornando um texto incorreto")
+	}
+}

@@ -120,3 +120,13 @@ func CriarDiretorioAbs(dirLOG string) (diretorio string) {
 
 	return dirBaseLog
 }
+
+// GetEstado retorna uma string representado o estado boleano informado em um texto amigável para usuários
+func GetEstado(estado bool) string {
+	estadoEmString := "ativo"
+	if !estado {
+		estadoEmString = "inativo"
+	}
+
+	return estadoEmString
+}

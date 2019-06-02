@@ -163,10 +163,7 @@ func (p *Pessoa) AlteraCampos(campos map[string]string) (err error) {
 
 // String é um método de pessoa que retorna uma string representando uma pessoa. A data é formatada usando a função helper.DataFormatada, os campos estado e administrador são formatados para uma forma mais amigável/legível
 func (p *Pessoa) String() string {
-	estado := "ativo"
-	if !p.Estado {
-		estado = "inativo"
-	}
+	estado := helper.GetEstado(p.Estado)
 
 	tipo := "Administrador"
 	if !p.Administrador {
@@ -185,7 +182,7 @@ func (p *Pessoa) Repr() string {
 }
 
 // VerificaAtributos é um método de pessoa que verifica os campos Cpf, NomeCompleto, Usuario, Senha e Email, retornando um erro != nil caso ocorra um problema
-func (p *Pessoa) VerificaAtributos() (err error) {
+func (p *Pessoa) VerificaAtributos() error {
 	return verifica(p.Cpf, p.NomeCompleto, p.Usuario, p.Senha, p.Email)
 }
 
@@ -219,19 +216,13 @@ func GetPessoaTest() (pessoa *Pessoa, err error) {
 }
 
 func newPessoaGeral(cpf, nome, usuario, senha, email string, admin bool) (pessoa *Pessoa, err error) {
-	pessoa = &Pessoa{
-		Cpf:             cpf,
-		NomeCompleto:    nome,
-		Usuario:         usuario,
-		Senha:           helper.GetSenhaSha256(senha),
-		Email:           email,
-		DataCriacao:     time.Now().Local(),
-		DataModificacao: time.Now().Local(),
-		Estado:          true,
-		Administrador:   admin}
+	pessoa = New(cpf, nome, usuario, senha, email)
+	pessoa.Administrador = admin
 
 	if err = pessoa.VerificaAtributos(); err != nil {
 		pessoa = nil
+	} else {
+		pessoa.Senha = helper.GetSenhaSha256(senha)
 	}
 
 	return
@@ -259,7 +250,8 @@ func verifica(cpf, nome, usuario, senha, email string) (err error) {
 }
 
 func verificaCPF(cpf string) (err error) {
-	padrao, _ := regexp.Compile("[0-9]{11}")
+	basePadrao := fmt.Sprintf("[0-9]{%d}", LenCpf)
+	padrao, _ := regexp.Compile(basePadrao)
 
 	if len(cpf) != LenCpf {
 		err = erro.ErroTamanho(MsgErroCpf01, len(cpf))

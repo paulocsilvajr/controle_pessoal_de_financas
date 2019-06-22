@@ -2,6 +2,10 @@ package dao
 
 import "testing"
 
+var (
+	db = GetDB()
+)
+
 func TestGetDB(t *testing.T) {
 	db := GetDB()
 	err := db.Ping()

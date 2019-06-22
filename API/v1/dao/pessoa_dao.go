@@ -287,7 +287,7 @@ func setValores04(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql
 }
 
 func alteraPessoa(db *sql.DB, pessoaBanco *pessoa.Pessoa, query, chave string) (p *pessoa.Pessoa, err error) {
-	resultado, err := altera(db, pessoaBanco, query, setValores02, chave)
+	resultado, err := altera(db, pessoaBanco, query, setValoresPessoa02, chave)
 	pessoaTemp, ok := resultado.(*pessoa.Pessoa)
 	if ok {
 		p = pessoaTemp
@@ -295,7 +295,7 @@ func alteraPessoa(db *sql.DB, pessoaBanco *pessoa.Pessoa, query, chave string) (
 	return
 }
 
-func setValores02(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
+func setValoresPessoa02(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
 
 	novaPessoa, ok := novoRegistro.(*pessoa.Pessoa)
 
@@ -312,7 +312,7 @@ func setValores02(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql
 }
 
 func adicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa, query string) (p *pessoa.Pessoa, err error) {
-	resultado, err := adiciona(db, novaPessoa, query, setValores01)
+	resultado, err := adiciona(db, novaPessoa, query, setValoresPessoa01)
 	pessoaTemp, ok := resultado.(*pessoa.Pessoa)
 	if ok {
 		p = pessoaTemp
@@ -320,7 +320,7 @@ func adicionaPessoa(db *sql.DB, novaPessoa *pessoa.Pessoa, query string) (p *pes
 	return
 }
 
-func setValores01(stmt *sql.Stmt, novoRegistro interface{}) (r sql.Result, err error) {
+func setValoresPessoa01(stmt *sql.Stmt, novoRegistro interface{}) (r sql.Result, err error) {
 
 	novaPessoa, ok := novoRegistro.(*pessoa.Pessoa)
 

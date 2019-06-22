@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	db      = GetDB()
 	cpf     = "38674832680" // cpf inválido somente para teste(com Dígito Verificador[DV] incorreto)
 	usuario = "teste_inclusao"
 )

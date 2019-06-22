@@ -147,7 +147,7 @@ func (t *TipoConta) Ativa() {
 	t.alteraEstado(true)
 }
 
-// Inativa é um método que define o TipoConta como ativo e atualiza a sua data de modificação
+// Inativa é um método que define o TipoConta como inativo e atualiza a sua data de modificação
 func (t *TipoConta) Inativa() {
 	t.alteraEstado(false)
 }

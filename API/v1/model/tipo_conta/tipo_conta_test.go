@@ -269,19 +269,6 @@ func TestAtiva(t *testing.T) {
 	}
 }
 
-// func TestGet(t *testing.T) {
-// 	t1 := GetTipoContaTest()
-// 	t2 := GetTipoContaTest()
-
-// 	tiposConta = TiposConta{t1, t2}
-
-// 	tiposContaRetornado := tiposConta.Get()
-// 	tipo := reflect.TypeOf(tiposContaRetornado)
-// 	if tipo.String() != "tipo_conta.TiposConta" {
-// 		t.Error("Tipo inválido", tipo.String())
-// 	}
-// }
-
 func TestProcutaTipoConta(t *testing.T) {
 	t1 := GetTipoContaTest()
 	t2 := GetTipoContaTest()

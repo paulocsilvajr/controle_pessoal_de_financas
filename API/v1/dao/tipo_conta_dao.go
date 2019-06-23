@@ -3,6 +3,7 @@ package dao
 import (
 	"controle_pessoal_de_financas/API/v1/model/tipo_conta"
 	"database/sql"
+	"errors"
 )
 
 var (
@@ -19,7 +20,7 @@ var (
 func CarregaTiposConta(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `
 SELECT
-	{{.nome}}, {{.descricaoDebito}}, {{.descricaoCredito}}, {{.dataCriacao}}, {{.dataModificacao}}
+	{{.nome}}, {{.descricaoDebito}}, {{.descricaoCredito}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
 FROM
 	{{.tabela}}
 WHERE
@@ -27,13 +28,13 @@ WHERE
 `
 	query := getTemplateQuery("CarregaTipoConta", tipoContaDB, sql)
 
-	return carregaTipoConta(db, query)
+	return carregaTiposConta(db, query)
 }
 
 func CarregaTiposContaInativa(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `
 SELECT
-	{{.nome}}, {{.descricaoDebito}}, {{.descricaoCredito}}, {{.dataCriacao}}, {{.dataModificacao}}
+	{{.nome}}, {{.descricaoDebito}}, {{.descricaoCredito}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
 FROM
 	{{.tabela}}
 WHERE
@@ -41,7 +42,7 @@ WHERE
 `
 	query := getTemplateQuery("CarregaTipoContaInativa", tipoContaDB, sql)
 
-	return carregaTipoConta(db, query)
+	return carregaTiposConta(db, query)
 }
 
 func AdicionaTipoConta(db *sql.DB, novoTipoConta *tipo_conta.TipoConta) (tc *tipo_conta.TipoConta, err error) {
@@ -58,6 +59,85 @@ VALUES($1, $2, $3, $4, $5, $6)
 	query := getTemplateQuery("AdicionaTipoConta", tipoContaDB, sql)
 
 	return adicionaTipoConta(db, tc, query)
+}
+
+func ProcuraTipoConta(db *sql.DB, nome string) (tc *tipo_conta.TipoConta, err error) {
+	sql := `
+SELECT
+	{{.nome}}, {{.descricaoDebito}}, {{.descricaoCredito}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+FROM
+	{{.tabela}}
+WHERE {{.nome}} = $1
+`
+	query := getTemplateQuery("ProcuraPessoa", tipoContaDB, sql)
+
+	tiposConta, err := carregaTiposConta(db, query, nome)
+	if len(tiposConta) == 1 {
+		tc = tiposConta[0]
+	} else {
+		err = errors.New("Não foi encontrado um registro com o nome " + nome)
+	}
+
+	return
+}
+
+func AtivaTipoConta(db *sql.DB, nome string) (tc *tipo_conta.TipoConta, err error) {
+	tipoContaBanco, err := ProcuraTipoConta(db, nome)
+	if err != nil {
+		return
+	}
+
+	tipoContaBanco.Ativa()
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.estado}} = $1, {{.dataModificacao}} = $2
+WHERE {{.nome}} = $3
+`
+
+	query := getTemplateQuery("AtivaTipoConta", tipoContaDB, sql)
+
+	return estadoTipoConta(db, tipoContaBanco, query, nome)
+}
+
+func InativaTipoConta(db *sql.DB, nome string) (tc *tipo_conta.TipoConta, err error) {
+	tipoContaBanco, err := ProcuraTipoConta(db, nome)
+	if err != nil {
+		return
+	}
+
+	tipoContaBanco.Inativa()
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.estado}} = $1, {{.dataModificacao}} = $2
+WHERE {{.nome}} = $3
+`
+
+	query := getTemplateQuery("InativaTipoConta", tipoContaDB, sql)
+
+	return estadoTipoConta(db, tipoContaBanco, query, nome)
+}
+
+func estadoTipoConta(db *sql.DB, tipoContaBanco *tipo_conta.TipoConta, query, chave string) (tc *tipo_conta.TipoConta, err error) {
+	resultado, err := altera(db, tipoContaBanco, query, setValoresTipoConta02, chave)
+	tipoContaTemp, ok := resultado.(*tipo_conta.TipoConta)
+	if ok {
+		tc = tipoContaTemp
+	}
+	return
+}
+
+func setValoresTipoConta02(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
+	novoTipoConta, ok := novoRegistro.(*tipo_conta.TipoConta)
+
+	if ok {
+		r, err = stmt.Exec(
+			novoTipoConta.Estado,
+			novoTipoConta.DataModificacao,
+			chave)
+	}
+	return
 }
 
 func adicionaTipoConta(db *sql.DB, novoTipoConta *tipo_conta.TipoConta, query string) (tc *tipo_conta.TipoConta, err error) {
@@ -85,7 +165,7 @@ func setValoresTipoConta01(stmt *sql.Stmt, novoRegistro interface{}) (r sql.Resu
 	return
 }
 
-func carregaTipoConta(db *sql.DB, query string, args ...interface{}) (tiposConta tipo_conta.TiposConta, err error) {
+func carregaTiposConta(db *sql.DB, query string, args ...interface{}) (tiposConta tipo_conta.TiposConta, err error) {
 	registros, err := carrega(db, query, registrosTipoConta01, args...)
 
 	tiposConta = converteEmTiposConta(registros)
@@ -110,7 +190,8 @@ func scanTipoConta01(rows *sql.Rows, tipoContaAtual *tipo_conta.TipoConta) error
 		&tipoContaAtual.DescricaoDebito,
 		&tipoContaAtual.DescricaoCredito,
 		&tipoContaAtual.DataCriacao,
-		&tipoContaAtual.DataModificacao)
+		&tipoContaAtual.DataModificacao,
+		&tipoContaAtual.Estado)
 }
 
 func converteEmTiposConta(registros []interface{}) (tiposConta tipo_conta.TiposConta) {

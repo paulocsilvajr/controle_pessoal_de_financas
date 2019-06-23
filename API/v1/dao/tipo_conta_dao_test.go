@@ -14,6 +14,8 @@ func TestAdicionaTipoConta(t *testing.T) {
 	tc5 := tipo_conta.GetTipoContaTest()
 	tc5.Nome = "banco teste 03"
 
+	tc7 := tipo_conta.New("EVA01", "", "")
+
 	tc3, err := AdicionaTipoConta(db, tc1)
 	strErroChavePrimariaDuplicada := "pq: duplicate key value violates unique constraint \"tipo_conta_pk\""
 	if err != nil && err.Error() != strErroChavePrimariaDuplicada {
@@ -29,6 +31,79 @@ func TestAdicionaTipoConta(t *testing.T) {
 	if err != nil && err.Error() != strErroChavePrimariaDuplicada {
 		t.Error(err, tc6)
 	}
+
+	tc8, err := AdicionaTipoConta(db, tc7)
+	if err.Error() != "Descrição do débito com tamanho inválido[0]" {
+		t.Error(err, tc8)
+	}
+}
+
+func TestInativaTipoConta(t *testing.T) {
+	nome01 := "banco teste 01"
+	nome02 := "banco teste 02"
+	nome03 := "banco teste 03"
+	nome04 := "banco teste 04"
+
+	tc01, err := InativaTipoConta(db, nome01)
+	if err != nil {
+		t.Error(err, tc01)
+	}
+
+	tc02, err := InativaTipoConta(db, nome02)
+	if err != nil {
+		t.Error(err, tc02)
+	}
+
+	tc03, err := InativaTipoConta(db, nome03)
+	if err != nil {
+		t.Error(err, tc03)
+	}
+
+	tc04, err := InativaTipoConta(db, nome04)
+	if err.Error() != "Não foi encontrado um registro com o nome banco teste 04" {
+		t.Error(err, tc04)
+	}
+
+	if tc01.Estado != false {
+		t.Error("Estado de tipo conta inválido, deveria ser false", tc01)
+	}
+
+	if tc02.Estado != false {
+		t.Error("Estado de tipo conta inválido, deveria ser false", tc02)
+	}
+
+	if tc03.Estado != false {
+		t.Error("Estado de tipo conta inválido, deveria ser false", tc03)
+	}
+}
+
+func TestAtivaTipoConta(t *testing.T) {
+	nome01 := "banco teste 01"
+	nome02 := "banco teste 02"
+	nome04 := "banco teste 04"
+
+	tc01, err := AtivaTipoConta(db, nome01)
+	if err != nil {
+		t.Error(err, tc01)
+	}
+
+	tc02, err := AtivaTipoConta(db, nome02)
+	if err != nil {
+		t.Error(err, tc02)
+	}
+
+	tc04, err := AtivaTipoConta(db, nome04)
+	if err.Error() != "Não foi encontrado um registro com o nome banco teste 04" {
+		t.Error(err, tc04)
+	}
+
+	if tc01.Estado != true {
+		t.Error("Estado de tipo conta inválido, deveria ser true", tc01)
+	}
+
+	if tc02.Estado != true {
+		t.Error("Estado de tipo conta inválido, deveria ser true", tc02)
+	}
 }
 
 func TestCarregaTiposConta(t *testing.T) {
@@ -42,24 +117,50 @@ func TestCarregaTiposConta(t *testing.T) {
 		t.Error(listaTiposConta)
 	}
 
-	if len(listaTiposConta) < 2 {
+	if len(listaTiposConta) < 3 {
 		t.Error(listaTiposConta)
 	}
 }
 
 func TestCarregaTiposContaInativa(t *testing.T) {
-	// listaTiposConta, err := CarregaTiposContaInativa(db)
+	listaTiposConta, err := CarregaTiposContaInativa(db)
 
-	///////////// DESCOMENTAR QUANDO IMPLEMENTAR dao.InativaTipoConta ///////////////////////
-	// if err != nil {
-	// 	t.Error(err, listaTiposConta)
-	// }
+	if err != nil {
+		t.Error(err, listaTiposConta)
+	}
 
-	// if len(listaTiposConta) == 0 {
-	// 	t.Error(listaTiposConta)
-	// }
+	if len(listaTiposConta) == 0 {
+		t.Error(listaTiposConta)
+	}
 
-	// if len(listaTiposConta) < 1 {
-	// 	t.Error(listaTiposConta)
-	// }
+	if len(listaTiposConta) < 1 {
+		t.Error(listaTiposConta)
+	}
+}
+
+func TestProcuraTipoConta(t *testing.T) {
+	nome01 := "banco teste 01"
+	nome02 := "banco teste 02"
+	nome03 := "banco teste 03"
+	nome04 := "banco teste 04"
+
+	tc01, err := ProcuraTipoConta(db, nome01)
+	if err != nil {
+		t.Error(err, tc01)
+	}
+
+	tc02, err := ProcuraTipoConta(db, nome02)
+	if err != nil {
+		t.Error(err, tc02)
+	}
+
+	tc03, err := ProcuraTipoConta(db, nome03)
+	if err != nil {
+		t.Error(err, tc03)
+	}
+
+	tc04, err := ProcuraTipoConta(db, nome04)
+	if err.Error() != "Não foi encontrado um registro com o nome banco teste 04" {
+		t.Error(err, tc04)
+	}
 }

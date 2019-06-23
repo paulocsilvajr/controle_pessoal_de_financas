@@ -164,3 +164,67 @@ func TestProcuraTipoConta(t *testing.T) {
 		t.Error(err, tc04)
 	}
 }
+
+func TestAlteraTipoConta(t *testing.T) {
+	tc01 := tipo_conta.GetTipoContaTest()
+	nome := tc01.Nome
+	tc01.Nome = "Teste alteração 01"
+	tc01.DescricaoDebito = "Débito"
+	tc01.DescricaoCredito = "Crédito"
+
+	tc02, err := AlteraTipoConta(db, nome, tc01)
+	if err != nil {
+		t.Error(err, tc02)
+	}
+
+	if tc02.Nome != tc01.Nome || tc02.DescricaoDebito != tc01.DescricaoDebito || tc02.DescricaoCredito != tc01.DescricaoCredito {
+		t.Error("Erro na alteração de tipo conta(Nome ou DescricaoDebito ou DescricaoCredito)", tc02)
+	}
+
+	nomeAlterado := tc02.Nome
+	tc02.Nome = nome
+	tc02, err = AlteraTipoConta(db, nomeAlterado, tc02)
+	if err != nil {
+		t.Error(err, tc02)
+	}
+
+	nome = "banco teste 04"
+	_, err = AlteraTipoConta(db, nome, tc01)
+	if err.Error() != "Não foi encontrado um registro com o nome banco teste 04" {
+		t.Error(err)
+	}
+
+	tc03 := tipo_conta.GetTipoContaTest()
+	tc03.DescricaoDebito = ""
+	_, err = AlteraTipoConta(db, tc02.Nome, tc03)
+	if err.Error() != "Descrição do débito com tamanho inválido[0]" {
+		t.Error(err)
+	}
+}
+
+func TestRemoveTipoConta(t *testing.T) {
+	nome01 := "banco teste 01"
+	nome02 := "banco teste 02"
+	nome03 := "banco teste 03"
+	nome04 := "banco teste 04"
+
+	err := RemoveTipoConta(db, nome01)
+	if err != nil {
+		t.Error(err, nome01)
+	}
+
+	err = RemoveTipoConta(db, nome02)
+	if err != nil {
+		t.Error(err, nome02)
+	}
+
+	err = RemoveTipoConta(db, nome03)
+	if err != nil {
+		t.Error(err, nome03)
+	}
+
+	err = RemoveTipoConta(db, nome04)
+	if err.Error() != "Não foi encontrado um registro com o nome banco teste 04" {
+		t.Error(err, nome04)
+	}
+}

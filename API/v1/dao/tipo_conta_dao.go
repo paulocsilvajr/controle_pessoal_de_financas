@@ -119,8 +119,54 @@ WHERE {{.nome}} = $3
 	return estadoTipoConta(db, tipoContaBanco, query, nome)
 }
 
-func estadoTipoConta(db *sql.DB, tipoContaBanco *tipo_conta.TipoConta, query, chave string) (tc *tipo_conta.TipoConta, err error) {
-	resultado, err := altera(db, tipoContaBanco, query, setValoresTipoConta02, chave)
+func AlteraTipoConta(db *sql.DB, nome string, tipoContaAlteracao *tipo_conta.TipoConta) (tc *tipo_conta.TipoConta, err error) {
+	tipoContaBanco, err := ProcuraTipoConta(db, nome)
+	if err != nil {
+		return
+	}
+
+	err = tipoContaBanco.Altera(tipoContaAlteracao.Nome, tipoContaAlteracao.DescricaoDebito, tipoContaAlteracao.DescricaoCredito)
+	if err != nil {
+		return
+	}
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.nome}} = $1, {{.descricaoDebito}} = $2, {{.descricaoCredito}} = $3, {{.dataModificacao}} = $4
+WHERE {{.nome}} = $5
+`
+
+	query := getTemplateQuery("AlteraTipoConta", tipoContaDB, sql)
+
+	return alteraTipoConta(db, tipoContaBanco, query, nome)
+}
+
+func RemoveTipoConta(db *sql.DB, nome string) (err error) {
+	sql := `
+DELETE FROM
+	{{.tabela}}
+WHERE {{.nome}} = $1
+`
+	query := getTemplateQuery("RemoveTipoConta", tipoContaDB, sql)
+
+	tc, err := ProcuraTipoConta(db, nome)
+	if tc != nil {
+		err = remove(db, tc.Nome, query)
+	}
+
+	return
+}
+
+func carregaTiposConta(db *sql.DB, query string, args ...interface{}) (tiposConta tipo_conta.TiposConta, err error) {
+	registros, err := carrega(db, query, registrosTipoConta01, args...)
+
+	tiposConta = converteEmTiposConta(registros)
+
+	return
+}
+
+func adicionaTipoConta(db *sql.DB, novoTipoConta *tipo_conta.TipoConta, query string) (tc *tipo_conta.TipoConta, err error) {
+	resultado, err := adiciona(db, novoTipoConta, query, setValoresTipoConta01)
 	tipoContaTemp, ok := resultado.(*tipo_conta.TipoConta)
 	if ok {
 		tc = tipoContaTemp
@@ -128,20 +174,17 @@ func estadoTipoConta(db *sql.DB, tipoContaBanco *tipo_conta.TipoConta, query, ch
 	return
 }
 
-func setValoresTipoConta02(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
-	novoTipoConta, ok := novoRegistro.(*tipo_conta.TipoConta)
-
+func alteraTipoConta(db *sql.DB, tipoContaBanco *tipo_conta.TipoConta, query, chave string) (p *tipo_conta.TipoConta, err error) {
+	resultado, err := altera(db, tipoContaBanco, query, setValoresTipoConta03, chave)
+	tipoContaTemp, ok := resultado.(*tipo_conta.TipoConta)
 	if ok {
-		r, err = stmt.Exec(
-			novoTipoConta.Estado,
-			novoTipoConta.DataModificacao,
-			chave)
+		p = tipoContaTemp
 	}
 	return
 }
 
-func adicionaTipoConta(db *sql.DB, novoTipoConta *tipo_conta.TipoConta, query string) (tc *tipo_conta.TipoConta, err error) {
-	resultado, err := adiciona(db, novoTipoConta, query, setValoresTipoConta01)
+func estadoTipoConta(db *sql.DB, tipoContaBanco *tipo_conta.TipoConta, query, chave string) (tc *tipo_conta.TipoConta, err error) {
+	resultado, err := altera(db, tipoContaBanco, query, setValoresTipoConta02, chave)
 	tipoContaTemp, ok := resultado.(*tipo_conta.TipoConta)
 	if ok {
 		tc = tipoContaTemp
@@ -165,11 +208,30 @@ func setValoresTipoConta01(stmt *sql.Stmt, novoRegistro interface{}) (r sql.Resu
 	return
 }
 
-func carregaTiposConta(db *sql.DB, query string, args ...interface{}) (tiposConta tipo_conta.TiposConta, err error) {
-	registros, err := carrega(db, query, registrosTipoConta01, args...)
+func setValoresTipoConta02(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
+	novoTipoConta, ok := novoRegistro.(*tipo_conta.TipoConta)
 
-	tiposConta = converteEmTiposConta(registros)
+	if ok {
+		r, err = stmt.Exec(
+			novoTipoConta.Estado,
+			novoTipoConta.DataModificacao,
+			chave)
+	}
+	return
+}
 
+func setValoresTipoConta03(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
+
+	novoTipoConta, ok := novoRegistro.(*tipo_conta.TipoConta)
+
+	if ok {
+		r, err = stmt.Exec(
+			novoTipoConta.Nome,
+			novoTipoConta.DescricaoDebito,
+			novoTipoConta.DescricaoCredito,
+			novoTipoConta.DataModificacao,
+			chave)
+	}
 	return
 }
 

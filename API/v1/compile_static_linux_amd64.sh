@@ -22,5 +22,7 @@ mkdir -p $PASTA 2> /dev/null
 echo -e "Compilando para $GOOS:$GOARCH\n"
 go build -v -o $ARQUIVO -a -ldflags '-extldflags "-static" -s'
 
+cp -vr keys $PASTA
+
 # # Caso não compile estáticamente, rode o comando abaixo no terminal e depois reexecute este script
 # go build -v -a -ldflags '-extldflags "-static" -s'

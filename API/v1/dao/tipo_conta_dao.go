@@ -17,6 +17,7 @@ var (
 		"estado":           "estado"}
 )
 
+// CarregaTiposConta retorna uma listagem de tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaTiposConta(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `
 SELECT
@@ -31,6 +32,7 @@ WHERE
 	return carregaTiposConta(db, query)
 }
 
+// CarregaTiposContaInativa retorna uma listagem de tipos de conta(tipo_conta.TiposConta) no estado inativo e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaTiposContaInativa(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `
 SELECT
@@ -45,6 +47,7 @@ WHERE
 	return carregaTiposConta(db, query)
 }
 
+// AdicionaTipoConta adiciona um tipo conta ao BD e retorna o tipo conta incluída(*TipoConta) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um tipo conta(*TipoConta)
 func AdicionaTipoConta(db *sql.DB, novoTipoConta *tipo_conta.TipoConta) (tc *tipo_conta.TipoConta, err error) {
 	tc, err = tipo_conta.NewTipoConta(novoTipoConta.Nome, novoTipoConta.DescricaoDebito, novoTipoConta.DescricaoCredito)
 	if err != nil {
@@ -61,6 +64,7 @@ VALUES($1, $2, $3, $4, $5, $6)
 	return adicionaTipoConta(db, tc, query)
 }
 
+// ProcuraTipoConta localiza um tipo conta no BD e retorna o tipo conta procurado(*TipoConta). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um NOME do tipo conta desejado
 func ProcuraTipoConta(db *sql.DB, nome string) (tc *tipo_conta.TipoConta, err error) {
 	sql := `
 SELECT
@@ -81,6 +85,7 @@ WHERE {{.nome}} = $1
 	return
 }
 
+// AtivaTipoConta ativa um tipo conta no BD e retorna o tipo conta(*TipoConta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um NOME do TipoConta desejado
 func AtivaTipoConta(db *sql.DB, nome string) (tc *tipo_conta.TipoConta, err error) {
 	tipoContaBanco, err := ProcuraTipoConta(db, nome)
 	if err != nil {
@@ -100,6 +105,7 @@ WHERE {{.nome}} = $3
 	return estadoTipoConta(db, tipoContaBanco, query, nome)
 }
 
+// InativaTipoConta inativa um tipo conta no BD e retorna o tipo conta(*TipoConta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um NOME do TipoConta desejado
 func InativaTipoConta(db *sql.DB, nome string) (tc *tipo_conta.TipoConta, err error) {
 	tipoContaBanco, err := ProcuraTipoConta(db, nome)
 	if err != nil {
@@ -119,6 +125,7 @@ WHERE {{.nome}} = $3
 	return estadoTipoConta(db, tipoContaBanco, query, nome)
 }
 
+// AlteraTipoConta altera um tipo conta com o nome(string) informado a partir dos dados do *TipoConta informado no parâmetro tipoContaAlteracao. O campo Estado não é alterado, enquanto que o campo Nome sim. Use a função específica para essa tarefa(estado). Retorna um *TipoConta alterado no BD e um error. error != nil caso ocorra um problema.
 func AlteraTipoConta(db *sql.DB, nome string, tipoContaAlteracao *tipo_conta.TipoConta) (tc *tipo_conta.TipoConta, err error) {
 	tipoContaBanco, err := ProcuraTipoConta(db, nome)
 	if err != nil {
@@ -141,6 +148,7 @@ WHERE {{.nome}} = $5
 	return alteraTipoConta(db, tipoContaBanco, query, nome)
 }
 
+// RemoveTipoConta remove um tipo conta do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma string contendo o NOME do tipo conta desejado
 func RemoveTipoConta(db *sql.DB, nome string) (err error) {
 	sql := `
 DELETE FROM

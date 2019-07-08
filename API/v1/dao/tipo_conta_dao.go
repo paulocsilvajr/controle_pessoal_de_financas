@@ -17,8 +17,21 @@ var (
 		"estado":           "estado"}
 )
 
-// CarregaTiposConta retorna uma listagem de tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
+// CarregaTiposConta retorna uma listagem de todos os tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaTiposConta(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
+	sql := `
+SELECT
+	{{.nome}}, {{.descricaoDebito}}, {{.descricaoCredito}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+FROM
+	{{.tabela}}
+`
+	query := getTemplateQuery("CarregaTiposConta", tipoContaDB, sql)
+
+	return carregaTiposConta(db, query)
+}
+
+// CarregaTiposContaAtiva retorna uma listagem de tipos de conta ativos(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
+func CarregaTiposContaAtiva(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `
 SELECT
 	{{.nome}}, {{.descricaoDebito}}, {{.descricaoCredito}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
@@ -27,7 +40,7 @@ FROM
 WHERE
 	{{.estado}} = true
 `
-	query := getTemplateQuery("CarregaTipoConta", tipoContaDB, sql)
+	query := getTemplateQuery("CarregaTiposContaAtiva", tipoContaDB, sql)
 
 	return carregaTiposConta(db, query)
 }
@@ -42,7 +55,7 @@ FROM
 WHERE
 	{{.estado}} = false
 `
-	query := getTemplateQuery("CarregaTipoContaInativa", tipoContaDB, sql)
+	query := getTemplateQuery("CarregaTiposContaInativa", tipoContaDB, sql)
 
 	return carregaTiposConta(db, query)
 }
@@ -73,7 +86,7 @@ FROM
 	{{.tabela}}
 WHERE {{.nome}} = $1
 `
-	query := getTemplateQuery("ProcuraPessoa", tipoContaDB, sql)
+	query := getTemplateQuery("ProcuraTipoConta", tipoContaDB, sql)
 
 	tiposConta, err := carregaTiposConta(db, query, nome)
 	if len(tiposConta) == 1 {

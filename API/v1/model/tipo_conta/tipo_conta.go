@@ -26,7 +26,6 @@ type TipoConta struct {
 	DataCriacao      time.Time `json:"data_criacao"`
 	DataModificacao  time.Time `json:"data_modificacao"`
 	Estado           bool      `json:"estado"`
-	ITipoConta
 }
 
 // MaxNome: tamanho máximo para o nome do tipo de conta

@@ -87,6 +87,36 @@ var Rotas = rotas{
 		"/pessoas/{usuario}/admin",
 		`Body: {"administrador": ?}`,
 	},
+	"TipoContaIndex": rota{
+		"GET",
+		"/tipos_conta",
+		"",
+	},
+	"TipoContaShow": rota{
+		"GET",
+		"/tipos_conta/{tipoConta}",
+		"",
+	},
+	"TipoContaCreate": rota{
+		"POST",
+		"/tipos_conta",
+		`Body: {"nome":"?",  "descricao_debito":"?", "descricao_credito":"?"}`,
+	},
+	"TipoContaRemove": rota{
+		"DELETE",
+		"/tipos_conta/{tipoConta}",
+		"",
+	},
+	"TipoContaAlter": rota{
+		"PUT",
+		"/tipos_conta/{tipoConta}",
+		`Body: {["nome":"?",]  "descricao_debito":"?", "descricao_credito":"?"}`,
+	},
+	"TipoContaEstado": rota{
+		"PUT",
+		"/tipos_conta/{tipoConta}/estado",
+		`Body: {"estado": ?}`,
+	},
 }
 
 // Configuracoes é a representação de um hashMap das configurações da API

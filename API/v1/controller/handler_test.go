@@ -12,10 +12,12 @@ import (
 	"testing"
 )
 
-const URLBaseTest string = "https://localhost:8085"
+// const URLBaseTest string = "https://a3fa135c.ngrok.io" // execute o script run.sh e posteriormente o script run_ngrok.sh para receber o ip externo(público) disponibilizado pelo NGROK e substitua a URLBaseTest pelo host atualzado
+const URLBaseTest string = "https://localhost:8085" // local
 
 var (
-	TokenTest string
+	TokenTest                      string
+	testTokenAdmin, testTokenComum string
 )
 
 func init() {
@@ -33,6 +35,10 @@ func init() {
 	}
 	dao.SetAdministrador(db, p1.Cpf, true)
 	dao.InativaPessoa(db, p3.Cpf)
+
+	// tokens(Administrador e usuário comum) para teste
+	testTokenAdmin, _ = getToken("teste01", "123456")
+	testTokenComum, _ = getToken("paulo", "123456")
 }
 
 func TestLogin(t *testing.T) {

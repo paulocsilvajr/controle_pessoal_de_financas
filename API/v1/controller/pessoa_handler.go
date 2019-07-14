@@ -379,9 +379,6 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 // PessoaEstado é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar o estado de usuários, mas não pode alterar o próprio estado. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
 func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
-	type estado struct {
-		Estado bool `json:"estado"`
-	}
 	var estadoPessoa estado
 
 	vars := mux.Vars(r)

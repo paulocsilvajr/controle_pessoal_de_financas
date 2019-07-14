@@ -33,6 +33,11 @@ func GetMySigningKey() []byte {
 	return mySigningKey
 }
 
+// estado é uma struct usada nas funções/handlers ...Estado para representar o estado(true ou false) passado como JSON nessas funções
+type estado struct {
+	Estado bool `json:"estado"`
+}
+
 // LimitData define a quantidade máxima de bytes que o body de uma requisição suporta.
 // Padrão: 1048576 Bytes == 1 MegaByte
 const LimitData int64 = 1048576

@@ -69,19 +69,28 @@ func TestTipoContaEstado(t *testing.T) {
 		t.Error(res, string(body))
 	}
 
-	// Inativar tipo conta(base) como usuário admin - 200
+	// Inativar tipo conta(base) como usuário comun - 200
 	tipoConta = "base"
 	rota = fmt.Sprintf("/tipos_conta/%s/estado", tipoConta)
-	res, body, err = put(rota, `{"estado": false}`, testTokenAdmin)
+	res, body, err = put(rota, `{"estado": false}`, testTokenComum)
 	status = res.StatusCode
 	if status != 200 {
 		t.Error(res, string(body))
 	}
 
-	// Ativar tipo conta(tipo conta teste 01) como usuário comum - 200
+	// Ativar tipo conta(tipo conta teste 01) como usuário comum - 500
 	tipoConta = "tipo conta teste 01"
 	rota = fmt.Sprintf("/tipos_conta/%s/estado", tipoConta)
 	res, body, err = put(rota, `{"estado": true}`, testTokenComum)
+	status = res.StatusCode
+	if status != 500 {
+		t.Error(res, string(body))
+	}
+
+	// Ativar tipo conta(tipo conta teste 01) como administrador - 200
+	tipoConta = "tipo conta teste 01"
+	rota = fmt.Sprintf("/tipos_conta/%s/estado", tipoConta)
+	res, body, err = put(rota, `{"estado": true}`, testTokenAdmin)
 	status = res.StatusCode
 	if status != 200 {
 		t.Error(res, string(body))

@@ -16,6 +16,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// TipoContaIndex é um handler/controller que responde a rota '[GET] /tipos_conta' e retorna StatusOK(200) e uma listagem de tipos de conta de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500). Quando solicitado como usuário comum, retorna somente tipos de conta ativos, enquanto que como administrador, retorna todos os registros de tipo de conta
 func TipoContaIndex(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 
@@ -64,6 +65,7 @@ func TipoContaIndex(w http.ResponseWriter, r *http.Request) {
 		"Enviando listagem de tipos de conta")
 }
 
+// TipoContaShow é um handler/controller que responde a rota '[GET] /tipos_conta/{tipoConta}' e retorna StatusOK(200) e os dados do tipo de conta(nome) solicitada caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func TipoContaShow(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 
@@ -114,6 +116,7 @@ func TipoContaShow(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando dados de tipo de conta '%s'", tipoContaEncontrada.Nome))
 }
 
+// TipoContaCreate é um handler/controller que responde a rota '[POST] /tipos_conta' e retorna StatusCreated(201) e os dados do tipo de conta criada através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"nome":"?",  "descricao_debito":"?", "descricao_credito":"?"}
 func TipoContaCreate(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError
 	var tipoContaFromJSON tipo_conta.TipoConta
@@ -181,6 +184,7 @@ func TipoContaCreate(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando dados de tipo de conta '%s'", t.Nome))
 }
 
+// TipoContaRemove é um handler/controller que responde a rota '[DELETE] /tipos_conta/{tipoConta}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que o tipo de conta informado seja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func TipoContaRemove(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 
@@ -229,6 +233,7 @@ func TipoContaRemove(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando resposta de remoção de tipo de conta '%s'", tipoContaRemocao))
 }
 
+// TipoContaAlter é um handler/controller que responde a rota '[PUT] /tipos_conta/{tipoConta}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados do tipo de conta alterado caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o tipo de conta informado na rota existir. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {["nome":"?",]  "descricao_debito":"?", "descricao_credito":"?"}, sendo campo nome opcional, ou StatusNotModified(304) caso ocorra algum erro na alteração do BD. Quando não for informado nome, esse campo não será alterado
 func TipoContaAlter(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 	var tipoContaFromJSON tipo_conta.TipoConta
@@ -296,11 +301,9 @@ func TipoContaAlter(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando novos dados de tipo de conta '%s'", t.Nome))
 }
 
+// TipoContaEstado é um handler/controller que responde a rota '[PUT] /tipos_conta/{tipoConta}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados do tipo de conta alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o tipo de conta informado na rota existir. Somente usuários ADMINISTRADORES podem ATIVAR tipos de conta, USUÁRIO COMUNS podem somente INATIVAR. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o tipo de conta informado na rota não existir
 func TipoContaEstado(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
-	type estado struct {
-		Estado bool `json:"estado"`
-	}
 	var estadoTipoConta estado
 
 	vars := mux.Vars(r)
@@ -312,13 +315,13 @@ func TipoContaEstado(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioToken, _, _, err := helper.GetClaims(token)
+	usuarioToken, _, admin, err := helper.GetClaims(token)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	_, err = dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -338,6 +341,17 @@ func TipoContaEstado(w http.ResponseWriter, r *http.Request) {
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
+	}
+
+	usuarioComum := !(admin && usuarioDB.Administrador)
+	if usuarioComum {
+		verif := estadoTipoConta.Estado
+
+		status = http.StatusInternalServerError // 500
+		err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem ativar um tipo de conta"))
+		if err != nil {
+			return
+		}
 	}
 
 	tipoContaDBAlteracao, err := dao.ProcuraTipoConta(db, tipoContaAlteracao)

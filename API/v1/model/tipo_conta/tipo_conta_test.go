@@ -14,7 +14,8 @@ func TestITipoConta(t *testing.T) {
 		}
 	}()
 
-	t1 := GetTipoContaTest()
+	var t1 ITipoConta
+	t1 = GetTipoContaTest()
 
 	// Métodos obrigatórios da Interface ITipoConta
 	t1.String()

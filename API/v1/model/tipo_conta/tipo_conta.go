@@ -91,7 +91,7 @@ func (t *TipoConta) String() string {
 	return fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s", t.Nome, t.DescricaoDebito, t.DescricaoCredito, dataCriacao, dataModificacao, estado)
 }
 
-// Repr é um método que retorna uma string da representação de uma TipoConta, sem formatações especiais
+// Repr é um método que retorna uma string da representação de um TipoConta, sem formatações especiais
 func (t *TipoConta) Repr() string {
 	return fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%v", t.Nome, t.DescricaoDebito, t.DescricaoCredito, t.DataCriacao, t.DataModificacao, t.Estado)
 }

@@ -101,7 +101,7 @@ func (t *TipoConta) VerificaAtributos() error {
 	return verifica(t.Nome, t.DescricaoDebito, t.DescricaoCredito)
 }
 
-// Altera é um método que modifica os dados do TipoConta a partir dos parâmetros ifnormados depois da verificação de cada parâmetro e atualiza a data de modificação dele. Retorna um erro != nil, caso algum parâmetro seja inválido
+// Altera é um método que modifica os dados do TipoConta a partir dos parâmetros informados depois da verificação de cada parâmetro e atualiza a data de modificação dele. Retorna um erro != nil, caso algum parâmetro seja inválido
 func (t *TipoConta) Altera(nome string, descDebito string, descCredito string) (err error) {
 	if err = verifica(nome, descDebito, descCredito); err != nil {
 		return
@@ -115,7 +115,7 @@ func (t *TipoConta) Altera(nome string, descDebito string, descCredito string) (
 	return
 }
 
-// AlteraCampos é um método para alterar os campos de um TipoConta a partir de hashMap informado no parâmetro campos. Somente as chaves ifnormadas com um valor correto serão atualizadas. É atualizado a data de modificação do TipoConta. Cado ocorra um problema na validação dos campos, retorna um erro != nil. Campos permitidos: nome, descricaoDebito, descricaoCredito
+// AlteraCampos é um método para alterar os campos de um TipoConta a partir de hashMap informado no parâmetro campos. Somente as chaves informadas com um valor correto serão atualizadas. É atualizado a data de modificação do TipoConta. Caso ocorra um problema na validação dos campos, retorna um erro != nil. Campos permitidos: nome, descricaoDebito, descricaoCredito
 func (t *TipoConta) AlteraCampos(campos map[string]string) (err error) {
 	for chave, valor := range campos {
 		switch chave {
@@ -165,7 +165,7 @@ func (ts TiposConta) ProcuraTipoConta(tipoConta string) (t *TipoConta, err error
 	return
 }
 
-// Len é um método de TiposConta que retorna a quantidade de elementos contidos dentro do slice de TipoConta. A interface ITiposConta exibe a implementação desse método
+// Len é um método de TiposConta que retorna a quantidade de elementos contidos dentro do slice de TipoConta. A interface ITiposConta exige a implementação desse método
 func (ts TiposConta) Len() int {
 	return len(ts)
 }

@@ -34,7 +34,7 @@ type Conta struct {
 // MaxCodigo: tamanho máximo para o Código
 // MaxComentario: tamanho máximo para o Comentário
 const (
-	MaxConta      = 50
+	MaxNome       = 50
 	MaxCodigo     = 19
 	MaxComentario = 150
 )
@@ -105,23 +105,117 @@ func (c *Conta) Repr() string {
 	return fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%v", c.Nome, c.NomeTipoConta, c.Codigo, c.ContaPai, c.Comentario, c.DataCriacao, c.DataModificacao, c.Estado)
 }
 
-// VerificaAtributos é um método de Conta que verifica os compos Nome, NomeTipoConta, Codigo, ContaPai, Comentario, retorna um erro != nil caso ocorra um problema
+// VerificaAtributos é um método de Conta que verifica os campos Nome, NomeTipoConta, Codigo, ContaPai, Comentario, retornando um erro != nil caso ocorra um problema
 func (c *Conta) VerificaAtributos() error {
-	return verifica(nome, nomeTipoConta, codigo, contaPai, comentario)
+	return verifica(c.Nome, c.NomeTipoConta, c.Codigo, c.ContaPai, c.Comentario)
 }
 
-func (c *Conta) Altera(string, string, string, string, string) error {
-	return nil
+// Altera é um método que modifica os dados da Conta a partir dos parâmetros informados depois da verificação de cada parâmetro e atualiza a data de modificação dela. Retorna um erro != nil, caso algun parâmetro seja inválido
+func (c *Conta) Altera(nome, nomeTipoConta, codigo, contaPai, comentario string) (err error) {
+	if err = verifica(nome, nomeTipoConta, codigo, contaPai, comentario); err != nil {
+		return
+	}
+
+	c.Nome = nome
+	c.NomeTipoConta = nomeTipoConta
+	c.Codigo = codigo
+	c.ContaPai = contaPai
+	c.Comentario = comentario
+	c.DataModificacao = time.Now().Local()
+
+	return
 }
 
-func (c *Conta) AlteraCampos(map[string]string) error {
-	return nil
+// AlteraCampos é um método para alterar os campos de uma Conta a partir de hashMap informado no parâmetro campos. Somente as chaves informadas com um valor correto serão atualizadas. É atualizado a data de modificação da Conta. Caso ocorra um problema na validação dos campos, retorna um erro != nil. Campos permitidos: nome, nomeTipoConta, codigo, contaPai, comentario
+func (c *Conta) AlteraCampos(campos map[string]string) (err error) {
+	for chave, valor := range campos {
+		switch chave {
+		case "nome":
+			if err = verificaCampoTexto("Nome", valor, MaxNome); err != nil {
+				return
+			}
+			c.Nome = valor
+		case "nomeTipoConta":
+			if err = verificaCampoTexto("Nome do Tipo de Conta", valor, MaxNome); err != nil {
+				return
+			}
+			c.NomeTipoConta = valor
+		case "codigo":
+			if err = verificaCampoTexto("Código", valor, MaxCodigo); err != nil {
+				return
+			}
+			c.Codigo = valor
+		case "contaPai":
+			if err = verificaCampoTexto("Nome da Conta Pai", valor, MaxNome); err != nil {
+				return
+			}
+			c.ContaPai = valor
+		case "comentario":
+			if err = verificaCampoTexto("Comentário", valor, MaxComentario); err != nil {
+				return
+			}
+			c.ContaPai = valor
+		}
+	}
+	c.DataModificacao = time.Now().Local()
+
+	return
 }
 
+// Ativa é um método que define a Conta como ativa e atualiza a sua data de modificação
 func (c *Conta) Ativa() {
-
+	c.alteraEstado(true)
 }
 
+// Inativa é um método que define a Conta como inativa e atualiza a sua data de modificação
 func (c *Conta) Inativa() {
+	c.alteraEstado(false)
+}
 
+// ProcuraConta é um método que retorna uma Conta a partir da busca em uma listagem de Contas. Caso não seja encontrado a Conta, retorna um erro != nil. A interface IConta exige a implementação desse método
+func (cs Contas) ProcuraConta(nomeConta string) (c *Conta, err error) {
+	for _, contaLista := range cs {
+		if contaLista.Nome == nomeConta {
+			c = contaLista
+			return
+		}
+	}
+
+	err = fmt.Errorf("Conta %s informada não existe na listagem", nomeConta)
+
+	return
+}
+
+// Len é um método de Contas que retorna a quantidade de elementos contidos dentro do slice de Conta. A interface IContas exige a implementação desse método
+func (cs Contas) Len() int {
+	return len(cs)
+}
+
+func verifica(nome, nomeTipoConta, codigo, contaPai, comentario string) (err error) {
+	if err = verificaCampoTexto("Nome", nome, MaxNome); err != nil {
+		return
+	} else if err = verificaCampoTexto("Nome do Tipo da Conta", nome, MaxNome); err != nil {
+		return
+	} else if err = verificaCampoTexto("Código", codigo, MaxCodigo); err != nil {
+		return
+	} else if err = verificaCampoTexto("Nome da Conta pai", contaPai, MaxNome); err != nil {
+		return
+	} else if err = verificaCampoTexto("Comentário", comentario, MaxComentario); err != nil {
+		return
+	}
+
+	return
+}
+
+func verificaCampoTexto(nomeCampo, campo string, tamanho int) error {
+	campoValido := len(campo) > 0 && len(campo) <= tamanho
+	if campoValido {
+		return nil
+	}
+	return fmt.Errorf("Tamanho de campo %s inválido[%d caracteres]", nomeCampo, tamanho)
+}
+
+func (c *Conta) alteraEstado(estado bool) {
+	c.DataModificacao = time.Now().Local()
+	c.Estado = estado
 }

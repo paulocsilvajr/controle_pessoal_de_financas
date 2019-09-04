@@ -141,12 +141,12 @@ func (c *Conta) AlteraCampos(campos map[string]string) (err error) {
 			}
 			c.NomeTipoConta = valor
 		case "codigo":
-			if err = verificaCampoTexto("Código", valor, MaxCodigo); err != nil {
+			if err = verificaCampoTextoOpcional("Código", valor, MaxCodigo); err != nil {
 				return
 			}
 			c.Codigo = valor
 		case "contaPai":
-			if err = verificaCampoTexto("Nome da Conta Pai", valor, MaxNome); err != nil {
+			if err = verificaCampoTextoOpcional("Nome da Conta Pai", valor, MaxNome); err != nil {
 				return
 			}
 			c.ContaPai = valor
@@ -196,9 +196,9 @@ func verifica(nome, nomeTipoConta, codigo, contaPai, comentario string) (err err
 		return
 	} else if err = verificaCampoTexto("Nome do Tipo da Conta", nome, MaxNome); err != nil {
 		return
-	} else if err = verificaCampoTexto("Código", codigo, MaxCodigo); err != nil {
+	} else if err = verificaCampoTextoOpcional("Código", codigo, MaxCodigo); err != nil {
 		return
-	} else if err = verificaCampoTexto("Nome da Conta pai", contaPai, MaxNome); err != nil {
+	} else if err = verificaCampoTextoOpcional("Nome da Conta pai", contaPai, MaxNome); err != nil {
 		return
 	} else if err = verificaCampoTexto("Comentário", comentario, MaxComentario); err != nil {
 		return
@@ -209,6 +209,14 @@ func verifica(nome, nomeTipoConta, codigo, contaPai, comentario string) (err err
 
 func verificaCampoTexto(nomeCampo, campo string, tamanho int) error {
 	campoValido := len(campo) > 0 && len(campo) <= tamanho
+	if campoValido {
+		return nil
+	}
+	return fmt.Errorf("Tamanho de campo %s inválido[%d caracteres]", nomeCampo, tamanho)
+}
+
+func verificaCampoTextoOpcional(nomeCampo, campo string, tamanho int) error {
+	campoValido := len(campo) >= 0 && len(campo) <= tamanho
 	if campoValido {
 		return nil
 	}

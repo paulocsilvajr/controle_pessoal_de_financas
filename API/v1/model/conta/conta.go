@@ -194,7 +194,7 @@ func (cs Contas) Len() int {
 func verifica(nome, nomeTipoConta, codigo, contaPai, comentario string) (err error) {
 	if err = verificaCampoTexto("Nome", nome, MaxNome); err != nil {
 		return
-	} else if err = verificaCampoTexto("Nome do Tipo da Conta", nome, MaxNome); err != nil {
+	} else if err = verificaCampoTexto("Nome do Tipo da Conta", nomeTipoConta, MaxNome); err != nil {
 		return
 	} else if err = verificaCampoTextoOpcional("Código", codigo, MaxCodigo); err != nil {
 		return
@@ -212,7 +212,7 @@ func verificaCampoTexto(nomeCampo, campo string, tamanho int) error {
 	if campoValido {
 		return nil
 	}
-	return fmt.Errorf("Tamanho de campo %s inválido[%d caracteres]", nomeCampo, tamanho)
+	return fmt.Errorf("Tamanho de campo %s inválido[%d caracter(es)]", nomeCampo, len(campo))
 }
 
 func verificaCampoTextoOpcional(nomeCampo, campo string, tamanho int) error {
@@ -220,7 +220,7 @@ func verificaCampoTextoOpcional(nomeCampo, campo string, tamanho int) error {
 	if campoValido {
 		return nil
 	}
-	return fmt.Errorf("Tamanho de campo %s inválido[%d caracteres]", nomeCampo, tamanho)
+	return fmt.Errorf("Tamanho de campo %s inválido[%d caracter(es)]", nomeCampo, len(campo))
 }
 
 func (c *Conta) alteraEstado(estado bool) {

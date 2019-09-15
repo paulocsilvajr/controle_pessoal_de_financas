@@ -300,3 +300,68 @@ func TestAltera(t *testing.T) {
 		t.Error(err, c1)
 	}
 }
+
+func TestAlteraCampos(t *testing.T) {
+	campos := map[string]string{
+		"nome":          "Ativos Teste 02",
+		"nomeTipoConta": "banco teste 02",
+		"codigo":        "002",
+		"contaPai":      "Ativos",
+		"comentario":    "teste de Conta 02"}
+
+	c1 := GetContaTest()
+	err := c1.AlteraCampos(campos)
+	if err != nil {
+		t.Error(err, c1)
+	}
+
+	campos["nome"] = "Nome muito longo para dar erro em teste unitário de modelo Conta"
+	campos["nomeTipoConta"] = "banco teste 02"
+	campos["codigo"] = "002"
+	campos["contaPai"] = "Ativos"
+	campos["comentario"] = "teste de Conta 02"
+	err = c1.AlteraCampos(campos)
+	if err.Error() != "Tamanho de campo Nome inválido[65 caracter(es)]" {
+		t.Error(err, c1)
+	}
+
+	campos["nome"] = "Ativos Teste 02"
+	campos["nomeTipoConta"] = "Nome de Tipo de Conta muito longa para dar erro em teste unitário de modelo Conta"
+	campos["codigo"] = "002"
+	campos["contaPai"] = "Ativos"
+	campos["comentario"] = "teste de Conta 02"
+	err = c1.AlteraCampos(campos)
+	if err.Error() != "Tamanho de campo Nome do Tipo de Conta inválido[82 caracter(es)]" {
+		t.Error(err, c1)
+	}
+
+	campos["nome"] = "Ativos Teste 02"
+	campos["nomeTipoConta"] = "banco teste 02"
+	campos["codigo"] = "ABCD123456789-20000101"
+	campos["contaPai"] = "Ativos"
+	campos["comentario"] = "teste de Conta 02"
+	err = c1.AlteraCampos(campos)
+	if err.Error() != "Tamanho de campo Código inválido[22 caracter(es)]" {
+		t.Error(err, c1)
+	}
+
+	campos["nome"] = "Ativos Teste 02"
+	campos["nomeTipoConta"] = "banco teste 02"
+	campos["codigo"] = "002"
+	campos["contaPai"] = "Nome de Conta Pai muito longa para dar erro em teste unitário de modelo Conta"
+	campos["comentario"] = "teste de Conta 02"
+	err = c1.AlteraCampos(campos)
+	if err.Error() != "Tamanho de campo Nome da Conta Pai inválido[78 caracter(es)]" {
+		t.Error(err, c1)
+	}
+
+	campos["nome"] = "Ativos Teste 02"
+	campos["nomeTipoConta"] = "banco teste 02"
+	campos["codigo"] = "002"
+	campos["contaPai"] = "Ativos"
+	campos["comentario"] = "Descrição de conta muito longa para dar erro em teste unitário de modelo Conta ......... ........... ............. ............. ..................."
+	err = c1.AlteraCampos(campos)
+	if err.Error() != "Tamanho de campo Comentário inválido[151 caracter(es)]" {
+		t.Error(err, c1)
+	}
+}

@@ -270,7 +270,7 @@ func TestAtiva(t *testing.T) {
 	}
 }
 
-func TestProcutaTipoConta(t *testing.T) {
+func TestProcuraTipoConta(t *testing.T) {
 	t1 := GetTipoContaTest()
 	t2 := GetTipoContaTest()
 

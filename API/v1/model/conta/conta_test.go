@@ -2,6 +2,7 @@ package conta
 
 import (
 	"controle_pessoal_de_financas/API/v1/model/tipo_conta"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -363,5 +364,47 @@ func TestAlteraCampos(t *testing.T) {
 	err = c1.AlteraCampos(campos)
 	if err.Error() != "Tamanho de campo Comentário inválido[151 caracter(es)]" {
 		t.Error(err, c1)
+	}
+}
+
+func TestAtivaInativa(t *testing.T) {
+	c1 := GetContaTest()
+
+	c1.Inativa()
+	if c1.Estado != false {
+		t.Error("Erro em função conta.Inativa, atributo Estado inválido", c1)
+	}
+
+	c1.Ativa()
+	if c1.Estado != true {
+		t.Error("Erro em função conta.Ativa, atributo Estado inválido", c1)
+	}
+}
+
+func TestProcuraConta(t *testing.T) {
+	c1 := GetContaTest()
+	c2 := GetContaTest()
+
+	contas := Contas{c1, c2}
+
+	c3, err := contas.ProcuraConta(c1.Nome)
+	if !reflect.DeepEqual(c3, c1) {
+		t.Error(err, c3)
+	}
+
+	c4, err := contas.ProcuraConta("NENHUM")
+	if err == nil {
+		t.Error("Erro em função conta.ProcuraConta, retornou Conta para nome de conta inexistente", c4)
+	}
+}
+
+func TestLen(t *testing.T) {
+	c1 := GetContaTest()
+	c2 := GetContaTest()
+
+	contas := Contas{c1, c2}
+
+	if contas.Len() != 2 {
+		t.Error("Erro em função conta.Len, retorna quantidade de elementos diferente do real", len(contas))
 	}
 }

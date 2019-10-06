@@ -18,7 +18,7 @@ func TestITipoConta(t *testing.T) {
 	t1 = GetTipoContaTest()
 
 	// Métodos obrigatórios da Interface ITipoConta
-	t1.String()
+	_ = t1.String()
 	t1.Repr()
 	t1.VerificaAtributos()
 	t1.Altera("Nome do tipo de conta", "Débito", "Crédito")

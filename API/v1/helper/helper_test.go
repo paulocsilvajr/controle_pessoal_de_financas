@@ -48,3 +48,12 @@ func TestGetEstado(t *testing.T) {
 		t.Error("Retorno de função GetEstado está retornando um texto incorreto")
 	}
 }
+
+func TestMonetarioFormatado(t *testing.T) {
+	valor := 3.14159265359
+	valorString := "3.142"
+
+	if convertido := MonetarioFormatado(valor); convertido != valorString {
+		t.Error("Retorno de MonetarioFormatado inválido", convertido)
+	}
+}

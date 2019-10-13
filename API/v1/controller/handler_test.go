@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-// const URLBaseTest string = "https://a3fa135c.ngrok.io" // execute o script run.sh e posteriormente o script run_ngrok.sh para receber o ip externo(público) disponibilizado pelo NGROK e substitua a URLBaseTest pelo host atualzado
+// const URLBaseTest string = "https://064ce4ef.ngrok.io" // execute o script run.sh e posteriormente o script run_ngrok.sh para receber o ip externo(público) disponibilizado pelo NGROK e substitua a URLBaseTest pelo host atualizado
 const URLBaseTest string = "https://localhost:8085" // local
 
 var (

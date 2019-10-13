@@ -1,8 +1,11 @@
 package detalhe_lancamento
 
 import (
+	"controle_pessoal_de_financas/API/v1/helper"
 	"controle_pessoal_de_financas/API/v1/model/conta"
 	"errors"
+	"fmt"
+	"strconv"
 )
 
 // IDetalheLancamento é uma interface que exige a implementação dos métodos origatórios em DetalheLancamento
@@ -10,10 +13,8 @@ type IDetalheLancamento interface {
 	String() string
 	Repr() string
 	VerificaAtributos() error
-	Altera(string, int64, int64) error
+	Altera(string, float64, float64) error
 	AlteraCampos(map[string]string) error
-	Ativa()
-	Inativa()
 	DebitoToStr() string
 	CreditoToStr() string
 }
@@ -22,8 +23,8 @@ type IDetalheLancamento interface {
 type DetalheLancamento struct {
 	ID        int     `json:"id"`
 	NomeConta string  `json:"nome_conta"`
-	Debito    float32 `json:"debito"`
-	Credito   float32 `json:"credito"`
+	Debito    float64 `json:"debito"`
+	Credito   float64 `json:"credito"`
 }
 
 // MaxNomeConta: tamanho máximo para o campo NomeConta, baseado em valor informado em modelo.conta
@@ -33,8 +34,9 @@ const (
 
 // IDetalheLancamentos é uma interface que exige a implementação obrigatória em conjunto/lista(slice) de DetalheLancamentos
 type IDetalheLancamentos interface {
-	Len()
-	ProcuraDetalheLancamento(int) *DetalheLancamento
+	Len() int
+	ProcuraDetalheLancamentos(string) (DetalheLancamentos, error)
+	ProcutaDetalheLancamentoID(int) (*DetalheLancamento, error)
 }
 
 // DetalheLancamentos representa um conjunto/lista(slice) de DetalheLancamentos(*DetalheLancamento)
@@ -49,7 +51,8 @@ func converteParaDetalheLancamento(dlb IDetalheLancamento) (*DetalheLancamento, 
 	return nil, errors.New("Erro ao converter para DetalheLancamento")
 }
 
-func New(id int, nomeConta string, debito, credito float32) *DetalheLancamento {
+// New retorna um novo Detalhe Lançamento(*DetalheLancamento) através dos parâmetros informados(id, nomeConta, debito, credito). Função equivalente a criação de um DetalheLancamento via literal &DetalheLancamento{ID: ..., ...}
+func New(id int, nomeConta string, debito, credito float64) *DetalheLancamento {
 	return &DetalheLancamento{
 		ID:        id,
 		NomeConta: nomeConta,
@@ -57,8 +60,22 @@ func New(id int, nomeConta string, debito, credito float32) *DetalheLancamento {
 		Credito:   credito}
 }
 
-func NewDetalheLancamento(id int, nomeConta string, debito, credito float32) (detalheLancamento *DetalheLancamento, err error) {
-	detalheLancamento = New(id, nomeConta, debito, credito)
+// NewD retorna um novo *DetalheLancamento com o valor de debito informado e credito zerado. Preferencialmente, use esta função para criar DetalheLancamento com valor de debito
+func NewD(id int, nomeConta string, debito float64) *DetalheLancamento {
+	return New(id, nomeConta, debito, 0.0)
+}
+
+// NewC retorna um novo *DetalheLancamento com o valor de credito informado e debito zerado. Preferencialmente, use esta função para criar DetalheLancamento com valor de credito
+func NewC(id int, nomeConta string, credito float64) *DetalheLancamento {
+	return New(id, nomeConta, 0.0, credito)
+}
+
+// NewDetalheLancamento cria uma novo DetalheLancamento semelhante a função New(), mas faz a validação dos campos informados nos parâmetros nomeConta, debito e credito. Se debito for zerado, cria o novo DetalheLancamento com a função NewC, caso contrário, cria com a função NewD
+func NewDetalheLancamento(id int, nomeConta string, debito, credito float64) (detalheLancamento *DetalheLancamento, err error) {
+	if debito == 0.0 {
+		detalheLancamento = NewC(id, nomeConta, credito)
+	}
+	detalheLancamento = NewD(id, nomeConta, debito)
 
 	if err = detalheLancamento.VerificaAtributos(); err != nil {
 		detalheLancamento = nil
@@ -67,12 +84,134 @@ func NewDetalheLancamento(id int, nomeConta string, debito, credito float32) (de
 	return
 }
 
-func GetDetalheLancamentoTest() (detalheLancamento *DetalheLancamento) {
-	detalheLancamento = New(9999, "Detalhe de conta teste", 100, 0)
+// GetDetalheLancamentoDTest retorna um DetalheLancamento teste usado para os testes em geral com valor de credito zerado
+func GetDetalheLancamentoDTest() (detalheLancamento *DetalheLancamento) {
+	detalheLancamento = NewD(9999, "Detalhe de conta teste", 100)
 
 	return
 }
 
+// GetDetalheLancamentoCTest retorna um DetalheLancamento teste usado para os testes em geral com valor de debito zerado
+func GetDetalheLancamentoCTest() (detalheLancamento *DetalheLancamento) {
+	detalheLancamento = NewC(9998, "Detalhe de conta teste", 200)
+
+	return
+}
+
+// String retorna uma representação textual de um DetalheLancamento. Valores de debito e credito são formacadas usando a função helper.MonetarioFormatado()
 func (dl *DetalheLancamento) String() string {
-	return ""
+	debito := helper.MonetarioFormatado(dl.Debito)
+	credito := helper.MonetarioFormatado(dl.Credito)
+	return fmt.Sprintf("%d\t%s\t%s\t%s", dl.ID, dl.NomeConta, debito, credito)
+}
+
+// Repr é um método que retorna uma string de representação de um DetalheLancamento, sem formatações especiais
+func (dl *DetalheLancamento) Repr() string {
+	return fmt.Sprintf("%d\t%s\t%f\t%f", dl.ID, dl.NomeConta, dl.Debito, dl.Credito)
+}
+
+// VerificaAtributos é um método de DetalheLancamento que verifica os campos NomeConta, Debito e Credito, retornando um erro != nil caso ocorra um problema
+func (dl *DetalheLancamento) VerificaAtributos() error {
+	return verifica(dl.NomeConta, dl.Debito, dl.Credito)
+}
+
+// Altera é um método que modifica os dados do DetalheLancamento a partir dos parâmetros informados depois da verificação de cada parâmetro. Retorna um erro != nil, caso algun parâmetro seja inválido
+func (dl *DetalheLancamento) Altera(nomeConta string, debito, credito float64) (err error) {
+	if err = verifica(nomeConta, debito, credito); err != nil {
+		return
+	}
+
+	dl.NomeConta = nomeConta
+	dl.Debito = debito
+	dl.Credito = credito
+
+	return
+}
+
+// AlteraCampos é um método para alterar os campos de um DetalheLancamento a partir de hashMap informado no parâmetro campos. Somente as chaves informadas com um valor correto serão atualizadas. Caso ocorra um problema na validação dos campos, retorna um erro != nil. Campos permitidos: nomeConta, debito, credito. Campos debito e credito devem ser informados como string, é feita uma verificação e conversão para atribuir em seus campos equivalente em float64
+func (dl *DetalheLancamento) AlteraCampos(campos map[string]string) (err error) {
+	for chave, valor := range campos {
+		switch chave {
+		case "nomeConta":
+			if err = helper.VerificaCampoTexto("NomeConta", valor, MaxNomeConta); err != nil {
+				return
+			}
+			dl.NomeConta = valor
+
+		case "debito", "credito":
+			decimal, err := strconv.ParseFloat(valor, 64)
+			if err != nil {
+				return errors.New("Erro ao converter string para float64")
+			}
+
+			err = helper.VerificaValor(chave, decimal)
+			if err != nil {
+				return err
+			}
+
+			if chave == "debito" {
+				dl.Debito = decimal
+			}
+			dl.Credito = decimal
+		}
+
+	}
+
+	return
+}
+
+// CreditoToStr retorna uma string formatada referente ao atributo Credito no formato definido em helper.MonetarioFormatado
+func (dl *DetalheLancamento) CreditoToStr() string {
+	return helper.MonetarioFormatado(dl.Credito)
+}
+
+// DebitoToStr retorna uma string formatada referente ao atributo Credito no formato definido em helper.MonetarioFormatado
+func (dl *DetalheLancamento) DebitoToStr() string {
+	return helper.MonetarioFormatado(dl.Debito)
+}
+
+// ProcuraDetalheLancamentos é um método que retorna um slice de *DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos. Caso não seja encontrado nenhum DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
+func (dls DetalheLancamentos) ProcuraDetalheLancamentos(nomeConta string) (dlse DetalheLancamentos, err error) {
+	for _, detalheLancamentoLista := range dls {
+		if detalheLancamentoLista.NomeConta == nomeConta {
+			dlse = append(dlse, detalheLancamentoLista)
+		}
+	}
+
+	if len(dlse) == 0 {
+		err = fmt.Errorf("Não foi encontrado nenhum DetalheLancamento com o NomeConta informado")
+	}
+
+	return
+}
+
+// ProcuraDetalheLancamentoID é um método que retorna um DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos. Caso não seja encontrado um DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
+func (dls DetalheLancamentos) ProcuraDetalheLancamentoID(id int) (dl *DetalheLancamento, err error) {
+	for _, detalheLancamentoLista := range dls {
+		if detalheLancamentoLista.ID == id {
+			dl = detalheLancamentoLista
+			return
+		}
+	}
+
+	err = fmt.Errorf("DetalheLancamento %d informado não existe na listagem", id)
+
+	return
+}
+
+// Len é um método de DetalheLancamentos que retorna a quantidade de elementos contidos dentro do slice de DetalheLancamento. A interface IDetalheLancamentos exige a implementação desse método
+func (dls DetalheLancamentos) Len() int {
+	return len(dls)
+}
+
+func verifica(nomeConta string, debito, credito float64) (err error) {
+	if err = helper.VerificaCampoTexto("NomeConta", nomeConta, MaxNomeConta); err != nil {
+		return
+	} else if err = helper.VerificaValor("Debito", debito); err != nil {
+		return
+	} else if err = helper.VerificaValor("Credito", credito); err != nil {
+		return
+	}
+
+	return
 }

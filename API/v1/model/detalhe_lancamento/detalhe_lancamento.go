@@ -21,10 +21,10 @@ type IDetalheLancamento interface {
 
 // DetalheLancamento é uma struct que representa uma detalhe de lançamento. Possui notação para JSON para cada campo
 type DetalheLancamento struct {
-	ID        int     `json:"id"`
-	NomeConta string  `json:"nome_conta"`
-	Debito    float64 `json:"debito"`
-	Credito   float64 `json:"credito"`
+	IDLancamento int     `json:"id_lancamento"`
+	NomeConta    string  `json:"nome_conta"`
+	Debito       float64 `json:"debito"`
+	Credito      float64 `json:"credito"`
 }
 
 // MaxNomeConta: tamanho máximo para o campo NomeConta, baseado em valor informado em modelo.conta
@@ -36,7 +36,7 @@ const (
 type IDetalheLancamentos interface {
 	Len() int
 	ProcuraDetalheLancamentos(string) (DetalheLancamentos, error)
-	ProcutaDetalheLancamentoID(int) (*DetalheLancamento, error)
+	ProcuraDetalheLancamento(int) (*DetalheLancamento, error)
 }
 
 // DetalheLancamentos representa um conjunto/lista(slice) de DetalheLancamentos(*DetalheLancamento)
@@ -51,31 +51,31 @@ func converteParaDetalheLancamento(dlb IDetalheLancamento) (*DetalheLancamento, 
 	return nil, errors.New("Erro ao converter para DetalheLancamento")
 }
 
-// New retorna um novo Detalhe Lançamento(*DetalheLancamento) através dos parâmetros informados(id, nomeConta, debito, credito). Função equivalente a criação de um DetalheLancamento via literal &DetalheLancamento{ID: ..., ...}
-func New(id int, nomeConta string, debito, credito float64) *DetalheLancamento {
+// New retorna um novo Detalhe Lançamento(*DetalheLancamento) através dos parâmetros informados(idLancamento, nomeConta, debito, credito). Função equivalente a criação de um DetalheLancamento via literal &DetalheLancamento{IDLancamento: ..., ...}
+func New(idLancamento int, nomeConta string, debito, credito float64) *DetalheLancamento {
 	return &DetalheLancamento{
-		ID:        id,
-		NomeConta: nomeConta,
-		Debito:    debito,
-		Credito:   credito}
+		IDLancamento: idLancamento,
+		NomeConta:    nomeConta,
+		Debito:       debito,
+		Credito:      credito}
 }
 
 // NewD retorna um novo *DetalheLancamento com o valor de debito informado e credito zerado. Preferencialmente, use esta função para criar DetalheLancamento com valor de debito
-func NewD(id int, nomeConta string, debito float64) *DetalheLancamento {
-	return New(id, nomeConta, debito, 0.0)
+func NewD(idLancamento int, nomeConta string, debito float64) *DetalheLancamento {
+	return New(idLancamento, nomeConta, debito, 0.0)
 }
 
 // NewC retorna um novo *DetalheLancamento com o valor de credito informado e debito zerado. Preferencialmente, use esta função para criar DetalheLancamento com valor de credito
-func NewC(id int, nomeConta string, credito float64) *DetalheLancamento {
-	return New(id, nomeConta, 0.0, credito)
+func NewC(idLancamento int, nomeConta string, credito float64) *DetalheLancamento {
+	return New(idLancamento, nomeConta, 0.0, credito)
 }
 
 // NewDetalheLancamento cria uma novo DetalheLancamento semelhante a função New(), mas faz a validação dos campos informados nos parâmetros nomeConta, debito e credito. Se debito for zerado, cria o novo DetalheLancamento com a função NewC, caso contrário, cria com a função NewD
-func NewDetalheLancamento(id int, nomeConta string, debito, credito float64) (detalheLancamento *DetalheLancamento, err error) {
+func NewDetalheLancamento(idLancamento int, nomeConta string, debito, credito float64) (detalheLancamento *DetalheLancamento, err error) {
 	if debito == 0.0 {
-		detalheLancamento = NewC(id, nomeConta, credito)
+		detalheLancamento = NewC(idLancamento, nomeConta, credito)
 	}
-	detalheLancamento = NewD(id, nomeConta, debito)
+	detalheLancamento = NewD(idLancamento, nomeConta, debito)
 
 	if err = detalheLancamento.VerificaAtributos(); err != nil {
 		detalheLancamento = nil
@@ -102,12 +102,12 @@ func GetDetalheLancamentoCTest() (detalheLancamento *DetalheLancamento) {
 func (dl *DetalheLancamento) String() string {
 	debito := helper.MonetarioFormatado(dl.Debito)
 	credito := helper.MonetarioFormatado(dl.Credito)
-	return fmt.Sprintf("%d\t%s\t%s\t%s", dl.ID, dl.NomeConta, debito, credito)
+	return fmt.Sprintf("%d\t%s\t%s\t%s", dl.IDLancamento, dl.NomeConta, debito, credito)
 }
 
 // Repr é um método que retorna uma string de representação de um DetalheLancamento, sem formatações especiais
 func (dl *DetalheLancamento) Repr() string {
-	return fmt.Sprintf("%d\t%s\t%f\t%f", dl.ID, dl.NomeConta, dl.Debito, dl.Credito)
+	return fmt.Sprintf("%d\t%s\t%f\t%f", dl.IDLancamento, dl.NomeConta, dl.Debito, dl.Credito)
 }
 
 // VerificaAtributos é um método de DetalheLancamento que verifica os campos NomeConta, Debito e Credito, retornando um erro != nil caso ocorra um problema
@@ -170,8 +170,8 @@ func (dl *DetalheLancamento) DebitoToStr() string {
 	return helper.MonetarioFormatado(dl.Debito)
 }
 
-// ProcuraDetalheLancamentos é um método que retorna um slice de *DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos. Caso não seja encontrado nenhum DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
-func (dls DetalheLancamentos) ProcuraDetalheLancamentos(nomeConta string) (dlse DetalheLancamentos, err error) {
+// ProcuraDetalheLancamentosConta é um método que retorna um slice de *DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos pelo nome de Conta informada. Caso não seja encontrado nenhum DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
+func (dls DetalheLancamentos) ProcuraDetalheLancamentosConta(nomeConta string) (dlse DetalheLancamentos, err error) {
 	for _, detalheLancamentoLista := range dls {
 		if detalheLancamentoLista.NomeConta == nomeConta {
 			dlse = append(dlse, detalheLancamentoLista)
@@ -185,16 +185,34 @@ func (dls DetalheLancamentos) ProcuraDetalheLancamentos(nomeConta string) (dlse 
 	return
 }
 
-// ProcuraDetalheLancamentoID é um método que retorna um DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos. Caso não seja encontrado um DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
-func (dls DetalheLancamentos) ProcuraDetalheLancamentoID(id int) (dl *DetalheLancamento, err error) {
+// ProcuraDetalheLancamentosLancamento é um método que retorna um slice de *DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos pelo ID de Lancamento informada. Caso não seja encontrado nenhum DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
+func (dls DetalheLancamentos) ProcuraDetalheLancamentosLancamento(idLancamento int) (dlse DetalheLancamentos, err error) {
 	for _, detalheLancamentoLista := range dls {
-		if detalheLancamentoLista.ID == id {
+		if detalheLancamentoLista.IDLancamento == idLancamento {
+			dlse = append(dlse, detalheLancamentoLista)
+		}
+	}
+
+	if len(dlse) == 0 {
+		err = fmt.Errorf("Não foi encontrado nenhum DetalheLancamento com o IDLancamento informado")
+	}
+
+	return
+}
+
+// ProcuraDetalheLancamento é um método que retorna um DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos. Caso não seja encontrado um DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
+func (dls DetalheLancamentos) ProcuraDetalheLancamento(idLancamento int, nomeConta string) (dl *DetalheLancamento, err error) {
+	for _, detalheLancamentoLista := range dls {
+		temID := detalheLancamentoLista.IDLancamento == idLancamento
+		temConta := detalheLancamentoLista.NomeConta == nomeConta
+
+		if temID && temConta {
 			dl = detalheLancamentoLista
 			return
 		}
 	}
 
-	err = fmt.Errorf("DetalheLancamento %d informado não existe na listagem", id)
+	err = fmt.Errorf("DetalheLancamento %d informado não existe na listagem", idLancamento)
 
 	return
 }

@@ -110,7 +110,7 @@ func (c *Conta) VerificaAtributos() error {
 	return verifica(c.Nome, c.NomeTipoConta, c.Codigo, c.ContaPai, c.Comentario)
 }
 
-// Altera é um método que modifica os dados da Conta a partir dos parâmetros informados depois da verificação de cada parâmetro e atualiza a data de modificação dela. Retorna um erro != nil, caso algun parâmetro seja inválido
+// Altera é um método que modifica os dados da Conta a partir dos parâmetros informados depois da verificação de cada parâmetro e atualiza a data de modificação dela. Retorna um erro != nil, caso algum parâmetro seja inválido
 func (c *Conta) Altera(nome, nomeTipoConta, codigo, contaPai, comentario string) (err error) {
 	if err = verifica(nome, nomeTipoConta, codigo, contaPai, comentario); err != nil {
 		return
@@ -172,7 +172,7 @@ func (c *Conta) Inativa() {
 	c.alteraEstado(false)
 }
 
-// ProcuraConta é um método que retorna uma Conta a partir da busca em uma listagem de Contas. Caso não seja encontrado a Conta, retorna um erro != nil. A interface IConta exige a implementação desse método
+// ProcuraConta é um método que retorna uma Conta a partir da busca em uma listagem de Contas. Caso não seja encontrado a Conta, retorna um erro != nil. A interface IContas exige a implementação desse método
 func (cs Contas) ProcuraConta(nomeConta string) (c *Conta, err error) {
 	for _, contaLista := range cs {
 		if contaLista.Nome == nomeConta {

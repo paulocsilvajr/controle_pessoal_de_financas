@@ -155,55 +155,55 @@ func TestNewConta(t *testing.T) {
 	comentario = ""
 	c2, err := NewConta(nome, tipoConta.Nome, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Comentário inválido[0 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 
 	comentario = "Descrição de conta muito longa para dar erro em teste unitário de modelo Conta ......... ........... ............. ............. ..................."
 	c2, err = NewConta(nome, tipoConta.Nome, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Comentário inválido[151 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 
 	contaPai = "Nome de Conta Pai muito longa para dar erro em teste unitário de modelo Conta"
 	c2, err = NewConta(nome, tipoConta.Nome, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Nome da Conta pai inválido[78 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 
 	codigo = "12345678901234567890"
 	c2, err = NewConta(nome, tipoConta.Nome, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Código inválido[20 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 
 	codigo = "ABCD123456789-20000101"
 	c2, err = NewConta(nome, tipoConta.Nome, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Código inválido[22 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 
 	nomeTipoConta := ""
 	c2, err = NewConta(nome, nomeTipoConta, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Nome do Tipo da Conta inválido[0 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 
 	nomeTipoConta = "Nome de Tipo de Conta muito longa para dar erro em teste unitário de modelo Conta"
 	c2, err = NewConta(nome, nomeTipoConta, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Nome do Tipo da Conta inválido[82 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 
 	nome = ""
 	c2, err = NewConta(nome, nomeTipoConta, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Nome inválido[0 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 
 	nome = "Nome muito longo para dar erro em teste unitário de modelo Conta"
 	c2, err = NewConta(nome, nomeTipoConta, codigo, contaPai, comentario)
 	if err.Error() != "Tamanho de campo Nome inválido[65 caracter(es)]" {
-		t.Error("Erro em função conta.NewConta, nao retornou o erro esperado", c2, err)
+		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 }
 

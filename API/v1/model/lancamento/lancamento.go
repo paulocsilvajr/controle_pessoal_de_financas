@@ -226,7 +226,7 @@ func verifica(cpf, numero, descricao string) (err error) {
 		return
 	} else if err = helper.VerificaCampoTextoOpcional("Número", numero, MaxNumero); err != nil {
 		return
-	} else if err = helper.VerificaCampoTextoOpcional("Descrição", descricao, MaxDescricao); err != nil {
+	} else if err = helper.VerificaCampoTexto("Descrição", descricao, MaxDescricao); err != nil {
 		return
 	}
 

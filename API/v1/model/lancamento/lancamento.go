@@ -14,7 +14,7 @@ type ILancamento interface {
 	String() string
 	Repr() string
 	VerificaAtributos() error
-	Altera(int, string, time.Time, string, string) error
+	Altera(string, time.Time, string, string) error
 	AlteraCampos(map[string]interface{}) error
 	Ativa()
 	Inativa()
@@ -116,12 +116,11 @@ func (l *Lancamento) VerificaAtributos() error {
 }
 
 // Altera é um método que modifica os dados de Lancamento a partir dos parâmetros informados depois da verificação de cada parâmetro e atualiza a data de modificação dela. Retorna um erro != nil, caso algum parâmetro seja inválido
-func (l *Lancamento) Altera(id int, cpf string, data time.Time, numero, descricao string) (err error) {
+func (l *Lancamento) Altera(cpf string, data time.Time, numero, descricao string) (err error) {
 	if err = verifica(cpf, numero, descricao); err != nil {
 		return
 	}
 
-	l.ID = id
 	l.CpfPessoa = cpf
 	l.Data = data
 	l.Numero = numero
@@ -131,16 +130,10 @@ func (l *Lancamento) Altera(id int, cpf string, data time.Time, numero, descrica
 	return
 }
 
-// AlteraCampos é um método para alterar os campos de um Lancamento a partir de hashMap informado no parâmetro campos. Somente as chaves informadas com um valor correto serão atualizadas. É atualizado a data de modificação do Lancamento. Caso ocorra um problema na validação dos campos, retorna um erro != nil. Campos permitidos: id, cpf, data, numero, descricao
+// AlteraCampos é um método para alterar os campos de um Lancamento a partir de hashMap informado no parâmetro campos. Somente as chaves informadas com um valor correto serão atualizadas. É atualizado a data de modificação do Lancamento. Caso ocorra um problema na validação dos campos, retorna um erro != nil. Campos permitidos: cpf, data, numero, descricao
 func (l *Lancamento) AlteraCampos(campos map[string]interface{}) (err error) {
 	for chave, valor := range campos {
 		switch chave {
-		case "id":
-			if id, ok := valor.(int); ok {
-				l.ID = id
-			} else {
-				return fmt.Errorf("ID inválido %v", valor)
-			}
 		case "cpf":
 			if cpf, ok := valor.(string); ok {
 				if err = helper.VerificaCampoTexto("CPF", cpf, MaxCPFPessoa); err != nil {
@@ -153,7 +146,7 @@ func (l *Lancamento) AlteraCampos(campos map[string]interface{}) (err error) {
 			if data, ok := valor.(time.Time); ok {
 				l.Data = data
 			} else {
-				return fmt.Errorf("Data inválida %v", valor)
+				return fmt.Errorf("Data inválida %v[%T]", valor, valor)
 			}
 		case "numero":
 			if numero, ok := valor.(string); ok {
@@ -165,7 +158,7 @@ func (l *Lancamento) AlteraCampos(campos map[string]interface{}) (err error) {
 			}
 		case "descricao":
 			if descricao, ok := valor.(string); ok {
-				if err = helper.VerificaCampoTextoOpcional("Descrição", descricao, MaxDescricao); err != nil {
+				if err = helper.VerificaCampoTexto("Descrição", descricao, MaxDescricao); err != nil {
 					return
 				}
 
@@ -202,16 +195,17 @@ func (ls Lancamentos) ProcuraLancamentoID(id int) (l *Lancamento, err error) {
 	return
 }
 
-// ProcuraLancamentoCPF é um método que retorna um Lancamento a partir da busca em uma listagem de Lancamentos por um cpf informado. Caso não seja encontrado o Lancamento, retorna um erro != nil. A interface ILancamentos exige a implementação desse método
-func (ls Lancamentos) ProcuraLancamentoCPF(cpf string) (l *Lancamento, err error) {
+// ProcuraLancamentoCPF é um método que retorna um slice de Lancamento a partir da busca em uma listagem de Lancamentos por um cpf informado. Caso não seja encontrado o Lancamento, retorna um erro != nil. A interface ILancamentos exige a implementação desse método
+func (ls Lancamentos) ProcuraLancamentoCPF(cpf string) (l Lancamentos, err error) {
 	for _, lancamentoLista := range ls {
 		if lancamentoLista.CpfPessoa == cpf {
-			l = lancamentoLista
-			return
+			l = append(l, lancamentoLista)
 		}
 	}
 
-	err = fmt.Errorf("Lançamento com CPF:%s informado não existe na listagem", cpf)
+	if l.Len() == 0 {
+		err = fmt.Errorf("Lançamento(s) com CPF:%s informado não existe na listagem", cpf)
+	}
 
 	return
 }

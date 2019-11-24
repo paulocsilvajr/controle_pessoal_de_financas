@@ -74,8 +74,11 @@ func NewC(idLancamento int, nomeConta string, credito float64) *DetalheLancament
 func NewDetalheLancamento(idLancamento int, nomeConta string, debito, credito float64) (detalheLancamento *DetalheLancamento, err error) {
 	if debito == 0.0 {
 		detalheLancamento = NewC(idLancamento, nomeConta, credito)
+	} else if credito == 0.0 {
+		detalheLancamento = NewD(idLancamento, nomeConta, debito)
+	} else {
+		detalheLancamento = New(idLancamento, nomeConta, debito, credito)
 	}
-	detalheLancamento = NewD(idLancamento, nomeConta, debito)
 
 	if err = detalheLancamento.VerificaAtributos(); err != nil {
 		detalheLancamento = nil
@@ -151,8 +154,9 @@ func (dl *DetalheLancamento) AlteraCampos(campos map[string]string) (err error) 
 
 			if chave == "debito" {
 				dl.Debito = decimal
+			} else if chave == "credito" {
+				dl.Credito = decimal
 			}
-			dl.Credito = decimal
 		}
 
 	}

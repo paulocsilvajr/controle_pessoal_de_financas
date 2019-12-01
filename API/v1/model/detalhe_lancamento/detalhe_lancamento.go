@@ -89,14 +89,14 @@ func NewDetalheLancamento(idLancamento int, nomeConta string, debito, credito fl
 
 // GetDetalheLancamentoDTest retorna um DetalheLancamento teste usado para os testes em geral com valor de credito zerado
 func GetDetalheLancamentoDTest() (detalheLancamento *DetalheLancamento) {
-	detalheLancamento = NewD(9999, "Detalhe de conta teste", 100)
+	detalheLancamento = NewD(9999, "Detalhe de conta teste A", 100)
 
 	return
 }
 
 // GetDetalheLancamentoCTest retorna um DetalheLancamento teste usado para os testes em geral com valor de debito zerado
 func GetDetalheLancamentoCTest() (detalheLancamento *DetalheLancamento) {
-	detalheLancamento = NewC(9998, "Detalhe de conta teste", 200)
+	detalheLancamento = NewC(9998, "Detalhe de conta teste B", 200)
 
 	return
 }
@@ -174,8 +174,8 @@ func (dl *DetalheLancamento) DebitoToStr() string {
 	return helper.MonetarioFormatado(dl.Debito)
 }
 
-// ProcuraDetalheLancamentosConta é um método que retorna um slice de *DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos pelo nome de Conta informada. Caso não seja encontrado nenhum DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
-func (dls DetalheLancamentos) ProcuraDetalheLancamentosConta(nomeConta string) (dlse DetalheLancamentos, err error) {
+// ProcuraDetalheLancamentosPorNomeConta é um método que retorna um slice de *DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos pelo nome de Conta informada. Caso não seja encontrado nenhum DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
+func (dls DetalheLancamentos) ProcuraDetalheLancamentosPorNomeConta(nomeConta string) (dlse DetalheLancamentos, err error) {
 	for _, detalheLancamentoLista := range dls {
 		if detalheLancamentoLista.NomeConta == nomeConta {
 			dlse = append(dlse, detalheLancamentoLista)
@@ -183,14 +183,14 @@ func (dls DetalheLancamentos) ProcuraDetalheLancamentosConta(nomeConta string) (
 	}
 
 	if len(dlse) == 0 {
-		err = fmt.Errorf("Não foi encontrado nenhum DetalheLancamento com o NomeConta informado")
+		err = fmt.Errorf("Não foi encontrado nenhum DetalheLancamento com o NomeConta[%s] informado", nomeConta)
 	}
 
 	return
 }
 
-// ProcuraDetalheLancamentosLancamento é um método que retorna um slice de *DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos pelo ID de Lancamento informada. Caso não seja encontrado nenhum DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
-func (dls DetalheLancamentos) ProcuraDetalheLancamentosLancamento(idLancamento int) (dlse DetalheLancamentos, err error) {
+// ProcuraDetalheLancamentosPorIDLancamento é um método que retorna um slice de *DetalheLancamento a partir da busca em uma listagem de DetalheLancamentos pelo ID de Lancamento informada. Caso não seja encontrado nenhum DetalheLancamento, retorna um erro != nil. A interface IDetalheLancamentos exige a implementação desse método
+func (dls DetalheLancamentos) ProcuraDetalheLancamentosPorIDLancamento(idLancamento int) (dlse DetalheLancamentos, err error) {
 	for _, detalheLancamentoLista := range dls {
 		if detalheLancamentoLista.IDLancamento == idLancamento {
 			dlse = append(dlse, detalheLancamentoLista)
@@ -198,7 +198,7 @@ func (dls DetalheLancamentos) ProcuraDetalheLancamentosLancamento(idLancamento i
 	}
 
 	if len(dlse) == 0 {
-		err = fmt.Errorf("Não foi encontrado nenhum DetalheLancamento com o IDLancamento informado")
+		err = fmt.Errorf("Não foi encontrado nenhum DetalheLancamento com o IDLancamento[%d] informado", idLancamento)
 	}
 
 	return
@@ -216,7 +216,7 @@ func (dls DetalheLancamentos) ProcuraDetalheLancamento(idLancamento int, nomeCon
 		}
 	}
 
-	err = fmt.Errorf("DetalheLancamento %d informado não existe na listagem", idLancamento)
+	err = fmt.Errorf("DetalheLancamento [%d:%s] informado não existe na listagem", idLancamento, nomeConta)
 
 	return
 }

@@ -8,7 +8,7 @@ import (
 	"html/template"
 	"log"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // pacote para comunicação com o Banco de Dados PostgreSQL
 )
 
 // GetDB retorna uma conexão com o banco de dados de acordo com as informações obtida de configurações

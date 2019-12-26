@@ -146,4 +146,25 @@ var MyRoutes = Routes{
 		controller.TipoContaEstado,
 		true,
 	},
+	Route{
+		"ContaIndex",
+		config.Rotas["ContaIndex"].Tipo,
+		config.Rotas["ContaIndex"].Rota,
+		controller.ContaIndex,
+		true,
+	},
+	Route{
+		"ContaShow",
+		config.Rotas["ContaShow"].Tipo,
+		config.Rotas["ContaShow"].Rota,
+		controller.ContaShow,
+		true,
+	},
+	Route{
+		"ContaCreate",
+		config.Rotas["ContaCreate"].Tipo,
+		config.Rotas["ContaCreate"].Rota,
+		controller.ContaCreate,
+		true,
+	},
 }

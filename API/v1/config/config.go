@@ -117,6 +117,21 @@ var Rotas = rotas{
 		"/tipos_conta/{tipoConta}/estado",
 		`Body: {"estado": ?}`,
 	},
+	"ContaIndex": rota{
+		"GET",
+		"/contas",
+		"",
+	},
+	"ContaShow": rota{
+		"GET",
+		"/contas/{conta}",
+		"",
+	},
+	"ContaCreate": rota{
+		"POST",
+		"/contas",
+		`Body: {"nome":"?",  "nome_tipo_conta":"?", "codigo":"?", "conta_pai":"?", "comentario":"?"}`,
+	},
 }
 
 // Configuracoes é a representação de um hashMap das configurações da API

@@ -82,23 +82,7 @@ VALUES($1, $2, $3, $4, $5, $6, $7, $8)
 	return adicionaConta(db, c, query)
 }
 
-func RemoveConta(db *sql.DB, nome string) (err error) {
-	sql := `
-DELETE FROM
-	{{.tabela}}
-WHERE {{.nome}} = $1
-`
-
-	query := getTemplateQuery("RemoveConta", contaDB, sql)
-
-	c, err := ProcuraConta(db, nome)
-	if c != nil {
-		err = remove(db, c.Nome, query)
-	}
-
-	return
-}
-
+// ProcuraConta localiza uma conta no BD e retorna a conta procurada(*Conta). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e o NOME da conta desejada
 func ProcuraConta(db *sql.DB, nome string) (c *conta.Conta, err error) {
 	sql := `
 SELECT
@@ -119,6 +103,148 @@ WHERE {{.nome}} = $1
 	return
 }
 
+// AtivaConta ativa uma conta no BD e retorna a conta(*Conta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um NOME da Conta desejada
+func AtivaConta(db *sql.DB, nome string) (c *conta.Conta, err error) {
+	contaBanco, err := ProcuraConta(db, nome)
+	if err != nil {
+		return
+	}
+
+	contaBanco.Ativa()
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.estado}} = $1, {{.dataModificacao}} = $2
+WHERE {{.nome}} = $3
+`
+
+	query := getTemplateQuery("AtivaConta", contaDB, sql)
+
+	return estadoConta(db, contaBanco, query, nome)
+}
+
+// InativaConta ativa uma conta no BD e retorna a conta(*Conta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um NOME da Conta desejada
+func InativaConta(db *sql.DB, nome string) (c *conta.Conta, err error) {
+	contaBanco, err := ProcuraConta(db, nome)
+	if err != nil {
+		return
+	}
+
+	contaBanco.Inativa()
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.estado}} = $1, {{.dataModificacao}} = $2
+WHERE {{.nome}} = $3
+`
+
+	query := getTemplateQuery("InativaConta", contaDB, sql)
+
+	return estadoConta(db, contaBanco, query, nome)
+}
+
+// AlteraConta altera uma conta com o nome(string) informado a partir dos dados da *Conta informada no parâmetro contaAlteracao. O campo Estado não é alterado, enquanto que o campo Nome sim. Use a função específica para essa tarefa(estado). Retorna uma *Conta alterada no BD e um error. error != nil caso ocorra um problema.
+func AlteraConta(db *sql.DB, nome string, contaAlteracao *conta.Conta) (c *conta.Conta, err error) {
+	contaBanco, err := ProcuraConta(db, nome)
+	if err != nil {
+		return
+	}
+
+	err = contaBanco.Altera(contaAlteracao.Nome, contaAlteracao.NomeTipoConta, contaAlteracao.Codigo, contaAlteracao.ContaPai, contaAlteracao.Comentario)
+	if err != nil {
+		return
+	}
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.nome}} = $1, {{.nomeTipoConta}} = $2, {{.codigo}} = $3, {{.contaPai}} = $4, {{.comentario}} = $5, {{.dataModificacao}} = $6
+WHERE {{.nome}} = $7
+`
+
+	query := getTemplateQuery("AlteraConta", contaDB, sql)
+
+	return alteraConta(db, contaBanco, query, nome)
+}
+
+// RemoveConta remove uma conta do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma string contendo o NOME da conta desejado
+func RemoveConta(db *sql.DB, nome string) (err error) {
+	sql := `
+DELETE FROM
+	{{.tabela}}
+WHERE {{.nome}} = $1
+`
+
+	query := getTemplateQuery("RemoveConta", contaDB, sql)
+
+	c, err := ProcuraConta(db, nome)
+	if c != nil {
+		err = remove(db, c.Nome, query)
+	}
+
+	return
+}
+
+func alteraConta(db *sql.DB, contaBanco *conta.Conta, query, chave string) (c *conta.Conta, err error) {
+	resultado, err := altera(db, contaBanco, query, setValoresConta03, chave)
+	contaTemp, ok := resultado.(*conta.Conta)
+	if ok {
+		c = contaTemp
+	}
+	return
+}
+
+func setValoresConta03(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
+	novaConta, ok := novoRegistro.(*conta.Conta)
+
+	codigo, contaPai, comentario := getCamposConvertidosConta(novaConta)
+
+	if ok {
+		r, err = stmt.Exec(
+			novaConta.Nome,
+			novaConta.NomeTipoConta,
+			codigo,
+			contaPai,
+			comentario,
+			novaConta.DataModificacao,
+			chave)
+	}
+	return
+}
+
+func getCamposConvertidosConta(novaConta *conta.Conta) (codigo, contaPai, comentario sql.NullString) {
+	TemCodigo := len(novaConta.Codigo) > 0
+	codigo = sql.NullString{String: novaConta.Codigo, Valid: TemCodigo}
+
+	TemContaPai := len(novaConta.ContaPai) > 0
+	contaPai = sql.NullString{String: novaConta.ContaPai, Valid: TemContaPai}
+
+	TemComentario := len(novaConta.Comentario) > 0
+	comentario = sql.NullString{String: novaConta.Comentario, Valid: TemComentario}
+
+	return
+}
+
+func estadoConta(db *sql.DB, contaBanco *conta.Conta, query, chave string) (c *conta.Conta, err error) {
+	resultado, err := altera(db, contaBanco, query, setValoresConta02, chave)
+	contaTemp, ok := resultado.(*conta.Conta)
+	if ok {
+		c = contaTemp
+	}
+	return
+}
+
+func setValoresConta02(stmt *sql.Stmt, novoRegistro interface{}, chave string) (r sql.Result, err error) {
+	novaConta, ok := novoRegistro.(*conta.Conta)
+
+	if ok {
+		r, err = stmt.Exec(
+			novaConta.Estado,
+			novaConta.DataModificacao,
+			chave)
+	}
+	return
+}
+
 func adicionaConta(db *sql.DB, novaConta *conta.Conta, query string) (c *conta.Conta, err error) {
 	resultado, err := adiciona(db, novaConta, query, setValoresConta01)
 	contaTemp, ok := resultado.(*conta.Conta)
@@ -131,14 +257,7 @@ func adicionaConta(db *sql.DB, novaConta *conta.Conta, query string) (c *conta.C
 func setValoresConta01(stmt *sql.Stmt, novoRegistro interface{}) (r sql.Result, err error) {
 	novaConta, ok := novoRegistro.(*conta.Conta)
 
-	TemCodigo := len(novaConta.Codigo) > 0
-	codigo := sql.NullString{String: novaConta.Codigo, Valid: TemCodigo}
-
-	TemContaPai := len(novaConta.ContaPai) > 0
-	contaPai := sql.NullString{String: novaConta.ContaPai, Valid: TemContaPai}
-
-	TemComentario := len(novaConta.Comentario) > 0
-	comentario := sql.NullString{String: novaConta.Comentario, Valid: TemComentario}
+	codigo, contaPai, comentario := getCamposConvertidosConta(novaConta)
 
 	if ok {
 		r, err = stmt.Exec(

@@ -200,7 +200,7 @@ func verifica(nome, nomeTipoConta, codigo, contaPai, comentario string) (err err
 		return
 	} else if err = helper.VerificaCampoTextoOpcional("Nome da Conta pai", contaPai, MaxNome); err != nil {
 		return
-	} else if err = helper.VerificaCampoTexto("Comentário", comentario, MaxComentario); err != nil {
+	} else if err = helper.VerificaCampoTextoOpcional("Comentário", comentario, MaxComentario); err != nil {
 		return
 	}
 

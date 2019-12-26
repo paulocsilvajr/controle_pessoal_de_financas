@@ -154,7 +154,7 @@ func TestNewConta(t *testing.T) {
 
 	comentario = ""
 	c2, err := NewConta(nome, tipoConta.Nome, codigo, contaPai, comentario)
-	if err.Error() != "Tamanho de campo Comentário inválido[0 caracter(es)]" {
+	if err != nil {
 		t.Error("Erro em função conta.NewConta, não retornou o erro esperado", c2, err)
 	}
 

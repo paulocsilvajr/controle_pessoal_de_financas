@@ -167,4 +167,18 @@ var MyRoutes = Routes{
 		controller.ContaCreate,
 		true,
 	},
+	Route{
+		"ContaRemove",
+		config.Rotas["ContaRemove"].Tipo,
+		config.Rotas["ContaRemove"].Rota,
+		controller.ContaRemove,
+		true,
+	},
+	Route{
+		"ContaEstado",
+		config.Rotas["ContaEstado"].Tipo,
+		config.Rotas["ContaEstado"].Rota,
+		controller.ContaEstado,
+		true,
+	},
 }

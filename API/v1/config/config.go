@@ -132,6 +132,21 @@ var Rotas = rotas{
 		"/contas",
 		`Body: {"nome":"?",  "nome_tipo_conta":"?", "codigo":"?", "conta_pai":"?", "comentario":"?"}`,
 	},
+	"ContaRemove": rota{
+		"DELETE",
+		"/contas/{conta}",
+		"",
+	},
+	"ContaAlter": rota{
+		"PUT",
+		"/contas/{conta}",
+		`Body: {["nome":"?",]  "nome_tipo_conta":"?", "codigo":"?", "conta_pai":"?", "comentario":"?"}`,
+	},
+	"ContaEstado": rota{
+		"PUT",
+		"/contas/{conta}/estado",
+		`Body: {"estado": ?}`,
+	},
 }
 
 // Configuracoes é a representação de um hashMap das configurações da API

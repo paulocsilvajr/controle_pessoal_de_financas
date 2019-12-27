@@ -175,6 +175,13 @@ var MyRoutes = Routes{
 		true,
 	},
 	Route{
+		"ContaAlter",
+		config.Rotas["ContaAlter"].Tipo,
+		config.Rotas["ContaAlter"].Rota,
+		controller.ContaAlter,
+		true,
+	},
+	Route{
 		"ContaEstado",
 		config.Rotas["ContaEstado"].Tipo,
 		config.Rotas["ContaEstado"].Rota,

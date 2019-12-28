@@ -210,6 +210,45 @@ func TestCarregaContas(t *testing.T) {
 	}
 }
 
+func TestProcuraConta(t *testing.T) {
+	nome01 := "Ativos Teste 01"
+	nome02 := "Ativos Teste 02"
+	nome03 := "Ativos Teste 03"
+
+	c1, err := ProcuraConta(db, nome01)
+	if err != nil {
+		t.Error(err, c1)
+	}
+
+	c2, err := ProcuraConta(db, nome02)
+	if err != nil {
+		t.Error(err, c2)
+	}
+
+	c3, err := ProcuraConta(db, nome03)
+	if err != nil {
+		t.Error(err, c3)
+	}
+}
+
+func TestAlteraConta(t *testing.T) {
+	nome01 := "Ativos Teste 01"
+	novaConta := conta.GetContaTest()
+	novaConta.Nome = nome01
+
+	c1, err := AlteraConta(db, nome01, novaConta)
+	if err != nil {
+		t.Error(err, c1)
+	}
+
+	if c1.Codigo != novaConta.Codigo ||
+		c1.Comentario != novaConta.Comentario ||
+		c1.ContaPai != novaConta.ContaPai ||
+		c1.Estado != novaConta.Estado {
+		t.Error("Erro na alteração de conta(Codigo ou Comentario ou ContaPai ou Estado)", c1, novaConta)
+	}
+}
+
 func TestRemoveConta(t *testing.T) {
 	nome01 := "Ativos Teste 01"
 	nome02 := "Ativos Teste 02"

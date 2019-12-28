@@ -212,14 +212,14 @@ func setValoresConta03(stmt *sql.Stmt, novoRegistro interface{}, chave string) (
 }
 
 func getCamposConvertidosConta(novaConta *conta.Conta) (codigo, contaPai, comentario sql.NullString) {
-	TemCodigo := len(novaConta.Codigo) > 0
-	codigo = sql.NullString{String: novaConta.Codigo, Valid: TemCodigo}
+	temCodigo := len(novaConta.Codigo) > 0
+	codigo = sql.NullString{String: novaConta.Codigo, Valid: temCodigo}
 
-	TemContaPai := len(novaConta.ContaPai) > 0
-	contaPai = sql.NullString{String: novaConta.ContaPai, Valid: TemContaPai}
+	temContaPai := len(novaConta.ContaPai) > 0
+	contaPai = sql.NullString{String: novaConta.ContaPai, Valid: temContaPai}
 
-	TemComentario := len(novaConta.Comentario) > 0
-	comentario = sql.NullString{String: novaConta.Comentario, Valid: TemComentario}
+	temComentario := len(novaConta.Comentario) > 0
+	comentario = sql.NullString{String: novaConta.Comentario, Valid: temComentario}
 
 	return
 }

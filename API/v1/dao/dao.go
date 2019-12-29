@@ -120,6 +120,31 @@ func remove(db *sql.DB, chavePrimaria interface{}, query string) (err error) {
 	return
 }
 
+func remove2(db *sql.DB, query string, chaves ...interface{}) (err error) {
+	transacao, err := db.Begin()
+	if err != nil {
+		return
+	}
+
+	stmt, err := transacao.Prepare(query)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(chaves...)
+	if err != nil {
+		return
+	}
+
+	err = transacao.Commit()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func altera(db *sql.DB, novoRegistro interface{}, query string, setValores func(*sql.Stmt, interface{}, string) (sql.Result, error), chave string) (r interface{}, err error) {
 
 	transacao, err := db.Begin()

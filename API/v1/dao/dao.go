@@ -11,6 +11,9 @@ import (
 	_ "github.com/lib/pq" // pacote para comunicação com o Banco de Dados PostgreSQL
 )
 
+// funcSetValores é um tipo representando a função para setar os valores para a alteração de um dado no BD. ...interface{} representa todos os campos chave(primária). Veja o exemplo de aplicação em detalhe_lancamento_dao.go na função setValoresDetalheLancamento03. Tipo usado pela função altera2
+type funcSetValores func(*sql.Stmt, interface{}, ...interface{}) (sql.Result, error)
+
 // GetDB retorna uma conexão com o banco de dados de acordo com as informações obtida de configurações
 func GetDB() *sql.DB {
 	config := config.AbrirConfiguracoes()
@@ -131,6 +134,34 @@ func altera(db *sql.DB, novoRegistro interface{}, query string, setValores func(
 	defer stmt.Close()
 
 	_, err = setValores(stmt, novoRegistro, chave)
+	if err != nil {
+		return
+	}
+
+	err = transacao.Commit()
+	if err != nil {
+		return
+	}
+
+	r = novoRegistro
+
+	return
+}
+
+func altera2(db *sql.DB, novoRegistro interface{}, query string, setValores funcSetValores, chave ...interface{}) (r interface{}, err error) {
+
+	transacao, err := db.Begin()
+	if err != nil {
+		return
+	}
+
+	stmt, err := transacao.Prepare(query)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = setValores(stmt, novoRegistro, chave...)
 	if err != nil {
 		return
 	}

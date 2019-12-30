@@ -20,16 +20,16 @@ type ILancamento interface {
 	Inativa()
 }
 
-// Lancamento é uma struct que representa um lancamento. Possui notação JSON para cada campo
+// Lancamento é uma struct que representa um lancamento.
 type Lancamento struct {
-	ID              int       `json:"id"`
-	CpfPessoa       string    `json:"cpf_pessoa"`
-	Data            time.Time `json:"data"`
-	Numero          string    `json:"numero"`
-	Descricao       string    `json:"descricao"`
-	DataCriacao     time.Time `json:"data_criacao"`
-	DataModificacao time.Time `json:"data_modificacao"`
-	Estado          bool      `json:"estado"`
+	ID              int
+	CpfPessoa       string
+	Data            time.Time
+	Numero          string
+	Descricao       string
+	DataCriacao     time.Time
+	DataModificacao time.Time
+	Estado          bool
 }
 
 // MaxCPFPessoa: tamanho máximo para o campo CpfPessoa, baseado em modelo em model.pessoa

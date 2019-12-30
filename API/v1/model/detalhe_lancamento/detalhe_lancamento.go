@@ -19,17 +19,12 @@ type IDetalheLancamento interface {
 	CreditoToStr() string
 }
 
-// DetalheLancamentoJSON é uma struct com a notação JSON para os campos de detalhe de lancamento
-type DetalheLancamentoJSON struct {
-	NomeConta string  `json:"nome_conta"`
-	Debito    float64 `json:"debito"`
-	Credito   float64 `json:"credito"`
-}
-
-// DetalheLancamento é uma struct que representa uma detalhe de lançamento. A notação para JSON de cada campo está na struct DetalheLancamentoJSON
+// DetalheLancamento é uma struct que representa uma detalhe de lançamento.
 type DetalheLancamento struct {
 	IDLancamento int
-	DetalheLancamentoJSON
+	NomeConta    string
+	Debito       float64
+	Credito      float64
 }
 
 // MaxNomeConta: tamanho máximo para o campo NomeConta, baseado em valor informado em modelo.conta
@@ -60,11 +55,9 @@ func converteParaDetalheLancamento(dlb IDetalheLancamento) (*DetalheLancamento, 
 func New(idLancamento int, nomeConta string, debito, credito float64) *DetalheLancamento {
 	return &DetalheLancamento{
 		IDLancamento: idLancamento,
-		DetalheLancamentoJSON: DetalheLancamentoJSON{
-			NomeConta: nomeConta,
-			Debito:    debito,
-			Credito:   credito},
-	}
+		NomeConta:    nomeConta,
+		Debito:       debito,
+		Credito:      credito}
 }
 
 // NewD retorna um novo *DetalheLancamento com o valor de debito informado e credito zerado. Preferencialmente, use esta função para criar DetalheLancamento com valor de debito

@@ -188,4 +188,11 @@ var MyRoutes = Routes{
 		controller.ContaEstado,
 		true,
 	},
+	Route{
+		"LancamentoIndex",
+		config.Rotas["LancamentoIndex"].Tipo,
+		config.Rotas["LancamentoIndex"].Rota,
+		controller.LancamentoIndex,
+		true,
+	},
 }

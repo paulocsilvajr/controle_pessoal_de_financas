@@ -147,6 +147,11 @@ var Rotas = rotas{
 		"/contas/{conta}/estado",
 		`Body: {"estado": ?}`,
 	},
+	"LancamentoIndex": rota{
+		"GET",
+		"/lancamentos",
+		"",
+	},
 }
 
 // Configuracoes é a representação de um hashMap das configurações da API

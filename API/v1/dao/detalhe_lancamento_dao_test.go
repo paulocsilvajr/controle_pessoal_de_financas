@@ -69,7 +69,6 @@ func TestAdicionaDetalheLancamento(t *testing.T) {
 
 func TestCarregaDetalheLancamento(t *testing.T) {
 	listaDetalhesLancamento, err := CarregaDetalheLancamentos(db)
-
 	if err != nil {
 		t.Error(err, listaDetalhesLancamento)
 	}
@@ -78,7 +77,33 @@ func TestCarregaDetalheLancamento(t *testing.T) {
 		t.Error(listaDetalhesLancamento)
 	}
 
-	if len(listaDetalhesLancamento) < 4 {
+	if len(listaDetalhesLancamento) != 4 {
+		t.Error(listaDetalhesLancamento)
+	}
+
+	listaDetalhesLancamento, err = CarregaDetalheLancamentosPorIDLancamento(db, numLanc01)
+	if err != nil {
+		t.Error(err, listaDetalhesLancamento)
+	}
+
+	if len(listaDetalhesLancamento) == 0 {
+		t.Error(listaDetalhesLancamento)
+	}
+
+	if len(listaDetalhesLancamento) != 2 {
+		t.Error(listaDetalhesLancamento)
+	}
+
+	listaDetalhesLancamento, err = CarregaDetalheLancamentosPorNomeConta(db, "Ativos Teste 02")
+	if err != nil {
+		t.Error(err, listaDetalhesLancamento)
+	}
+
+	if len(listaDetalhesLancamento) == 0 {
+		t.Error(listaDetalhesLancamento)
+	}
+
+	if len(listaDetalhesLancamento) != 2 {
 		t.Error(listaDetalhesLancamento)
 	}
 }

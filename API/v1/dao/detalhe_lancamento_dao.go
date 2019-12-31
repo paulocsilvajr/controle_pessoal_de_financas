@@ -30,6 +30,36 @@ FROM
 	return carregaDetalheLancamentos(db, query)
 }
 
+// CarregaDetalheLancamentosPorIDLancamento retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) ref ao id de lancamento informado e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD e um idLancamento(int) como parâmetro obrigatório
+func CarregaDetalheLancamentosPorIDLancamento(db *sql.DB, idLancamento int) (detalheLancamentos detalhe_lancamento.DetalheLancamentos, err error) {
+	sql := `
+SELECT
+	{{.idLancamento}}, {{.nomeConta}}, {{.debito}}, {{.credito}}
+FROM
+	{{.tabela}}
+WHERE {{.idLancamento}} = $1
+`
+
+	query := getTemplateQuery("CarregaDetalheLancamentosPorIdLancamento", detalheLancamentoDB, sql)
+
+	return carregaDetalheLancamentos(db, query, idLancamento)
+}
+
+// CarregaDetalheLancamentosPorNomeConta retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) ref ao nome de conta informado e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD e um nomeConta(string) como parâmetro obrigatório
+func CarregaDetalheLancamentosPorNomeConta(db *sql.DB, nomeConta string) (detalheLancamentos detalhe_lancamento.DetalheLancamentos, err error) {
+	sql := `
+SELECT
+	{{.idLancamento}}, {{.nomeConta}}, {{.debito}}, {{.credito}}
+FROM
+	{{.tabela}}
+WHERE {{.nomeConta}} = $1
+`
+
+	query := getTemplateQuery("CarregaDetalheLancamentosPorNomeConta", detalheLancamentoDB, sql)
+
+	return carregaDetalheLancamentos(db, query, nomeConta)
+}
+
 // AdicionaDetalheLancamento adiciona um detalhe lancamento ao BD e retorna o detalhe lancamento incluída(*DetalheLancamento) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um detalhe lancamento(*DetalheLancamento)
 func AdicionaDetalheLancamento(db *sql.DB, novoDetalheLancamento *detalhe_lancamento.DetalheLancamento) (dl *detalhe_lancamento.DetalheLancamento, err error) {
 	dl, err = detalhe_lancamento.NewDetalheLancamento(novoDetalheLancamento.IDLancamento, novoDetalheLancamento.NomeConta, novoDetalheLancamento.Debito, novoDetalheLancamento.Credito)

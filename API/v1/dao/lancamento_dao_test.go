@@ -109,6 +109,19 @@ func TestInativaLancamentoECarregaLancamentosInativos(t *testing.T) {
 	if len(lancamentos) < 3 {
 		t.Error(lancamentos)
 	}
+
+	lancamentos, err = CarregaLancamentosInativoPorCpf(db, cpf)
+	if err != nil {
+		t.Error(err, lancamentos)
+	}
+
+	if len(lancamentos) == 0 {
+		t.Error(lancamentos)
+	}
+
+	if len(lancamentos) < 3 {
+		t.Error(lancamentos)
+	}
 }
 
 func TestAtivaLancamentoECarregaLancamentosAtivos(t *testing.T) {
@@ -145,6 +158,19 @@ func TestAtivaLancamentoECarregaLancamentosAtivos(t *testing.T) {
 	}
 
 	lancamentos, err := CarregaLancamentosAtivo(db)
+	if err != nil {
+		t.Error(err, lancamentos)
+	}
+
+	if len(lancamentos) == 0 {
+		t.Error(lancamentos)
+	}
+
+	if len(lancamentos) < 4 {
+		t.Error(lancamentos)
+	}
+
+	lancamentos, err = CarregaLancamentosAtivoPorCpf(db, cpf)
 	if err != nil {
 		t.Error(err, lancamentos)
 	}

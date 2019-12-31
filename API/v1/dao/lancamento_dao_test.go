@@ -174,6 +174,22 @@ func TestCarregaLancamentos(t *testing.T) {
 	}
 }
 
+func TestCarregaLancamentosPorCpf(t *testing.T) {
+	listaLancamentos, err := CarregaLancamentosPorCpf(db, cpf)
+
+	if err != nil {
+		t.Error(err, listaLancamentos)
+	}
+
+	if len(listaLancamentos) == 0 {
+		t.Error(listaLancamentos)
+	}
+
+	if len(listaLancamentos) < 4 {
+		t.Error(listaLancamentos)
+	}
+}
+
 func TestProcuraLancamento(t *testing.T) {
 	l1, err := ProcuraLancamento(db, numLanc01)
 	if err != nil {

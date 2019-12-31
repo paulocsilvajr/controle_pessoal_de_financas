@@ -66,6 +66,22 @@ WHERE
 	return carregaLancamentos(db, query)
 }
 
+// CarregaLancamentosPorCpf retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma string contendo o cpf(11 caracteres)
+func CarregaLancamentosPorCpf(db *sql.DB, cpf string) (lancamentos lancamento.Lancamentos, err error) {
+	sql := `
+SELECT
+	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+FROM
+	{{.tabela}}
+WHERE
+	{{.cpfPessoa}} = $1
+`
+
+	query := getTemplateQuery("CarregaLancamentosPorCpf", lancamentoDB, sql)
+
+	return carregaLancamentos(db, query, cpf)
+}
+
 // AdicionaLancamento adiciona um lancamento ao BD e retorna o lancamento incluída(*Lancamento) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um lancamento(*Lancamento)
 func AdicionaLancamento(db *sql.DB, novoLancamento *lancamento.Lancamento) (l *lancamento.Lancamento, err error) {
 	l, err = lancamento.NewLancamento(novoLancamento.ID, novoLancamento.CpfPessoa, novoLancamento.Data, novoLancamento.Numero, novoLancamento.Descricao)

@@ -152,6 +152,16 @@ var Rotas = rotas{
 		"/lancamentos",
 		"",
 	},
+	"LancamentoCreate": rota{
+		"POST",
+		"/lancamentos",
+		`Body: {"cpf_pessoa":"?",  "nome_conta_origem":"?", "data":"?", "numero":"?", "descricao":"?", "nome_conta_destino":"?", "debito":?, "credito":?}`,
+	},
+	"LancamentoRemove": rota{
+		"DELETE",
+		"/lancamentos/{lancamento}",
+		"",
+	},
 }
 
 // Configuracoes é a representação de um hashMap das configurações da API

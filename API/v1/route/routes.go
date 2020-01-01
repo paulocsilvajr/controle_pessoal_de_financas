@@ -195,4 +195,18 @@ var MyRoutes = Routes{
 		controller.LancamentoIndex,
 		true,
 	},
+	Route{
+		"LancamentoCreate",
+		config.Rotas["LancamentoCreate"].Tipo,
+		config.Rotas["LancamentoCreate"].Rota,
+		controller.LancamentoCreate,
+		true,
+	},
+	Route{
+		"LancamentoRemove",
+		config.Rotas["LancamentoRemove"].Tipo,
+		config.Rotas["LancamentoRemove"].Rota,
+		controller.LancamentoRemove,
+		true,
+	},
 }

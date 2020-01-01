@@ -150,6 +150,12 @@ func TestNewDetalheLancamento(t *testing.T) {
 		t.Error("Erro em função detalhe_lancamento.NewDetalheLancamento, atributo Credito")
 	}
 
+	credito, debito = 0, 0
+	dl, err = NewDetalheLancamento(lancamento.ID, conta.Nome, debito, credito)
+	if err.Error() != "Campos débito e crédito não podem ter simultaneamente valor zero(0)" {
+		t.Error("Erro em função detalhe_lancamento.NewLancamento, não retornou o erro esperado", dl, err)
+	}
+
 	credito = -20
 	dl, err = NewDetalheLancamento(lancamento.ID, conta.Nome, debito, credito)
 	if err.Error() != "O campo Credito deve ser >= 0" {

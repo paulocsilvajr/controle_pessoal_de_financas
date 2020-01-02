@@ -98,7 +98,7 @@ func ContaShow(w http.ResponseWriter, r *http.Request) {
 
 	if !contaEncontrada.Estado {
 		verif := !(admin && usuarioDB.Administrador)
-		err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem consultar um tipo de conta inativa"))
+		err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem consultar uma conta inativa"))
 		if err != nil {
 			return
 		}
@@ -231,7 +231,7 @@ func ContaRemove(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando resposta de remoção de conta '%s'", contaRemocao))
 }
 
-// ContaAlter é um handler/controller que responde a rota '[PUT] /contas/{conta}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da conta alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o tipo de conta informado na rota existir. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {["nome":"?",]  "nome_tipo_conta":"?", "codigo":"?", "conta_pai":"?", "comentario":"?"}, sendo campo nome opcional, ou StatusNotModified(304) caso ocorra algum erro na alteração do BD. Quando não for informado nome, esse campo não será alterado
+// ContaAlter é um handler/controller que responde a rota '[PUT] /contas/{conta}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da conta alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e a conta informada na rota existir. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {["nome":"?",]  "nome_tipo_conta":"?", "codigo":"?", "conta_pai":"?", "comentario":"?"}, sendo campo nome opcional, ou StatusNotModified(304) caso ocorra algum erro na alteração do BD. Quando não for informado nome, esse campo não será alterado
 func ContaAlter(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 	var contaFromJSON conta.Conta
@@ -299,7 +299,7 @@ func ContaAlter(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando novos dados de conta '%s'", c.Nome))
 }
 
-// ContaEstado é um handler/controller que responde a rota '[PUT] /contas/{conta}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da conta alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o tipo de conta informado na rota existir. Somente usuários ADMINISTRADORES podem ATIVAR contas, USUÁRIO COMUNS podem somente INATIVAR. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o tipo de conta informado na rota não existir
+// ContaEstado é um handler/controller que responde a rota '[PUT] /contas/{conta}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da conta alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e a conta informada na rota existir. Somente usuários ADMINISTRADORES podem ATIVAR contas, USUÁRIO COMUNS podem somente INATIVAR. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso a conta informada na rota não existir
 func ContaEstado(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 	var estadoConta estado
@@ -346,7 +346,7 @@ func ContaEstado(w http.ResponseWriter, r *http.Request) {
 		verif := estadoConta.Estado
 
 		status = http.StatusInternalServerError // 500
-		err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem ativar um tipo de conta"))
+		err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem ativar uma conta"))
 		if err != nil {
 			return
 		}

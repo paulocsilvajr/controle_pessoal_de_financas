@@ -200,3 +200,20 @@ func altera2(db *sql.DB, novoRegistro interface{}, query string, setValores func
 
 	return
 }
+
+func altera2T(transacao *sql.Tx, novoRegistro interface{}, query string, setValores funcSetValores, chave ...interface{}) (r interface{}, err error) {
+	stmt, err := transacao.Prepare(query)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = setValores(stmt, novoRegistro, chave...)
+	if err != nil {
+		return
+	}
+
+	r = novoRegistro
+
+	return
+}

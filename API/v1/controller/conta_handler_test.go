@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -103,6 +104,43 @@ func TestContaEstado(t *testing.T) {
 	status = res.StatusCode
 	if status != 200 {
 		t.Error(res, string(body))
+	}
+}
+
+func TestContaIndex(t *testing.T) {
+	var retorno ReturnData
+	var quantAdmin, quantComum int
+
+	// retorno de dados das contas cadastradas usando um token como administrador - 200
+	rota := "/contas"
+	res, body, err := get(rota, testTokenAdmin)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	status := res.StatusCode
+	json.Unmarshal(body, &retorno)
+	quantAdmin = retorno.Count
+
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// retorno de dados de contas usando um token de um usuário comum - 200
+	res, body, _ = get(rota, testTokenComum)
+	status = res.StatusCode
+	json.Unmarshal(body, &retorno)
+	quantComum = retorno.Count
+
+	if status != 200 {
+		t.Error(res, string(body))
+	}
+
+	// deve haver 2 lancamentos pertencentes ao usuário Admin e 1 ao usuário comum, tendo como diferença 1. Se for 0 ou menor(negativo), ocorreu algum problema
+	diferenca := quantAdmin - quantComum
+	if diferenca < 1 {
+		t.Error("Diferença entre a quantidade de registros na busca de Conta como adminitrador está menor do que a quantidade de registros como usuário comum", diferenca, "=", quantAdmin, "-", quantComum)
 	}
 }
 

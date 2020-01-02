@@ -197,7 +197,6 @@ WHERE {{.id}} = $3
 // AlteraLancamento altera um lancamento com o id(int) informado a partir dos dados do *Lancamento informada no parâmetro lancamentoAlteracao. O campo Estado não é alterado. Use a função específica para essa tarefa(estado). Retorna um *Lancamento alterado no BD e um error. error != nil caso ocorra um problema.
 func AlteraLancamento(db *sql.DB, id int, lancamentoAlteracao *lancamento.Lancamento) (l *lancamento.Lancamento, err error) {
 	lancamentoBanco, err := ProcuraLancamento(db, id)
-
 	if err != nil {
 		return
 	}
@@ -216,6 +215,29 @@ WHERE {{.id}} = $6
 	query := getTemplateQuery("AlteraLancamento", lancamentoDB, sql)
 
 	return alteraLancamento(db, lancamentoBanco, query, id)
+}
+
+// AlteraLancamento2 altera um lancamento com o id(int) informado a partir dos dados do *Lancamento informada no parâmetro lancamentoAlteracao. O campo Estado não é alterado. Use a função específica para essa tarefa(estado). Retorna um *Lancamento alterado no BD e um error. error != nil caso ocorra um problema.
+func AlteraLancamento2(db *sql.DB, transacao *sql.Tx, id int, lancamentoAlteracao *lancamento.Lancamento) (l *lancamento.Lancamento, err error) {
+	lancamentoBanco, err := ProcuraLancamento(db, id)
+	if err != nil {
+		return
+	}
+
+	err = lancamentoBanco.Altera(lancamentoAlteracao.CpfPessoa, lancamentoAlteracao.Data, lancamentoAlteracao.Numero, lancamentoAlteracao.Descricao)
+	if err != nil {
+		return
+	}
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.cpfPessoa}} = $1, {{.data}} = $2, {{.numero}} = $3, {{.descricao}} = $4, {{.dataModificacao}} = $5
+WHERE {{.id}} = $6
+`
+
+	query := getTemplateQuery("AlteraLancamento", lancamentoDB, sql)
+
+	return alteraLancamento2(transacao, lancamentoBanco, query, id)
 }
 
 // RemoveLancamento remove um lancamento do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um int contendo o ID do lancamento desejado
@@ -242,6 +264,33 @@ func alteraLancamento(db *sql.DB, lancamentoBanco *lancamento.Lancamento, query 
 	lancamentoTemp, ok := resultado.(*lancamento.Lancamento)
 	if ok {
 		l = lancamentoTemp
+	}
+	return
+}
+
+func alteraLancamento2(transacao *sql.Tx, lancamentoBanco *lancamento.Lancamento, query string, chave int) (l *lancamento.Lancamento, err error) {
+	chaveString := strconv.Itoa(chave)
+	resultado, err := altera2T(transacao, lancamentoBanco, query, setValoresLancamento04, chaveString)
+	lancamentoTemp, ok := resultado.(*lancamento.Lancamento)
+	if ok {
+		l = lancamentoTemp
+	}
+	return
+}
+
+func setValoresLancamento04(stmt *sql.Stmt, novoRegistro interface{}, chave ...interface{}) (r sql.Result, err error) {
+	novoLancamento, ok := novoRegistro.(*lancamento.Lancamento)
+
+	numero := getCamposConvertidosLancamento(novoLancamento)
+
+	if ok {
+		r, err = stmt.Exec(
+			novoLancamento.CpfPessoa,
+			novoLancamento.Data,
+			numero,
+			novoLancamento.Descricao,
+			novoLancamento.DataModificacao,
+			chave[0])
 	}
 	return
 }

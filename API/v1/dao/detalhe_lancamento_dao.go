@@ -122,6 +122,30 @@ WHERE {{.idLancamento}} = $4 AND {{.nomeConta}} = $5
 	return alteraDetalheLancamento(db, detalheLancamentoBanco, query, idLancamento, nomeConta)
 }
 
+// AlteraDetalheLancamento2 altera um detalhe lancamento com o IDLancamento(int) e NomeConta(string) informado a partir dos dados do *DetalheLancamento informado no parâmetro detalheLancamentoAlteracao. O IDLancamento não é alterado. Retorna um *DetalheLancamento alterado no BD e um error. error != nil caso ocorra um problema.
+func AlteraDetalheLancamento2(db *sql.DB, transacao *sql.Tx, idLancamento int, nomeConta string, detalheLancamentoAlteracao *detalhe_lancamento.DetalheLancamento) (dl *detalhe_lancamento.DetalheLancamento, err error) {
+	detalheLancamentoBanco, err := ProcuraDetalheLancamento(db, idLancamento, nomeConta)
+
+	if err != nil {
+		return
+	}
+
+	err = detalheLancamentoBanco.Altera(detalheLancamentoAlteracao.NomeConta, detalheLancamentoAlteracao.Debito, detalheLancamentoAlteracao.Credito)
+	if err != nil {
+		return
+	}
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.nomeConta}} = $1, {{.debito}} = $2, {{.credito}} = $3
+WHERE {{.idLancamento}} = $4 AND {{.nomeConta}} = $5
+`
+
+	query := getTemplateQuery("AlteraLancamento", detalheLancamentoDB, sql)
+
+	return alteraDetalheLancamento2(transacao, detalheLancamentoBanco, query, idLancamento, nomeConta)
+}
+
 // RemoveDetalheLancamento remove um detalhe lancamento do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um int contendo o IDLancamento e um string contendo o NomeConta desejado
 func RemoveDetalheLancamento(db *sql.DB, idLancamento int, nomeConta string) (err error) {
 	sql := `
@@ -144,6 +168,17 @@ func alteraDetalheLancamento(db *sql.DB, detalheLancamentoBanco *detalhe_lancame
 	chave1String := strconv.Itoa(chave1)
 
 	resultado, err := altera2(db, detalheLancamentoBanco, query, setValoresDetalheLancamento03, chave1String, chave2)
+	detalheLancamentoTemp, ok := resultado.(*detalhe_lancamento.DetalheLancamento)
+	if ok {
+		dl = detalheLancamentoTemp
+	}
+	return
+}
+
+func alteraDetalheLancamento2(transacao *sql.Tx, detalheLancamentoBanco *detalhe_lancamento.DetalheLancamento, query string, chave1 int, chave2 string) (dl *detalhe_lancamento.DetalheLancamento, err error) {
+	chave1String := strconv.Itoa(chave1)
+
+	resultado, err := altera2T(transacao, detalheLancamentoBanco, query, setValoresDetalheLancamento03, chave1String, chave2)
 	detalheLancamentoTemp, ok := resultado.(*detalhe_lancamento.DetalheLancamento)
 	if ok {
 		dl = detalheLancamentoTemp

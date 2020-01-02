@@ -152,15 +152,30 @@ var Rotas = rotas{
 		"/lancamentos",
 		"",
 	},
+	"LancamentoShow": rota{
+		"GET",
+		"/lancamentos/{lancamento}",
+		"",
+	},
 	"LancamentoCreate": rota{
 		"POST",
 		"/lancamentos",
-		`Body: {"cpf_pessoa":"?",  "nome_conta_origem":"?", "data":"?", "numero":"?", "descricao":"?", "nome_conta_destino":"?", "debito":?, "credito":?}`,
+		`Body: {"cpf_pessoa":"?", "nome_conta_origem":"?", "data":"?", "numero":"?", "descricao":"?", "nome_conta_destino":"?", "debito":?, "credito":?}`,
 	},
 	"LancamentoRemove": rota{
 		"DELETE",
 		"/lancamentos/{lancamento}",
 		"",
+	},
+	"LancamentoAlter": rota{
+		"PUT",
+		"/lancamentos/{lancamento}/{origen}/{destino}",
+		`Body: {["cpf_pessoa":"?",] "nome_conta_origem":"?", "data":"?", "numero":"?", "descricao":"?", "nome_conta_destino":"?", "debito":?, "credito":?}`,
+	},
+	"LancamentoEstado": rota{
+		"PUT",
+		"/lancamentos/{lancamento}/estado",
+		`Body: {"estado": ?}`,
 	},
 }
 

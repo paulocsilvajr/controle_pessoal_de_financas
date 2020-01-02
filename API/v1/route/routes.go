@@ -196,6 +196,13 @@ var MyRoutes = Routes{
 		true,
 	},
 	Route{
+		"LancamentoShow",
+		config.Rotas["LancamentoShow"].Tipo,
+		config.Rotas["LancamentoShow"].Rota,
+		controller.LancamentoShow,
+		true,
+	},
+	Route{
 		"LancamentoCreate",
 		config.Rotas["LancamentoCreate"].Tipo,
 		config.Rotas["LancamentoCreate"].Rota,
@@ -207,6 +214,20 @@ var MyRoutes = Routes{
 		config.Rotas["LancamentoRemove"].Tipo,
 		config.Rotas["LancamentoRemove"].Rota,
 		controller.LancamentoRemove,
+		true,
+	},
+	Route{
+		"LancamentoAlter",
+		config.Rotas["LancamentoAlter"].Tipo,
+		config.Rotas["LancamentoAlter"].Rota,
+		controller.LancamentoAlter,
+		true,
+	},
+	Route{
+		"LancamentoEstado",
+		config.Rotas["LancamentoEstado"].Tipo,
+		config.Rotas["LancamentoEstado"].Rota,
+		controller.LancamentoEstado,
 		true,
 	},
 }

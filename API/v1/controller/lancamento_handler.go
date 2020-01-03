@@ -100,8 +100,68 @@ func LancamentoIndex(w http.ResponseWriter, r *http.Request) {
 		"Enviando listagem de lançamentos")
 }
 
+// LancamentoShow é um handler/controller que responde a rota '[GET] /lancamentos/{lancamento}' e retorna StatusOK(200) e os dados do lancamento(ID) solicitado caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func LancamentoShow(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError // 500
 
+	vars := mux.Vars(r)
+	lancamentoRota := vars["lancamento"]
+
+	token, err := helper.GetToken(r, GetMySigningKey())
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioToken, _, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	idLancamentoRota, err := converteParaIDLancamento(lancamentoRota)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	lancamentoEncontrado, err := dao.ProcuraLancamento(db, idLancamentoRota)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	if !lancamentoEncontrado.Estado {
+		verif := !(admin && usuarioDB.Administrador)
+		err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem consultar um lancamento inativo"))
+		if err != nil {
+			return
+		}
+	}
+
+	lancamentosConvertidos, err := empacotaParaLancamentoPersJSON(db, lancamentoEncontrado)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	lancamentoJSON := lancamentosConvertidos[0]
+	status = http.StatusOK // 200
+	funcao := "LancamentoShow"
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJSON,
+		status,
+		lancamentoJSON,
+		funcao,
+		fmt.Sprintf("Dados de lancamento '%d'", lancamentoJSON.ID),
+		fmt.Sprintf("Enviando dados de lancamento '%d'", lancamentoJSON.ID))
 }
 
 // LancamentoCreate é um handler/controller que responde a rota '[POST] /lancamentos' e retorna StatusCreated(201) e os dados de um lancamento e seus detalhes lancamento criados através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"cpf_pessoa":"?",  "nome_conta_origem":"?", "data":"?", "numero":"?", "descricao":"?", "nome_conta_destino":"?", "debito":?, "credito":?}
@@ -217,7 +277,7 @@ func LancamentoRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idLancamentoRemocao, err := strconv.Atoi(lancamentoRemocao)
+	idLancamentoRemocao, err := converteParaIDLancamento(lancamentoRemocao)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -239,6 +299,256 @@ func LancamentoRemove(w http.ResponseWriter, r *http.Request) {
 		funcao,
 		fmt.Sprintf("Removido lancamento '%s'", lancamentoRemocao),
 		fmt.Sprintf("Enviando resposta de remoção de lancamento '%s'", lancamentoRemocao))
+}
+
+// LancamentoAlter é um handler/controller que responde a rota '[PUT] /lancamentos/{lancamento}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados do lancamento alterado caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o lancamento informado na rota existir. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"cpf_pessoa":"?", "nome_conta_origem":"?", "data":"?", "numero":"?", "descricao":"?", "nome_conta_destino":"?", "debito":?, "credito":?}, ou StatusNotModified(304) caso ocorra algum erro na alteração do BD.
+func LancamentoAlter(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError // 500
+	var lancamentoFromJSON LancamentoPersJSON
+	var lancamentoAlteracao *lancamento.Lancamento
+	var detalheLancamentoAlteracao1, detalheLancamentoAlteracao2 *detalhe_lancamento.DetalheLancamento
+
+	vars := mux.Vars(r)
+	lancamentoAlteracaoID := vars["lancamento"]
+	origemAlteracao := vars["origem"]
+	destinoAlteracao := vars["destino"]
+
+	token, err := helper.GetToken(r, GetMySigningKey())
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioToken, _, _, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	_, err = dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, LimitData))
+	if err != nil {
+		log.Println(err)
+	}
+
+	if err := r.Body.Close(); err != nil {
+		log.Println(err)
+	}
+
+	err = json.Unmarshal(body, &lancamentoFromJSON)
+	status = http.StatusUnprocessableEntity // 422
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	lancamentoAlteracao, detalheLancamentoAlteracao1, detalheLancamentoAlteracao2, err = desempacotaDeLancPersJSON(lancamentoFromJSON)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	idLancamentoAlteracao, err := converteParaIDLancamento(lancamentoAlteracaoID)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	transacao, err := db.Begin()
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	l, err := dao.AlteraLancamento2(db, transacao, idLancamentoAlteracao, lancamentoAlteracao)
+	status = http.StatusInternalServerError // 500
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		transacao.Rollback()
+		return
+	}
+
+	detalheLancamentoAlteracao1.IDLancamento = l.ID
+	dl1, err := dao.AlteraDetalheLancamento2(db, transacao, l.ID, origemAlteracao, detalheLancamentoAlteracao1)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		transacao.Rollback()
+		return
+	}
+
+	detalheLancamentoAlteracao2.IDLancamento = l.ID
+	dl2, err := dao.AlteraDetalheLancamento2(db, transacao, l.ID, destinoAlteracao, detalheLancamentoAlteracao2)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		transacao.Rollback()
+		return
+	}
+
+	err = transacao.Commit()
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	d := dados{l, dl1, dl2}
+	status = http.StatusOK // 200
+	funcao := "LancamentoAlter"
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJSON,
+		status,
+		d,
+		funcao,
+		fmt.Sprintf("Novos dados de lancamento '%d'", l.ID),
+		fmt.Sprintf("Enviando novos dados de lancamento '%d'", l.ID))
+}
+
+// LancamentoEstado é um handler/controller que responde a rota '[PUT] /lancamentos/{lancamento}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados do lancamento alterado caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o lancamento informado na rota existir. Somente usuários ADMINISTRADORES podem ATIVAR contas, USUÁRIO COMUNS podem somente INATIVAR. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o lancamento informado na rota não existir
+func LancamentoEstado(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError // 500
+	var estadoLancamento estado
+
+	vars := mux.Vars(r)
+	lancamentoAlteracao := vars["lancamento"]
+
+	token, err := helper.GetToken(r, GetMySigningKey())
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioToken, _, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, LimitData))
+	if err != nil {
+		log.Println(err)
+	}
+
+	if err := r.Body.Close(); err != nil {
+		log.Println(err)
+	}
+
+	err = json.Unmarshal(body, &estadoLancamento)
+	status = http.StatusUnprocessableEntity // 422
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioComum := !(admin && usuarioDB.Administrador)
+	if usuarioComum {
+		verif := estadoLancamento.Estado
+
+		status = http.StatusInternalServerError // 500
+		err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem ativar um lancamento"))
+		if err != nil {
+			return
+		}
+	}
+
+	idLancamentoAlteracao, err := converteParaIDLancamento(lancamentoAlteracao)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	lancamentoDBAlteracao, err := dao.ProcuraLancamento(db, idLancamentoAlteracao)
+	status = http.StatusNotFound // 404
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	var alteraEstado func(*sql.DB, int) (*lancamento.Lancamento, error)
+	if estadoLancamento.Estado {
+		alteraEstado = dao.AtivaLancamento
+	} else {
+		alteraEstado = dao.InativaLancamento
+	}
+	l, err := alteraEstado(db, lancamentoDBAlteracao.ID)
+	status = http.StatusNotModified // 304
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	status = http.StatusOK // 200
+	funcao := "LancamentoEstado"
+	DefineHeaderRetornoDado(
+		w,
+		SetHeaderJSON,
+		status,
+		l,
+		funcao,
+		fmt.Sprintf("Novos dados de lancamento '%d'", l.ID),
+		fmt.Sprintf("Enviando novos dados de lancamento '%d'", l.ID))
+}
+
+// LancamentoPorConta é um handler/controller que responde a rota '[GET] /lancamentos_conta/{conta}' e retorna StatusOK(200) e uma listagem de lancamentos de acordo a conta informada e com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500). Quando solicitado como usuário comum, retorna somente lancamentos ativos ref a esse usuário(cpf), enquanto que como administrador, retorna todos os registros de lancamentos ref ao usuário
+func LancamentoPorConta(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusInternalServerError // 500
+
+	vars := mux.Vars(r)
+	contaRota := vars["conta"]
+
+	token, err := helper.GetToken(r, GetMySigningKey())
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioToken, _, admin, err := helper.GetClaims(token)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	pessoa, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	var listaLancamentosPersJSON LancamentosPersJSON
+	if admin {
+		listaLancamentosPersJSON, err = empacotaParaLancPersJSONPorCpfEConta(db, pessoa.Cpf, contaRota, true)
+		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+		if err != nil {
+			return
+		}
+	} else {
+		listaLancamentosPersJSON, err = empacotaParaLancPersJSONPorCpfEConta(db, pessoa.Cpf, contaRota, false)
+		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+		if err != nil {
+			return
+		}
+	}
+
+	status = http.StatusOK
+	funcao := "LancamentoPorConta"
+	DefineHeaderRetornoDados(
+		w,
+		SetHeaderJSON,
+		status,
+		listaLancamentosPersJSON,
+		funcao,
+		fmt.Sprintf("Listagem de lançamentos por conta %s", contaRota),
+		fmt.Sprintf("Enviando listagem de lançamentos por conta %s", contaRota))
 }
 
 func desempacotaDeLancPersJSON(lancamentoFromJSON LancamentoPersJSON) (lanc *lancamento.Lancamento, detLancamento1, detLancamento2 *detalhe_lancamento.DetalheLancamento, err error) {
@@ -284,8 +594,57 @@ func empacotaParaLancPersJSONPorCpf(db *sql.DB, cpfPessoa string, todosOsRegistr
 		return
 	}
 
-	for _, lancamento := range listaLancamentos {
-		var lancPersJSON *LancamentoPersJSON
+	// substituido código comentado pela função "empacotaParaLancamentoPersJSON"
+	// for _, lancamento := range listaLancamentos {
+	// 	var lancPersJSON *LancamentoPersJSON
+
+	// 	detalheLancamentos, err := dao.CarregaDetalheLancamentosPorIDLancamento(db, lancamento.ID)
+	// 	// todo o lancamento deve ter 2 detalhes lancamento obrigatóriamente. Caso contrário, o laço é quebrado e retorna o erro personalizado
+	// 	if err != nil && len(detalheLancamentos) != 2 {
+	// 		err = errors.New("Lancamentos devem ser obrigatoriamente em par, representando o valor em débito e crédito de cada conta")
+	// 		break
+	// 	}
+
+	// 	lancPersJSON.ID = lancamento.ID
+	// 	lancPersJSON.CpfPessoa = lancamento.CpfPessoa
+	// 	lancPersJSON.NomeContaOrigem = detalheLancamentos[0].NomeConta
+	// 	lancPersJSON.Data = lancamento.Data
+	// 	lancPersJSON.Numero = lancamento.Numero
+	// 	lancPersJSON.Descricao = lancamento.Descricao
+	// 	lancPersJSON.NomeContaDestino = detalheLancamentos[1].NomeConta
+	// 	lancPersJSON.Debito = detalheLancamentos[0].Debito
+	// 	lancPersJSON.Credito = detalheLancamentos[0].Credito
+	// 	lancPersJSON.DataCriacao = lancamento.DataCriacao
+	// 	lancPersJSON.DataModificacao = lancamento.DataModificacao
+	// 	lancPersJSON.Estado = lancamento.Estado
+
+	// 	listaLancamentosPersJSON = append(listaLancamentosPersJSON, lancPersJSON)
+	// }
+	// // if err != nil {
+	// // 	return
+	// // }
+
+	// return
+	return empacotaParaLancamentoPersJSON(db, listaLancamentos...)
+}
+
+func empacotaParaLancPersJSONPorCpfEConta(db *sql.DB, cpfPessoa, conta string, todosOsRegistros bool) (listaLancamentosPersJSON LancamentosPersJSON, err error) {
+	var listaLancamentos lancamento.Lancamentos
+	if todosOsRegistros {
+		listaLancamentos, err = dao.CarregaLancamentosPorCpf(db, cpfPessoa)
+	} else {
+		listaLancamentos, err = dao.CarregaLancamentosAtivoPorCpf(db, cpfPessoa)
+	}
+	if err != nil {
+		return
+	}
+
+	return empacotaParaLancamentoPersJSON(db, listaLancamentos...)
+}
+
+func empacotaParaLancamentoPersJSON(db *sql.DB, lancamentos ...*lancamento.Lancamento) (listaLancamentosPersJSON LancamentosPersJSON, err error) {
+	for _, lancamento := range lancamentos {
+		lancPersJSON := new(LancamentoPersJSON)
 
 		detalheLancamentos, err := dao.CarregaDetalheLancamentosPorIDLancamento(db, lancamento.ID)
 		// todo o lancamento deve ter 2 detalhes lancamento obrigatóriamente. Caso contrário, o laço é quebrado e retorna o erro personalizado
@@ -309,9 +668,15 @@ func empacotaParaLancPersJSONPorCpf(db *sql.DB, cpfPessoa string, todosOsRegistr
 
 		listaLancamentosPersJSON = append(listaLancamentosPersJSON, lancPersJSON)
 	}
+
+	return
+}
+
+func converteParaIDLancamento(codigo string) (numero int, err error) {
+	numero, err = strconv.Atoi(codigo)
 	if err != nil {
+		err = fmt.Errorf("ID de lançamento informado inválido[%s]", codigo)
 		return
 	}
-
 	return
 }

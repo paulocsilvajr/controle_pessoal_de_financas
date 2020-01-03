@@ -230,4 +230,11 @@ var MyRoutes = Routes{
 		controller.LancamentoEstado,
 		true,
 	},
+	Route{
+		"LancamentoPorConta",
+		config.Rotas["LancamentoPorConta"].Tipo,
+		config.Rotas["LancamentoPorConta"].Rota,
+		controller.LancamentoPorConta,
+		true,
+	},
 }

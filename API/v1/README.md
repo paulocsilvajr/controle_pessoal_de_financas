@@ -11,7 +11,7 @@ Como go é uma linguagem compilada, deve-se gerar o executável usando o script 
 
 Para executar os scripts(*.sh) deve-se conceder privilégio de execução a cada um.
 
-O banco de dados utilizado é o **PostgreSQL 11**. Atualmente nos testes é usado o **Docker** para criar o container do Postgres e PgAdmin. Pode-se replicar esse ambiente utilizando o repositório [docker-code](https://paulocsilvajr@bitbucket.org/paulocsilvajr/docker-code.git) pasta **yml/postgreSQL_pgadmin4**. Senhas e usuários em arquivo .YML de repositório apresentado. Em branch **DESENVOLVIMENTO** na pasta DOC/sql/, pode-se encontrar backups.sql do banco de dados, use a versão com data mais atual para restaurar o banco **controle_pessoal_financas**.
+O banco de dados utilizado é o **PostgreSQL 11**. Atualmente nos testes é usado o **Docker** para criar o container do Postgres e PgAdmin. Pode-se replicar esse ambiente utilizando o repositório [docker-code](https://bitbucket.org/paulocsilvajr/docker-code/src/master/) pasta **yml/postgreSQL_pgadmin4**. Senhas e usuários em arquivo .YML de repositório apresentado. Em branch **DESENVOLVIMENTO** na pasta DOC/sql/, pode-se encontrar backups.sql do banco de dados, use a versão com data mais atual para restaurar o banco **controle_pessoal_financas**.
 
 Execute o script **install_dependencies.sh** antes da primeira execução do código para instalar as dependências da API em GO.
 

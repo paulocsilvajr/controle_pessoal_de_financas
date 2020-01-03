@@ -9,15 +9,18 @@ import (
 
 var (
 	lancamentoDB = map[string]string{
-		"tabela":          "lancamento",
-		"id":              "id",
-		"cpfPessoa":       "cpf_pessoa",
-		"data":            "data",
-		"numero":          "numero",
-		"descricao":       "descricao",
-		"dataCriacao":     "data_criacao",
-		"dataModificacao": "data_modificacao",
-		"estado":          "estado"}
+		"tabela":                 "lancamento",
+		"tabelaComplementar01":   detalheLancamentoDB["tabela"],
+		"id":                     "id",
+		"cpfPessoa":              "cpf_pessoa",
+		"data":                   "data",
+		"numero":                 "numero",
+		"descricao":              "descricao",
+		"dataCriacao":            "data_criacao",
+		"dataModificacao":        "data_modificacao",
+		"estado":                 "estado",
+		"idTabelaComplementar01": detalheLancamentoDB["idLancamento"],
+		"nomeConta":              detalheLancamentoDB["nomeConta"]}
 )
 
 // CarregaLancamentos retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
@@ -112,6 +115,42 @@ WHERE
 	query := getTemplateQuery("CarregaLancamentosInativoPorCpf", lancamentoDB, sql)
 
 	return carregaLancamentos(db, query, cpf)
+}
+
+// CarregaLancamentosAtivoPorCpfEConta retorna uma listagem de todos os lancamentos ativos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
+func CarregaLancamentosAtivoPorCpfEConta(db *sql.DB, cpf, conta string) (lancamentos lancamento.Lancamentos, err error) {
+	sql := `
+SELECT
+	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+FROM
+	{{.tabela}}
+INNER JOIN
+	{{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}
+WHERE
+	{{.cpfPessoa}} = $1 AND {{.nomeConta}} = $2 AND {{.estado}} = true
+`
+
+	query := getTemplateQuery("CarregaLancamentosAtivoPorCpfEConta", lancamentoDB, sql)
+
+	return carregaLancamentos(db, query, cpf, conta)
+}
+
+// CarregaLancamentosInativoPorCpfEConta retorna uma listagem de todos os lancamentos inativos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
+func CarregaLancamentosInativoPorCpfEConta(db *sql.DB, cpf, conta string) (lancamentos lancamento.Lancamentos, err error) {
+	sql := `
+SELECT
+	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+FROM
+	{{.tabela}}
+INNER JOIN
+	{{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}
+WHERE
+	{{.cpfPessoa}} = $1 AND {{.nomeConta}} = $2 AND {{.estado}} = false
+`
+
+	query := getTemplateQuery("CarregaLancamentosInativoPorCpfEConta", lancamentoDB, sql)
+
+	return carregaLancamentos(db, query, cpf, conta)
 }
 
 // AdicionaLancamento adiciona um lancamento ao BD e retorna o lancamento incluída(*Lancamento) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um lancamento(*Lancamento)

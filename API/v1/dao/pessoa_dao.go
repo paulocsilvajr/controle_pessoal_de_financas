@@ -236,8 +236,8 @@ func adicionaPessoaBase(db *sql.DB, novaPessoa *pessoa.Pessoa, newPessoa func(st
 
 	sql := `
 INSERT INTO {{.tabela}}(
-	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}})
-VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}, {{.administrador}})
+VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `
 	query := getTemplateQuery("AdicionaPessoa", pessoaDB, sql)
 
@@ -333,7 +333,8 @@ func setValoresPessoa01(stmt *sql.Stmt, novoRegistro interface{}) (r sql.Result,
 			novaPessoa.Email,
 			novaPessoa.DataCriacao,
 			novaPessoa.DataModificacao,
-			novaPessoa.Estado)
+			novaPessoa.Estado,
+			novaPessoa.Administrador)
 	}
 	return
 }

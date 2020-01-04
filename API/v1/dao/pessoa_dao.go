@@ -291,6 +291,7 @@ func alteraPessoa(db *sql.DB, pessoaBanco *pessoa.Pessoa, query, chave string) (
 	pessoaTemp, ok := resultado.(*pessoa.Pessoa)
 	if ok {
 		p = pessoaTemp
+		p.DataCriacao = p.DataCriacao.Local()
 	}
 	return
 }

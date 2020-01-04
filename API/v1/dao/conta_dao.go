@@ -189,6 +189,7 @@ func alteraConta(db *sql.DB, contaBanco *conta.Conta, query, chave string) (c *c
 	contaTemp, ok := resultado.(*conta.Conta)
 	if ok {
 		c = contaTemp
+		c.DataCriacao = c.DataCriacao.Local()
 	}
 	return
 }

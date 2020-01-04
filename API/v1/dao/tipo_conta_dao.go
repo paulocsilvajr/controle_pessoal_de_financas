@@ -195,11 +195,12 @@ func adicionaTipoConta(db *sql.DB, novoTipoConta *tipo_conta.TipoConta, query st
 	return
 }
 
-func alteraTipoConta(db *sql.DB, tipoContaBanco *tipo_conta.TipoConta, query, chave string) (p *tipo_conta.TipoConta, err error) {
+func alteraTipoConta(db *sql.DB, tipoContaBanco *tipo_conta.TipoConta, query, chave string) (tc *tipo_conta.TipoConta, err error) {
 	resultado, err := altera(db, tipoContaBanco, query, setValoresTipoConta03, chave)
 	tipoContaTemp, ok := resultado.(*tipo_conta.TipoConta)
 	if ok {
-		p = tipoContaTemp
+		tc = tipoContaTemp
+		tc.DataCriacao = tc.DataCriacao.Local()
 	}
 	return
 }

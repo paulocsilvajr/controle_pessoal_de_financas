@@ -303,6 +303,7 @@ func alteraLancamento(db *sql.DB, lancamentoBanco *lancamento.Lancamento, query 
 	lancamentoTemp, ok := resultado.(*lancamento.Lancamento)
 	if ok {
 		l = lancamentoTemp
+		l.DataCriacao = l.DataCriacao.Local()
 	}
 	return
 }
@@ -313,6 +314,7 @@ func alteraLancamento2(transacao *sql.Tx, lancamentoBanco *lancamento.Lancamento
 	lancamentoTemp, ok := resultado.(*lancamento.Lancamento)
 	if ok {
 		l = lancamentoTemp
+		l.DataCriacao = l.DataCriacao.Local()
 	}
 	return
 }

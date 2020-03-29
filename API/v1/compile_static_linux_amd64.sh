@@ -1,6 +1,7 @@
 #!/bin/bash
 
-PASTA=bin/API_CPF
+BASE=$(dirname $0)
+PASTA=$BASE/bin/API_CPF
 ARQUIVO=$PASTA/API_CPF
 
 sudo apt install musl musl-dev musl-tools tree && echo -e "Instalado musl\n"
@@ -20,12 +21,13 @@ fi
 mkdir -p $PASTA 2> /dev/null
 
 echo -e "Compilando para $GOOS:$GOARCH\n"
-go build -v -o $ARQUIVO -a -installsuffix cgo -ldflags '-extldflags "-static" -s'
+go build -v -o $ARQUIVO -a -installsuffix cgo -ldflags '-extldflags "-static" -s' $BASE
 
-cp -vr keys $PASTA
+cp -vr $BASE/keys $PASTA
+chmod -R 777 $PASTA
 
 echo
 file $ARQUIVO && ldd $ARQUIVO
 
 echo -e "\nArquivos em $PASTA:"
-tree $PASTA
+tree -D $PASTA

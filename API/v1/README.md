@@ -22,17 +22,29 @@ O banco de dados utilizado é o **PostgreSQL 11**. Atualmente nos testes é usad
 
 Execute o script **install_dependencies.sh** antes da primeira execução do código para instalar as dependências da API em GO.
 
+### Compilando com DOCKER
+
+Foi desenvolvido scripts para compilar a API via Docker.
+
+Pode-se instalar o Docker via link [**Get Started**](https://www.docker.com/get-started) ou usando o utilitário [**Instalador de programas**](https://github.com/paulocsilvajr/instalador-programas) selecionado a opção *docker ce*.
+
+Inicialmente deve-se executar o script **get_golang_docker.sh** para obter a imagem base do docker. Após execute o script **build_docker_image.sh** para construir a imagem com as dependências que são necessárias para gerar o executável para linux *amd64*. Use finalmente o script **compile_in_docker.sh** para compilar o executável em pasta bin da raiz do projeto(*~/go/src/controle_pessoal_de_financas/API/v1/bin*). **OBS**: dentro do script *compile_in_docker.sh**, deve-se alterar o conteúdo da variável **DIR_ABS** para o **diretório absoluto do projeto**, geralmente localizado na pasta 'go' na home se seu usuário, para gerar o executável compilado na pasta correta.
+
 ### Arquivos
 
 ```
-bin/: Pasta com os binários compilados pelo script "compile_static_linux_amd64.sh". Esta pasta é gerado ao executar o script citado nos pré-requisitos.
+bin/: Pasta com os binários compilados pelo script "compile_static_linux_amd64.sh". Esta pasta é gerado ao executar o script citado nos Pré-requisitos ou em Compilando em DOCKER.
+build_docker_image.sh: Script que constroi uma imagem docker com dependências que são necessárias para gerar o executável para linux *amd64*.
+compile_in_docker.sh: Script usado para compilar o executável em pasta bin usado a imagem gerada com script build_docker_image.sh
 compile_static_linux_amd64.sh: Script que compila a API usando como compilador C o MUSL(https://www.musl-libc.org/). Faz a instalação do Musl via apt caso não esteja instalado. Foi usado o Musl para gerar executável estaticamente lincado, evitando bibliotecas dinamicamente lincadas em executável de API. Também copia as chaves/certificados para usar o protocolo HTTPS.
 config/: Pasta com o arquivo de configuração inicial da API "config.json". Nele pode-se alterar configurações do banco de dados, duração do token, host e porta padrão e protocolo usado(HTTP ou HTTPS). Também contém informações de rotas da API. Ao executar a API compilada na primeira vez, é gerado na mesma pasta do executável uma cópia definida em arquivo "config.go" na função "criarConfigPadrao()".
 controller/: Pasta com todos os handlers/controllers da API. Faz a comunicação entre as rotas definidas e as funções DAO que comunicam com o banco de dados.
 cURL/: Pasta com exemplo de script para comunicar com API via comando "curl".
 dao/: Pasta com os arquivos que fazem a comunicação com o banco de dados, convertendo os modelos em instruções SQL e vice-versa.
+Dockerfile: Arquivo usado pelo script build_docker_image.sh para gerar a imagem do docker para compilar a API.
 frase_key.txt: Arquivo com a frase secreta e desafio de chaves/certificados gerados para as requisições HTTPS.
 gerar_keys.sh: Script para gerar as chaves/certificados utilizados no protocolo HTTPS.
+get_golang_docker.sh: Script para obter a imagem base do docker. Se casp for alterado a versão da imagem, deve-se atualizar também no arquivo Dockerfile.
 go_clean.sh: Script para limpar o cache de teste. Deve ser executado sempre que o cache atrapalhar os testes unitários não retornando os valores desejados.
 go_test_all_json.sh: Script para efetuar todos os testes criados e gerar como saída um JSON com os resultados.
 go_test_all.sh: Script para efetuar todos os teste unitários criados em suas respectivas pastas/packages.

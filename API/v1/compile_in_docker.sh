@@ -7,3 +7,5 @@
 DIR_ABS=$HOME/go/src/controle_pessoal_de_financas
 
 docker run -it --rm -v $DIR_ABS:/go/src/controle_pessoal_de_financas golang_custom:controle_pessoal_de_financas ./controle_pessoal_de_financas/API/v1/compile_static_linux_amd64.sh
+
+chown -R $USER $DIR_ABS/bin

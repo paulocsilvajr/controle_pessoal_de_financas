@@ -28,7 +28,9 @@ Foi desenvolvido scripts para compilar a API via Docker.
 
 Pode-se instalar o Docker via link [**Get Started**](https://www.docker.com/get-started) ou usando o utilitário [**Instalador de programas**](https://github.com/paulocsilvajr/instalador-programas) selecionado a opção *docker ce*.
 
-Inicialmente deve-se executar o script **get_golang_docker.sh** para obter a imagem base do docker. Após execute o script **build_docker_image.sh** para construir a imagem com as dependências que são necessárias para gerar o executável para linux *amd64*. Use finalmente o script **compile_in_docker.sh** para compilar o executável em pasta bin da raiz do projeto(*~/go/src/controle_pessoal_de_financas/API/v1/bin*). **OBS**: dentro do script *compile_in_docker.sh**, deve-se alterar o conteúdo da variável **DIR_ABS** para o **diretório absoluto do projeto**, geralmente localizado na pasta 'go' na home se seu usuário, para gerar o executável compilado na pasta correta.
+Inicialmente deve-se executar o script **get_golang_docker.sh** para obter a imagem base do docker. Após execute o script **build_docker_image.sh** para construir a imagem com as dependências que são necessárias para gerar o executável para linux *amd64*. Use finalmente o script **compile_in_docker.sh** para compilar o executável em pasta bin da raiz do projeto(*~/go/src/controle_pessoal_de_financas/API/v1/bin*).
+
+**OBS**: Caso ao executar o script **compile_in_docker.sh** de erro ou não gere o executável na pasta bin do projeto, deve-se alterar o conteúdo da variável **DIR_ABS** para o **diretório absoluto do projeto**, geralmente localizado na pasta *go* na home se seu usuário, para gerar o executável compilado na pasta correta.
 
 ### Arquivos
 

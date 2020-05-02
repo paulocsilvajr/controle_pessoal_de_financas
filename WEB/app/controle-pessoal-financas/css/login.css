@@ -1,0 +1,19 @@
+.formulario-login {
+  max-width: 330px;
+  margin: auto;
+  padding-top: 4rem;
+}
+
+.titulo-login {
+  margin-bottom: 3rem;
+}
+
+@media screen and (max-height: 480px) {
+  .formulario-login {
+    padding-top: 1rem;
+  }
+
+  .titulo-login {
+    margin-bottom: 1rem;
+  }
+}

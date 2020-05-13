@@ -7,6 +7,13 @@ Este repositório contém a API de um software desenvolvido em go para disponibi
 
 Para testar e compilar, deve-se ter instalado e configurado o [**Go**](https://golang.org/). O link do [github](https://github.com/golang/go/wiki/Ubuntu) demonstra como instalar via **apt** em distribuições línux baseados no Debian/Ubuntu. Também pode-se instalar usando o utilitário de instalação [**Instalador de programas**](https://github.com/paulocsilvajr/instalador-programas). Para que a compilação ocorra corretamente, este branch(**API**) deve ser clonado dentro da pasta **$HOME/go/src**
 
+Também pode-se obter este repositório usando o comando **go get** de acordo com o exemplo abaixo:
+
+```
+go get -v github.com/paulocsilvajr/controle_pessoal_de_financas
+```
+O repositório será criado na pasta **$HOME/go/src/github.com/paulocsilvajr/**
+
 Como go é uma linguagem compilada, deve-se gerar o executável usando o script "compile_static_linux_amd64.sh"(executável gerado em bin/) ou executar o script "run.sh" que compila e executa o programa em pasta temporária. Pode-se também rodar e compilar usando os respectivos comandos abaixo:
 
 ```

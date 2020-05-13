@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 	"fmt"
 	"io"
 	"log"

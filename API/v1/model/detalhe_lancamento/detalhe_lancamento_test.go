@@ -1,11 +1,12 @@
 package detalhe_lancamento
 
 import (
-	"controle_pessoal_de_financas/API/v1/model/conta"
-	"controle_pessoal_de_financas/API/v1/model/lancamento"
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 )
 
 func TestIDetalheLancamento(t *testing.T) {

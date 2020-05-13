@@ -1,7 +1,7 @@
 package conta
 
 import (
-	"controle_pessoal_de_financas/API/v1/model/tipo_conta"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
 	"reflect"
 	"testing"
 	"time"

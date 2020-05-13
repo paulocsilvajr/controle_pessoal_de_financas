@@ -2,11 +2,11 @@ package main
 
 import (
 	"bufio"
-	"controle_pessoal_de_financas/API/v1/config"
-	"controle_pessoal_de_financas/API/v1/dao"
-	"controle_pessoal_de_financas/API/v1/helper"
-	"controle_pessoal_de_financas/API/v1/model/pessoa"
-	"controle_pessoal_de_financas/API/v1/route"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/route"
 	"fmt"
 	"log"
 	"net/http"

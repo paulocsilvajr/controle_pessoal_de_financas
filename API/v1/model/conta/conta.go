@@ -1,7 +1,7 @@
 package conta
 
 import (
-	"controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 	"errors"
 	"fmt"
 	"time"

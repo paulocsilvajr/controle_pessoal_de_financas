@@ -2,7 +2,7 @@ package dao
 
 import (
 	"bytes"
-	"controle_pessoal_de_financas/API/v1/config"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
 	"database/sql"
 	"fmt"
 	"html/template"

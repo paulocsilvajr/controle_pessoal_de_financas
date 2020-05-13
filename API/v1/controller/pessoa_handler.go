@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"controle_pessoal_de_financas/API/v1/dao"
-	"controle_pessoal_de_financas/API/v1/helper"
-	"controle_pessoal_de_financas/API/v1/model/pessoa"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"database/sql"
 	"encoding/json"
 	"errors"

@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"controle_pessoal_de_financas/API/v1/config"
-	"controle_pessoal_de_financas/API/v1/dao"
-	"controle_pessoal_de_financas/API/v1/helper"
-	"controle_pessoal_de_financas/API/v1/logger"
-	"controle_pessoal_de_financas/API/v1/model/pessoa"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"encoding/json"
 	"errors"
 	"fmt"

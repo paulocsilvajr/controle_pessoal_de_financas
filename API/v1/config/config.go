@@ -1,8 +1,8 @@
 package config
 
 import (
-	"controle_pessoal_de_financas/API/v1/helper"
-	"controle_pessoal_de_financas/API/v1/logger"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
 	"encoding/json"
 	"fmt"
 	"os"

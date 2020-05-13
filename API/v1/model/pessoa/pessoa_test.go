@@ -2,7 +2,7 @@
 package pessoa
 
 import (
-	"controle_pessoal_de_financas/API/v1/model/erro"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/erro"
 	"testing"
 	"time"
 )

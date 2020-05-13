@@ -1,7 +1,7 @@
 package lancamento
 
 import (
-	"controle_pessoal_de_financas/API/v1/model/pessoa"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"fmt"
 	"reflect"
 	"testing"

@@ -1,9 +1,9 @@
 package lancamento
 
 import (
-	"controle_pessoal_de_financas/API/v1/helper"
-	"controle_pessoal_de_financas/API/v1/model/conta"
-	"controle_pessoal_de_financas/API/v1/model/pessoa"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"errors"
 	"fmt"
 	"time"

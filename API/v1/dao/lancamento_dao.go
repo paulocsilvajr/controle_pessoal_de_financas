@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"controle_pessoal_de_financas/API/v1/model/lancamento"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 	"database/sql"
 	"fmt"
 	"strconv"

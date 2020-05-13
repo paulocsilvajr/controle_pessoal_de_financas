@@ -1,9 +1,10 @@
 package route
 
 import (
-	"controle_pessoal_de_financas/API/v1/controller"
-	"controle_pessoal_de_financas/API/v1/logger"
 	"net/http"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/controller"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"

@@ -1,19 +1,39 @@
+html, body {
+  height: 100%;
+}
+
+main {
+  width: 100%;
+}
+
+body {
+  display: flex;
+  align-items: center;
+}
+
 .formulario-login {
+  width: 100%;
   max-width: 330px;
+  padding: 15px;
   margin: auto;
-  padding-top: 4rem;
 }
 
 .titulo-login {
   margin-bottom: 3rem;
+  font-weight: bold;
 }
 
+/* ALTURA de screen <= 480px */
 @media screen and (max-height: 480px) {
   .formulario-login {
-    padding-top: 1rem;
+    padding-top: 0rem;
   }
 
   .titulo-login {
     margin-bottom: 1rem;
+  }
+
+  #botao-logar {
+    margin-top: 1rem !important;
   }
 }

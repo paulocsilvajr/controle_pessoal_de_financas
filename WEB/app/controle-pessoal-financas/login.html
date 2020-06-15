@@ -1,53 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
 
-    <title>Login do Controle Pessoal de Finanças</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
 
-    <link
-      rel="stylesheet"
-      href="bootstrap-4.4.1-dist/css/bootstrap-reboot.min.css"
-    />
-    <link rel="stylesheet" href="bootstrap-4.4.1-dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/login.css" />
-  </head>
+  <title>Login do Controle Pessoal de Finanças</title>
 
-  <body class="text-center">
-    <header></header>
+  <link rel="stylesheet" href="bootstrap-4.4.1-dist/css/bootstrap-reboot.min.css" />
+  <link rel="stylesheet" href="bootstrap-4.4.1-dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/login.css" />
+</head>
 
-    <main>
-      <form class="formulario-login">
-          <h1 class="titulo-login">Controle pessoal de Finanças</h1>
+<body class="text-center">
+  <header></header>
 
-          <h2 class="mb-3">Informe seu usuário e senha</h2>
+  <main>
+    <form class="formulario-login" action="home.html">
+      <h1 class="titulo-login">Controle pessoal de Finanças</h1>
 
-          <label for="usuario" class="sr-only">Usuário</label>
-          <input
-            type="text"
-            id="usuario"
-            class="form-control"
-            placeholder="Usuário"
-            required
-            autofocus
-          />
+      <h2 class="mb-3">Informe seu usuário e senha</h2>
 
-          <label for="senha" class="sr-only">Senha</label>
-          <input
-            type="text"
-            id="senha"
-            class="form-control mt-2"
-            placeholder="Senha"
-            required
-          />
+      <label for="usuario" class="sr-only">Usuário</label>
+      <input type="text" id="usuario" class="form-control" placeholder="Usuário" required autofocus />
 
-          <button class="mt-5 btn btn-primary btn-block" id="botao-logar" type="submit">
-            Logar
-          </button>
-      </form>
-    </main>
+      <label for="senha" class="sr-only">Senha</label>
+      <input type="text" id="senha" class="form-control mt-2" placeholder="Senha" required />
 
-    <footer></footer>
-  </body>
+      <button class="mt-5 btn btn-primary btn-block" id="botao-logar" type="submit">
+        Logar
+      </button>
+    </form>
+  </main>
+
+  <footer></footer>
+</body>
+
 </html>

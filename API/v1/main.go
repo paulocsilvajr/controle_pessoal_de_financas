@@ -2,16 +2,17 @@ package main
 
 import (
 	"bufio"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/route"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/route"
 )
 
 func main() {
@@ -48,7 +49,7 @@ func main() {
 func criarUsuarioAdminInicial() {
 	db := dao.GetDB()
 
-	admin, _ := pessoa.NewPessoaAdmin("00000000000", "Administrador", "admin", "admin", "meuemail@email.com")
+	admin := pessoa.New("00000000000", "Administrador", "admin", "admin", "meuemail@email.com")
 
 	_, err := dao.ProcuraPessoaPorUsuario(db, admin.Usuario)
 	novaPessoa := new(pessoa.Pessoa)

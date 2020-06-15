@@ -1,11 +1,6 @@
 package controller
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,6 +10,12 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
@@ -172,7 +173,7 @@ func API(w http.ResponseWriter, r *http.Request) {
 		status,
 		map[string]string{"API OnLine": fmt.Sprintf("%.2d rota(s) cadastrada(s)", len(config.Rotas))},
 		"API",
-		"API Online, faça o login pela rota [GET] '/login/{usuario}' e consulte todas as rotas em [GET] '/'",
+		"API Online, faça o login pela rota [POST] '/login/{usuario}' e consulte todas as rotas em [GET] '/'",
 		"API Online")
 }
 

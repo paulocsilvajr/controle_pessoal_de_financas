@@ -2,11 +2,12 @@ package dao
 
 import (
 	"bytes"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
 	"database/sql"
 	"fmt"
 	"html/template"
 	"log"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
 
 	_ "github.com/lib/pq" // pacote para comunicação com o Banco de Dados PostgreSQL
 )

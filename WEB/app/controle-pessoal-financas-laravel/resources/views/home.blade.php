@@ -39,7 +39,7 @@
           </li>
         </ul>
 
-        <a href="/login" class="nav-link">Sair</a>
+        <a href="/logout" class="nav-link">Sair</a>
         <form class="form-inline my-2 my-md-0">
           <input class="form-control" type="text" placeholder="Search">
         </form>
@@ -49,6 +49,7 @@
 
 @section('conteudo')
     <h1 class="mensagem-inicial text-center">Bem vindo {{ $usuario }}</h1>
-    <p>{{ $senha }}</p>
-    <p>{{ substr($token, 0, 10) }}...{{ substr($token, -10) }}</p>
+    <p>senha: {{ $senha }}</p>
+    <p>token: {{ substr($token, 0, 10) }}...{{ substr($token, -10) }}</p>
+    <p>logado: {{ $logado }}</p>
 @endsection

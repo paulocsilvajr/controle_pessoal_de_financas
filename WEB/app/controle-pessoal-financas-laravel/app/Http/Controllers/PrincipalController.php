@@ -11,8 +11,9 @@ class PrincipalController extends Controller
         $usuario = $request->session()->get('usuario');
         $senha = $request->session()->get('senha');
         $token = $request->session()->get('token');
+        $logado = $request->session()->get('logado');
 
         // enviando e exibindo senha somente para teste
-        return view('home', compact('usuario', 'senha', 'token'));
+        return view('home', compact('usuario', 'senha', 'token', 'logado'));
     }
 }

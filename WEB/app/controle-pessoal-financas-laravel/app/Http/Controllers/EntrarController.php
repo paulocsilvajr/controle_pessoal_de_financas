@@ -32,6 +32,7 @@ class EntrarController extends Controller
             $request->session()->put('usuario', $usuario);
             $request->session()->put('senha', $senha);
             $request->session()->put('token', $resposta['token']);
+            $this->logar($request);
 
             return redirect()->route('home');
         }
@@ -41,8 +42,30 @@ class EntrarController extends Controller
             $msg = "Problema interno do servidor";
         }
 
+        $this->deslogar($request);
         $request->session()->flash('mensagem', $msg);
 
         return redirect()->route('login');
+    }
+
+    public function sair(Request $request)
+    {
+        $this->deslogar($request);
+        return redirect()->route('login');
+    }
+
+    private function logar(Request $request)
+    {
+        $this->definirChaveLogadoSessao($request, true);
+    }
+
+    private function deslogar(Request $request)
+    {
+        $this->definirChaveLogadoSessao($request, false);
+    }
+
+    private function definirChaveLogadoSessao(Request $request, bool $logado)
+    {
+        $request->session()->put('logado', $logado);
     }
 }

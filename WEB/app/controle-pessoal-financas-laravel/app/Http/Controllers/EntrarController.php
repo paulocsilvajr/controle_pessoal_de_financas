@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\RequisicaoHttp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -13,25 +14,21 @@ class EntrarController extends Controller
         return view('login', compact('mensagem'));
     }
 
-    public function entrar(Request $request)
+    public function entrar(Request $request, RequisicaoHttp $http)
     {
         $usuario = $request->usuario;
         $senha = $request->senha;
 
-        $verificarCertificadoSSL = false;
-        $resposta = Http::withOptions([
-            'verify' => $verificarCertificadoSSL
-        ])->withHeaders([
-            'Content-Type' => 'application:json'
-        ])->post("https://localhost:8085/login/{$usuario}", [
-            'usuario' => $usuario,
-            'senha' => $senha
-        ]);
+        $resposta = $http->post(
+            "/login/{$usuario}",
+            [
+                'usuario' => $usuario,
+                'senha' => $senha
+            ]
+        );
 
         if ($resposta->successful()) {
-            $request->session()->put('usuario', $usuario);
-            $request->session()->put('senha', $senha);
-            $request->session()->put('token', $resposta['token']);
+            $this->definirSessaoUsuario($request, $usuario, $senha, $resposta['token']);
             $this->logar($request);
 
             return redirect()->route('home');
@@ -43,6 +40,7 @@ class EntrarController extends Controller
         }
 
         $this->deslogar($request);
+        $this->removerSessaoUsuario($request);
         $request->session()->flash('mensagem', $msg);
 
         return redirect()->route('login');
@@ -67,5 +65,19 @@ class EntrarController extends Controller
     private function definirChaveLogadoSessao(Request $request, bool $logado)
     {
         $request->session()->put('logado', $logado);
+    }
+
+    private function definirSessaoUsuario(Request $request, string $usuario, string $senha, string $token)
+    {
+        $request->session()->put('usuario', $usuario);
+        $request->session()->put('senha', $senha);
+        $request->session()->put('token', $token);
+    }
+
+    private function removerSessaoUsuario(Request $request)
+    {
+        $request->session()->remove('usuario');
+        $request->session()->remove('senha');
+        $request->session()->remove('token');
     }
 }

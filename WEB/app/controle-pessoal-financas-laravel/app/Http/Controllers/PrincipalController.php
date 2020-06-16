@@ -13,7 +13,9 @@ class PrincipalController extends Controller
         $token = $request->session()->get('token');
         $logado = $request->session()->get('logado');
 
+        $tokenParcial = substr($token ?? '', 0, 10) . "..." . substr($token ?? '', -10);
+
         // enviando e exibindo senha somente para teste
-        return view('home', compact('usuario', 'senha', 'token', 'logado'));
+        return view('home', compact('usuario', 'senha', 'tokenParcial', 'logado'));
     }
 }

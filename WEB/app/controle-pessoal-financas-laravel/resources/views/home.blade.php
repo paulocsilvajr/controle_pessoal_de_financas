@@ -10,9 +10,9 @@
 
       <div class="navbar-collapse collapse" id="navbarsExample04" style="">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
+          {{-- <li class="nav-item active">
             <a class="nav-link" href="#">Home<span class="sr-only">(current)</span></a>
-          </li>
+          </li> --}}
           <li class="nav-item">
             <a class="nav-link" href="#">Link</a>
           </li>
@@ -39,17 +39,31 @@
           </li>
         </ul>
 
-        <a href="/logout" class="nav-link">Sair</a>
-        <form class="form-inline my-2 my-md-0">
-          <input class="form-control" type="text" placeholder="Search">
-        </form>
+        <div>
+            <form class="form-inline my-2 my-md-0">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a href="/logout" class="nav-link">Sair</a>
+                    </li>
+                </ul>
+                <input class="form-control" type="text" placeholder="Search">
+            </form>
+        </div>
       </div>
     </nav>
 @endsection
 
 @section('conteudo')
-    <h1 class="mensagem-inicial text-center">Bem vindo {{ $usuario }}</h1>
-    <p>senha: {{ $senha }}</p>
-    <p>token: {{ substr($token, 0, 10) }}...{{ substr($token, -10) }}</p>
-    <p>logado: {{ $logado }}</p>
+    <h1 class="mensagem-inicial text-center">Bem vindo {{ $usuario ?? '' }}</h1>
+    <p class="text-center">Use a barra de navegação para acessar as funcionalidades do sistema</p>
+
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">Dados em sessão</h5>
+            <p class="card-text">senha: {{ $usuario ?? '' }}</p>
+            <p class="card-text">senha: {{ $senha ?? '' }}</p>
+            <p class="card-text">token: {{ $tokenParcial ?? '' }}</p>
+            <p class="card-text">logado: {{ $logado ?? '' }}</p>
+        </div>
+    </div>
 @endsection

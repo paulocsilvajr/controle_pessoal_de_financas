@@ -13,14 +13,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/laravel', function () {
     return view('welcome');
 });
 
 Route::get('/login', 'EntrarController@index')->name('login');
 Route::post('/login', 'EntrarController@entrar');
+Route::get('/logout', 'EntrarController@sair')->name('logout');
 
-Route::get('/home', 'PrincipalController@index')->name('home');
+Route::get('/', 'PrincipalController@index')
+    ->middleware('autenticador');
+Route::get('/home', 'PrincipalController@index')->name('home')
+    ->middleware('autenticador');
 
 Route::get('/teste', function () {
     return view('teste');

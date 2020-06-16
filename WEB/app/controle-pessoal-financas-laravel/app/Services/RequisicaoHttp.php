@@ -17,7 +17,7 @@ class RequisicaoHttp
         $this->requisicao = Http::withOptions([
             'verify' => $this->verificarCertificadoSSL
         ]);
-        $this->rotaBase = "https://localhost:8085";
+        $this->rotaBase = env('API_URL', "https://localhost:8085");
     }
 
     public function setRotaBase(string $rota)
@@ -34,13 +34,27 @@ class RequisicaoHttp
         return $this->rotaBase;
     }
 
-    public function post(string $rota, array $body): Response
+    public function post(string $rota, array $body = []): Response
     {
+        $this->verificaRota($rota);
+
         $headers = [
             'Content-Type' => 'application:json'
         ];
         return $this->requisicao
             ->withHeaders($headers)
             ->post($this->rotaBase . $rota, $body);
+    }
+
+    public function verificaRota(string $rota)
+    {
+        $iniciaComBarra = strpos($rota, "/") === 0;
+        $temTamanhoMinimo = strlen($rota) > 1;
+
+        if (!$iniciaComBarra) {
+            throw new \Exception("Rota '$rota' deve iniciar com /");
+        } else if (!$temTamanhoMinimo) {
+            throw new \Exception("Rota '$rota' incompleta");
+        }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\Client\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class RequisicaoHttp
@@ -11,13 +12,15 @@ class RequisicaoHttp
     public $verificarCertificadoSSL = false;
     private $requisicao;
     private $rotaBase;
+    private $request;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
         $this->requisicao = Http::withOptions([
             'verify' => $this->verificarCertificadoSSL
         ]);
         $this->rotaBase = env('API_URL', "https://localhost:8085");
+        $this->request = $request;
     }
 
     public function setRotaBase(string $rota)
@@ -46,7 +49,22 @@ class RequisicaoHttp
             ->post($this->rotaBase . $rota, $body);
     }
 
-    public function verificaRota(string $rota)
+    public function get(string $rota = ''): Response
+    {
+        $token = $this->request->session()->get('token');
+
+        return $this->requisicao
+            ->withToken($token)
+            ->get($this->rotaBase . $rota);
+    }
+
+    public function getWithoutToken(string $rota = ''): Response
+    {
+        return $this->requisicao
+            ->get($this->rotaBase . $rota);
+    }
+
+    private function verificaRota(string $rota)
     {
         $iniciaComBarra = strpos($rota, "/") === 0;
         $temTamanhoMinimo = strlen($rota) > 1;

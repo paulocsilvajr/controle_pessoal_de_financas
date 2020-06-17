@@ -2,6 +2,12 @@
     margin-top: 5rem;
 }
 
+.informacoes-sessao {
+    margin: auto;
+    margin-top: 5rem;
+    background-color: khaki;
+}
+
 @media screen and (max-width: 380px) {
     .navbar {
         padding: .5rem .5rem;

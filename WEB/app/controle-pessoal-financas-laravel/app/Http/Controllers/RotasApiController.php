@@ -14,7 +14,7 @@ class RotasApiController extends Controller
         $nomes = array_keys($dados);
 
         if ($resposta->successful()) {
-            return view('rotasApi', [
+            return view('RotasApi.rotasApi', [
                 'nomes' => $nomes,
                 'dados' => $dados
             ]);

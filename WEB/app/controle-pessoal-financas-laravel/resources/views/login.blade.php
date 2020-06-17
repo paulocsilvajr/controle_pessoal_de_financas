@@ -12,11 +12,13 @@
         <input type="text" id="usuario" name='usuario' class="form-control" placeholder="Usuário" required autofocus />
 
         <label for="senha" class="sr-only">Senha</label>
-        <input type="password" id="senha" name="senha" class="form-control mt-2 mb-2" placeholder="Senha" required />
+        <input type="password" id="senha" name="senha" class="form-control mt-2 mb-3" placeholder="Senha" required />
 
-        @include('mensagem', ['mensagem' => $mensagem ?? '', 'tipo' => 'danger' ])
+        @include('mensagem', ['mensagem' => $mensagem ?? '', 'tipo' => $tipoMensagem ])
 
-        <button class="mt-5 btn btn-primary btn-block" id="botao-logar" type="submit">
+        @include('mensagemApi', ['estadoApi' => $estadoApi ?? false])
+
+        <button class="mt-3 btn btn-primary btn-block" id="botao-logar" type="submit" {{ $estadoApi === true ? '' : 'disabled' }}>
             Logar
         </button>
     </form>

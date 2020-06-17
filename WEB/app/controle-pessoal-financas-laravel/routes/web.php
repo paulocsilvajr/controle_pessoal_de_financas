@@ -26,6 +26,5 @@ Route::get('/', 'PrincipalController@index')
 Route::get('/home', 'PrincipalController@index')->name('home')
     ->middleware('autenticador');
 
-Route::get('/teste', function () {
-    return view('teste');
-});
+Route::get('/api', 'RotasApiController@index')
+    ->middleware('autenticador');

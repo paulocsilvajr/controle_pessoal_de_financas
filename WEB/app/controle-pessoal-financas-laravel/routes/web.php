@@ -28,3 +28,6 @@ Route::get('/home', 'PrincipalController@index')->name('home')
 
 Route::get('/api', 'RotasApiController@index')
     ->middleware('autenticador');
+
+Route::get('/conta', 'ContaController@index')->name('conta')
+    ->middleware('autenticador');

@@ -37,14 +37,16 @@
     </ul>
 
     <div>
-        <form class="form-inline my-2 my-md-0">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a href="/logout" class="nav-link">Sair</a>
-                </li>
-            </ul>
-            <input class="form-control" type="text" placeholder="Search">
-        </form>
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a href="/logout" class="nav-link">Sair</a>
+            </li>
+            <li>
+                <form class="form-inline my-2 my-md-0">
+                    <input class="form-control" type="text" placeholder="Search">
+                </form>
+            </li>
+        </ul>
     </div>
     </div>
 </nav>

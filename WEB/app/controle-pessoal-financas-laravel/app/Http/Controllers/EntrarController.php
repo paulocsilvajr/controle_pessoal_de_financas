@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Imprime;
 use App\Services\RequisicaoHttp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -10,8 +11,19 @@ class EntrarController extends Controller
 {
     public function index(Request $request)
     {
+        $this->apiOnLine($request);
+
         $mensagem = $request->session()->get('mensagem');
-        return view('login', compact('mensagem'));
+        $tipoMensagem = $request->session()->get('tipoMensagem');
+        $estadoApi = $request->session()->get('estadoApi');
+        return view(
+            'login',
+            compact(
+                'mensagem',
+                'tipoMensagem',
+                'estadoApi',
+            )
+        );
     }
 
     public function entrar(Request $request, RequisicaoHttp $http)
@@ -42,6 +54,7 @@ class EntrarController extends Controller
         $this->deslogar($request);
         $this->removerSessaoUsuario($request);
         $request->session()->flash('mensagem', $msg);
+        $request->session()->flash('tipoMensagem', 'danger');
 
         return redirect()->route('login');
     }
@@ -50,6 +63,25 @@ class EntrarController extends Controller
     {
         $this->deslogar($request);
         return redirect()->route('login');
+    }
+
+    private function apiOnLine(Request $request)
+    {
+        $http = new RequisicaoHttp($request);
+        try {
+            $resposta = $http->getWithoutToken('/API');
+
+            if ($resposta->successful()) {
+                $request->session()->put('estadoApi', true);
+                Imprime::console(">>> API ONLINE <<<");
+                return;
+            }
+            $request->session()->put('estadoApi', false);
+            Imprime::console(">>> API OFFLINE <<<");
+        } catch (\Throwable $th) {
+            $request->session()->put('estadoApi', false);
+            Imprime::console(">>> API OFFLINE <<<");
+        }
     }
 
     private function logar(Request $request)

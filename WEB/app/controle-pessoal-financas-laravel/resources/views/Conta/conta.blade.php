@@ -8,15 +8,42 @@
     <div class="container">
         <h1 class="text-center mt-3">Contas</h1>
 
-        <ul class="list-group mt-3">
+        {{-- impressão de variável com HTML --}}
+        {{-- {!! $lista !!} --}}
+
+        <?php
+            function imprime(array $contas, string $nomeAnterior, string &$texto)
+            {
+                $texto .= '<ul class="nav-item" style="list-style: none;">';
+                foreach ($contas as $conta) {
+                    if ($conta['conta_pai'] == $nomeAnterior) {
+                        $texto .= '<li class="nav-item">';
+                        $texto .= '<a href="#" class="nav-link">' . ucfirst($conta['nome']) . '</a>';
+                        imprime($contas, $conta['nome'], $texto);
+                        $texto .= '</li>';
+                    }
+                }
+                $texto .= '</ul>';
+            }
+        ?>
+
+        {{-- impressão de contas recursiva --}}
+        <ul class="nav flex-column mt-3">
             @foreach ($dados as $conta)
                 @if (empty($conta['conta_pai']))
-                    <li class="list-group-item list-group-item-action">
-                        <a href="#">{{ ucfirst($conta['nome']) }}</a>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">{{ ucfirst($conta['nome']) }}</a>
+                        <?php
+                            $texto = '';
+                            imprime($dados, $conta['nome'], $texto);
+                            echo $texto;
+                        ?>
                     </li>
                 @endif
             @endforeach
         </ul>
+
+    </div>
 @endsection
 
 @section('script')

@@ -14,7 +14,12 @@ class ContaController extends Controller
         if ($resposta->successful()) {
             $dados = $resposta['data'];
 
-            return view('Conta.conta', compact('dados'));
+            return view(
+                'Conta.conta',
+                compact(
+                    'dados',
+                )
+            );
         }
 
         return redirect()->route('home');

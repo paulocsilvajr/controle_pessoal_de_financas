@@ -24,7 +24,7 @@
                         <th scope="row">{{ $cont + 1 }}</th>
                         <td>{{ $nome }}</td>
                         <td>{{ $dados[$nome]['Tipo'] }}</td>
-                        <td>{{ $dados[$nome]['Rota'] }}</td>
+                        <td><strong>{{ $dados[$nome]['Rota'] }}</strong></td>
                         <td>{{ $dados[$nome]['Descricao'] }}</td>
                     </tr>
                 @endforeach

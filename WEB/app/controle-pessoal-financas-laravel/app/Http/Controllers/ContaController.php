@@ -3,25 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Services\RequisicaoHttp;
+use App\Services\Token;
 use Illuminate\Http\Request;
 
 class ContaController extends Controller
 {
-    public function index(Request $request, RequisicaoHttp $http)
+    public function index(Request $request, RequisicaoHttp $http, Token $token)
     {
-        $resposta = $http->get('/contas');
+        if ($token->valido()) {
+            $resposta = $http->get('/contas');
 
-        if ($resposta->successful()) {
-            $dados = $resposta['data'];
+            if ($resposta->successful()) {
+                $dados = $resposta['data'];
 
-            return view(
-                'Conta.conta',
-                compact(
-                    'dados',
-                )
-            );
+                return view(
+                    'Conta.conta',
+                    compact(
+                        'dados',
+                    )
+                );
+            }
+
+            return redirect()->route('home');
+        } else {
+            return redirect()->route('login');
         }
-
-        return redirect()->route('home');
     }
 }

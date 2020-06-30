@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
     <a class="navbar-brand" href="/home">Controle Pessoal de Finanças</a>
     <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExample04"
     aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">

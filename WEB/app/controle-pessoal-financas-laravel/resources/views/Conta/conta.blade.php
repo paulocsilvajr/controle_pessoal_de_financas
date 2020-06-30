@@ -6,7 +6,7 @@
 
 @section('conteudo')
     <div class="container">
-        <h1 class="text-center mt-3">Contas</h1>
+        <h1 class="text-center titulo">Contas</h1>
 
         {{-- impressão de variável com HTML --}}
         {{-- {!! $lista !!} --}}

@@ -29,18 +29,20 @@
 
         {{-- impressão de contas recursiva --}}
         <ul class="nav flex-column mt-3">
-            @foreach ($dados as $conta)
-                @if (empty($conta['conta_pai']))
-                    <li class="nav-item">
-                    <a href="conta/{{ $conta['nome'] }}" class="nav-link"><strong>{{ ucfirst($conta['nome']) }}</strong></a>
-                        <?php
-                            $texto = '';
-                            imprime($dados, $conta['nome'], $texto);
-                            echo $texto;
-                        ?>
-                    </li>
-                @endif
-            @endforeach
+            @if (is_array($dados))
+                @foreach ($dados as $conta)
+                    @if (empty($conta['conta_pai']))
+                        <li class="nav-item">
+                        <a href="conta/{{ $conta['nome'] }}" class="nav-link"><strong>{{ ucfirst($conta['nome']) }}</strong></a>
+                            <?php
+                                $texto = '';
+                                imprime($dados, $conta['nome'], $texto);
+                                echo $texto;
+                            ?>
+                        </li>
+                    @endif
+                @endforeach
+            @endif
         </ul>
 
     </div>

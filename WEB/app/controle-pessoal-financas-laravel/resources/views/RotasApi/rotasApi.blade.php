@@ -6,7 +6,7 @@
 
 @section('conteudo')
     <div class="container">
-        <h1 class="text-center mt-3">Rotas da API</h1>
+        <h1 class="text-center titulo">Rotas da API</h1>
 
         <table class="table table-striped table-hover table-responsive mt-3">
             <thead class="thead-dark">

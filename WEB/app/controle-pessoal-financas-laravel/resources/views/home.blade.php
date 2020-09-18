@@ -11,7 +11,7 @@
     <div class="card informacoes-sessao" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">Dados em sessão</h5>
-            <p class="card-text">senha: {{ $usuario }}</p>
+            <p class="card-text">usuário: {{ $usuario }}</p>
             <p class="card-text">senha: {{ $senha }}</p>
             <p class="card-text">token: {{ $tokenParcial }}</p>
             <p class="card-text">logado: {{ $logado }}</p>

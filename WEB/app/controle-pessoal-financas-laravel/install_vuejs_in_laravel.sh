@@ -1,7 +1,7 @@
 # nodejs/npm atualizado via snap
-sudo snap install node --classic --channel=8
+sudo snap install node --classic
 
-composer require laravel/ui
+composer require laravel/ui -W
 php artisan ui vue
 npm install
 

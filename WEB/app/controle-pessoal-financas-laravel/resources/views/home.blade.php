@@ -17,4 +17,13 @@
             <p class="card-text">logado: {{ $logado }}</p>
         </div>
     </div>
+
+    <div id="app">
+        <exemplo></exemplo>
+    </div>
+    
+@endsection
+
+@section('script')
+    <script src="js/app.js"></script>
 @endsection

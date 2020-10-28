@@ -1,0 +1,18 @@
+<template>
+    <p class="dev">Desenvolvido por <a href="https://github.com/paulocsilvajr">Paulo C. Silva Jr</a></p>
+</template>
+
+<script>
+    export default {
+        mounted() {
+            console.log('Componente desenvolvedor mountado')
+        }
+    }
+</script>
+
+<style scoped>
+    .dev {
+        margin-top: 2em;
+        text-align: center;
+    }
+</style>

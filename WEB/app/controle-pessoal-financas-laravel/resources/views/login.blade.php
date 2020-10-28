@@ -23,4 +23,8 @@
         </button>
     </form>
 
+    <div id="app">
+        <desenvolvedor></desenvolvedor>
+    </div>
+
 @endsection

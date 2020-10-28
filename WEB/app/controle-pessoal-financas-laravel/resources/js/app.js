@@ -4,7 +4,7 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
+// require('./bootstrap');
 
 window.Vue = require('vue');
 
@@ -19,6 +19,7 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
+import exemplo from './components/ExampleComponent.vue';
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
 import desenvolvedor from './components/Desenvolvedor.vue';
@@ -34,5 +35,6 @@ const app = new Vue({
     el: '#app',
     components: {
         'desenvolvedor': desenvolvedor,
+        'exemplo': exemplo,
     }
 });

@@ -31,3 +31,6 @@ Route::get('/api', 'RotasApiController@index')
 
 Route::get('/conta', 'ContaController@index')->name('conta')
     ->middleware('autenticador');
+
+Route::get('/conta/{nomeConta}', 'ContaController@contaEspecifica')->name('contaEspecifica')
+    ->middleware('autenticador');

@@ -29,4 +29,19 @@ class ContaController extends Controller
             return redirect()->route('login');
         }
     }
+
+    public function contaEspecifica(Request $request, RequisicaoHttp $http, Token $token, string $nomeConta)
+    {
+        if ($token->valido()) {
+            return view(
+                'Conta.contaEspecifica',
+                compact(
+                    'nomeConta'
+                )
+            );
+            return redirect()->route('home');
+        } else {
+            return redirect()->route('login');
+        }
+    }
 }

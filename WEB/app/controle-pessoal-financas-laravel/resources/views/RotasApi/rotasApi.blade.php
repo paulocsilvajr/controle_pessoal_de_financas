@@ -8,6 +8,8 @@
     <div class="container">
         <h1 class="text-center titulo">Rotas da API</h1>
 
+        <p>{{ $quant }} rotas cadastradas</p>
+
         <table class="table table-striped table-hover table-responsive mt-3">
             <thead class="thead-dark">
                 <tr>

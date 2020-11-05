@@ -13,12 +13,14 @@ class RotasApiController extends Controller
         if ($token->valido()) {
             $resposta = $requisicao->get();
             $dados = $resposta['data'];
+            $quant = $resposta['count'];
             $nomes = array_keys($dados);
 
             if ($resposta->successful()) {
                 return view('RotasApi.rotasApi', [
                     'nomes' => $nomes,
-                    'dados' => $dados
+                    'dados' => $dados,
+                    'quant' => $quant
                 ]);
             }
             return redirect()->route('home');

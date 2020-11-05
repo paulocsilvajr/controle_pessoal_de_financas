@@ -27,6 +27,7 @@
 
     <script src="{{ asset('js/jquery-3.5.1.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="https://kit.fontawesome.com/affcd44970.js" crossorigin="anonymous"></script>
     @yield('script')
 </body>
 

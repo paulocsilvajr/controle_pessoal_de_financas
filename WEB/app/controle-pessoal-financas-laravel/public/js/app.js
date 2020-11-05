@@ -99,6 +99,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     console.log('Componente desenvolvedor mountado');
@@ -1276,9 +1280,13 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("p", { staticClass: "dev" }, [
-      _vm._v("Desenvolvido por "),
+      _vm._v("\n    Desenvolvido por "),
       _c("a", { attrs: { href: "https://github.com/paulocsilvajr" } }, [
-        _vm._v("Paulo C. Silva Jr")
+        _vm._v("\n    Paulo C. Silva Jr\n    "),
+        _c("i", {
+          staticClass: "fab fa-github",
+          attrs: { "aria-hidden": "true" }
+        })
       ])
     ])
   }

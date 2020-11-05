@@ -1,5 +1,9 @@
 <template>
-    <p class="dev">Desenvolvido por <a href="https://github.com/paulocsilvajr">Paulo C. Silva Jr</a></p>
+    <p class="dev">
+        Desenvolvido por <a href="https://github.com/paulocsilvajr">
+        Paulo C. Silva Jr
+        <i class="fab fa-github" aria-hidden="true"></i></a>
+    </p>
 </template>
 
 <script>

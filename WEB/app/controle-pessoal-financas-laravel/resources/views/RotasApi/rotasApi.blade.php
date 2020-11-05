@@ -6,7 +6,7 @@
 
 @section('conteudo')
     <div class="container">
-        <h1 class="text-center titulo">Rotas da API</h1>
+        <h1 class="text-center margem-navbar-conteudo">Rotas da API</h1>
 
         <p>{{ $quant }} rotas cadastradas</p>
 

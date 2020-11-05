@@ -13,6 +13,16 @@
     margin-top: 5rem;
 }
 
+.margem-navbar-conteudo {
+    margin-top: 5rem;
+}
+
+@media screen and (max-width: 576px) {
+    .titulo-conta-sm {
+        margin-bottom: 1.5rem;
+    }
+}
+
 @media screen and (max-width: 380px) {
     .navbar {
         padding: .5rem .5rem;

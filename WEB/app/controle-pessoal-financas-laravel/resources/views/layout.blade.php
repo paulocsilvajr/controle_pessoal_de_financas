@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="css/bootstrap-reboot.min.css" />
-    <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/{{ $css }}.css" />
+    <link rel="stylesheet" href="{{ asset('css/bootstrap-reboot.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/' . $css . '.css') }}" />
 
     <title>Controle Pessoal de Finanças</title>
 </head>
@@ -25,8 +25,8 @@
         @yield('rodape')
     </footer>
 
-    <script src="js/jquery-3.5.1.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="{{ asset('js/jquery-3.5.1.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     @yield('script')
 </body>
 

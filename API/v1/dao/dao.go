@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
 
@@ -22,7 +25,18 @@ func GetDB() *sql.DB {
 	db, err := sql.Open(config["DB"], connStr)
 
 	if err != nil {
+		logger.GeraLogFS(
+			fmt.Sprintf("Erro ao conectar em servidor do Banco de dados"),
+			time.Now(),
+		)
 		log.Fatal(err)
+	}
+
+	if err := db.Ping(); err != nil {
+		logger.GeraLogFS(
+			fmt.Sprintf("Erro em PING em servidor de Banco de Dados[%s]", err),
+			time.Now(),
+		)
 	}
 
 	return db

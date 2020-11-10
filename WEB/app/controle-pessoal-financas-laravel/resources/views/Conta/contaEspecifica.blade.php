@@ -11,7 +11,7 @@
                 <h1 class="text-center" style="margin: auto">{{ ucfirst($nomeConta) }}</h1>
             </div>
             <div class="col-sm-6 col-md-2 d-flex align-items-center">
-                <button class="btn btn-primary btn-block">
+            <button class="btn btn-primary btn-block" onclick="location.href = '/conta/{{ $nomeConta }}/cadastro';">
                     Novo
                     <i class="fa fa-plus" aria-hidden="true"></i>
                 </button>

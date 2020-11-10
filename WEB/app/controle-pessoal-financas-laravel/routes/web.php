@@ -34,3 +34,6 @@ Route::get('/conta', 'ContaController@index')->name('conta')
 
 Route::get('/conta/{nomeConta}', 'ContaController@contaEspecifica')->name('contaEspecifica')
     ->middleware('autenticador');
+
+Route::get('/conta/{nomeConta}/cadastro', 'ContaController@cadastro')->name('contaCadastro')
+    ->middleware('autenticador');

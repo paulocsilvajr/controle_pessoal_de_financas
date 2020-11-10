@@ -57,4 +57,17 @@ class ContaController extends Controller
             return redirect()->route('login');
         }
     }
+
+    public function cadastro(Request $request, RequisicaoHttp $http, Token $token, string $nomeConta) {
+        if ($token->valido()) {
+            return view(
+                'Conta.cadastro',
+                compact(
+                    'nomeConta',
+                )
+            );
+        } else {
+            return redirect()->route('login');
+        }
+    }
 }

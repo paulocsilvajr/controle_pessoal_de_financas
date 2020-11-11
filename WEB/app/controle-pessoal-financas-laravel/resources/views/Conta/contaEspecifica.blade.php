@@ -7,12 +7,12 @@
 @section('conteudo')
     <div class="container">
         <div class="row margem-navbar-conteudo">
-            <div class="col-sm-6 col-md-10 titulo-conta-sm">
+            <div class="col-sm-6 col-md-9 titulo-conta-sm">
                 <h1 class="text-center" style="margin: auto">{{ ucfirst($nomeConta) }}</h1>
             </div>
-            <div class="col-sm-6 col-md-2 d-flex align-items-center">
-            <button class="btn btn-primary btn-block" onclick="location.href = '/conta/{{ $nomeConta }}/cadastro';">
-                    Novo
+            <div class="col-sm-6 col-md-3 d-flex align-items-center">
+            <button class="btn btn-primary btn-block" onclick="location.href = '/conta/{{ $nomeConta }}/cadastroLancamento';">
+                    Novo Lançamento
                     <i class="fa fa-plus" aria-hidden="true"></i>
                 </button>
             </div>

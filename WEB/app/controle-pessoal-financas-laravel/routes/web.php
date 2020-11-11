@@ -35,5 +35,5 @@ Route::get('/conta', 'ContaController@index')->name('conta')
 Route::get('/conta/{nomeConta}', 'ContaController@contaEspecifica')->name('contaEspecifica')
     ->middleware('autenticador');
 
-Route::get('/conta/{nomeConta}/cadastro', 'ContaController@cadastro')->name('contaCadastro')
+Route::get('/conta/{nomeConta}/cadastroLancamento', 'ContaController@carregaCadastroLancamento')->name('contaCadastroLancamento')
     ->middleware('autenticador');

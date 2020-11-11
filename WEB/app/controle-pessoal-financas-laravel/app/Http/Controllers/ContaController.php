@@ -58,16 +58,25 @@ class ContaController extends Controller
         }
     }
 
-    public function cadastro(Request $request, RequisicaoHttp $http, Token $token, string $nomeConta) {
+    public function carregaCadastroLancamento(Request $request, RequisicaoHttp $http, Token $token, string $nomeConta) {
         if ($token->valido()) {
+            $mensagem = '';
+            $tipoMensagem = '';
+
             return view(
-                'Conta.cadastro',
+                'Conta.cadastroLancamento',
                 compact(
                     'nomeConta',
+                    'mensagem',
+                    'tipoMensagem',
                 )
             );
         } else {
             return redirect()->route('login');
         }
+    }
+
+    public function cadastraLancamento(Request $request, RequisicaoHttp $http, Token $token) {
+
     }
 }

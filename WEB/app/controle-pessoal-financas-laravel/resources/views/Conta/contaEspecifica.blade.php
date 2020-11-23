@@ -6,7 +6,7 @@
 
 @section('conteudo')
     <div class="container">
-        <div class="row margem-navbar-conteudo">
+        <div class="row margem-navbar-conteudo mb-2">
             <div class="col-sm-6 col-md-9 titulo-conta-sm">
                 <h1 class="text-center" style="margin: auto">{{ ucfirst($nomeConta) }}</h1>
             </div>

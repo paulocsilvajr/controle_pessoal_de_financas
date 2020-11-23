@@ -61,12 +61,12 @@
 
             <div class="row mt-3">
                 <div class="col-sm mb-2">
-                    <button class="btn btn-primary btn-block" id="botao-salvar-conta" type="submit">
+                    <button class="btn btn-primary btn-block" id="botao-salvar-lancamento" type="submit">
                         Salvar
                     </button>
                 </div>
                 <div class="col-sm mb-2">
-                    <button class="btn btn-secondary btn-block" id="botao-voltar" type="submit">
+                    <button class="btn btn-secondary btn-block" id="botao-voltar" onclick="history.back()">
                         Voltar
                     </button>
                 </div>

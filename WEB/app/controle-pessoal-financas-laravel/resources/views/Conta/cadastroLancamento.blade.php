@@ -7,7 +7,9 @@
 @section('conteudo')
     <div class="container">
         <div class="row margem-navbar-conteudo mb-4">
-            <h1 class="text-center" style="margin: auto">Cadastro de Lançamento em <u>{{ ucfirst($nomeConta) }}</u></h1>
+            <div class="col">
+                <h1 class="text-center" style="margin: auto">Cadastro de Lançamento em <u>{{ ucfirst($nomeConta) }}</u></h1>
+            </div>
         </div>
 
         <form action="" method="post">

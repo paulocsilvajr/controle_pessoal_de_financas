@@ -77,6 +77,29 @@ class ContaController extends Controller
     }
 
     public function cadastraLancamento(Request $request, RequisicaoHttp $http, Token $token) {
+        $cpf = $request->cpf_pessoa;
+        $nome_conta_origem = $request->nome_conta_origem;
+        $data = $request->data;
+        $numero = $request->numero;
+        $descricao = $request->descricao;
+        $nome_conta_destino = $request->nome_conta_destino;
+        $valor = $request->valor;
+        $tipo = $request->tipo;
 
+        Imprime::console("<<<
+CPF: $cpf
+Origem: $nome_conta_origem
+Data: $data
+Número: $numero
+Descrição: $descricao
+Destino: $nome_conta_destino
+Valor: $valor
+Tipo: $tipo
+>>>");
+
+        return redirect()->route(
+            'contaEspecifica',
+            ['nomeConta' => $nome_conta_origem]
+        );
     }
 }

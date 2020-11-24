@@ -37,3 +37,6 @@ Route::get('/conta/{nomeConta}', 'ContaController@contaEspecifica')->name('conta
 
 Route::get('/conta/{nomeConta}/cadastroLancamento', 'ContaController@carregaCadastroLancamento')->name('contaCadastroLancamento')
     ->middleware('autenticador');
+
+Route::post('/conta/{nomeConta}/cadastroLancamento', 'ContaController@cadastraLancamento')
+    ->middleware('autenticador');

@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <form action="" method="post">
+        <form method="post" action="/conta/{{ $nomeConta }}/cadastroLancamento">
             @csrf
 
             <input type="text" id="cpf_pessoa" name="cpf_pessoa" value="{{ $cpf ?? 'Enviar CPF para cá' }}" hidden>

@@ -5,6 +5,7 @@ import (
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/controller"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 )
 
 // Route é uma estrutura que representa cada rota do sistema. É composto por Name(nome), Method(método-POST, GET,...), Pattern(Padrão da rota, ex: /login/{usuario}), HandlerFunc(handler de pacote controller para a rota, com as regras e retornos específicos), Auth(Verdadeiro se na rota será obrigatório a passagem de TOKEN em anexo para acessá-la)
@@ -238,4 +239,11 @@ var MyRoutes = Routes{
 		controller.LancamentoPorConta,
 		true,
 	},
+}
+
+func init() {
+	for _, itemRota := range MyRoutes {
+		documentacao := helper.FuncDescription(itemRota.HandlerFunc)
+		config.Rotas.DefineDocumentacao(itemRota.Name, documentacao)
+	}
 }

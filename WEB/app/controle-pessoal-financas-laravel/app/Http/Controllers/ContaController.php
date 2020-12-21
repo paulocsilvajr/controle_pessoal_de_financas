@@ -128,13 +128,6 @@ Tipo: $tipo
             } else {
                 $nomeCompleto = $conta['conta_pai'] . '>' . $conta['nome'];
 
-                // foreach ($contas as $conta2) {
-                //     if (empty($conta2['conta_pai'])) {
-                //         continue;
-                //     } else if ($conta2['nome'] == $conta['conta_pai']) {
-                //         $nomeCompleto = $conta2['conta_pai'] . '>' . $nomeCompleto;
-                //     }
-                // }
                 $this->geraNomeCompletoR($contas, $conta['conta_pai'], $nomeCompleto);
 
                 $lista[$conta['nome']] = $nomeCompleto;

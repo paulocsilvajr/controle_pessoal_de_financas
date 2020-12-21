@@ -5,7 +5,7 @@
 @endsection
 
 @section('conteudo')
-    <div class="container">
+    <div class="container-fluid">
         <h1 class="text-center margem-navbar-conteudo">Rotas da API</h1>
 
         <p>{{ $quant }} rotas cadastradas</p>
@@ -18,6 +18,7 @@
                     <th scope="col">Tipo</th>
                     <th scope="col">Rota</th>
                     <th scope="col">Descrição</th>
+                    <th scope="col">Documentação</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,6 +29,7 @@
                         <td>{{ $dados[$nome]['Tipo'] }}</td>
                         <td><strong>{{ $dados[$nome]['Rota'] }}</strong></td>
                         <td>{{ $dados[$nome]['Descricao'] }}</td>
+                        <td>{{ $dados[$nome]['Documentacao'] }}</td>
                     </tr>
                 @endforeach
             </tbody>

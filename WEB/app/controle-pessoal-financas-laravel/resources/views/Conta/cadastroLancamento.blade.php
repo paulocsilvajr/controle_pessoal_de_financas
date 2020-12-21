@@ -15,9 +15,9 @@
         <form method="post" action="/conta/{{ $nomeConta }}/cadastroLancamento">
             @csrf
 
-            <input type="text" id="cpf_pessoa" name="cpf_pessoa" value="{{ $cpf ?? 'Enviar CPF para cá' }}" hidden>
+            <input type="hidden" id="cpf_pessoa" name="cpf_pessoa" value="{{ $cpf ?? 'Enviar CPF para cá' }}">
 
-            <input type="text" id="nome_conta_origem" name="nome_conta_origem" value="{{ $nomeConta }}" hidden>
+            <input type="hidden" id="nome_conta_origem" name="nome_conta_origem" value="{{ $nomeConta }}">
 
             <div class="row">
                 <div class="col-sm mb-2">
@@ -40,6 +40,11 @@
             <div class="row">
                 <div class="col mb-2">
                     <label for="nome_conta_destino">Conta</label>
+                    <select name="nome_conta_destino" id="nome_conta_destino" class="form-control" required>
+                        <option value=>Selecione uma conta</option>
+                        <option value="Teste 01">Teste 01</option>
+                        <option value="Teste 02">Teste 02</option>
+                    </select>
                     <input type="text" id="nome_conta_destino" name="nome_conta_destino" class="form-control" placeholder="Conta" required />
                 </div>
             </div>

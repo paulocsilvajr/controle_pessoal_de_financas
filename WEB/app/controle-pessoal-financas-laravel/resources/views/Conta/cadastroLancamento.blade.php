@@ -42,10 +42,11 @@
                     <label for="nome_conta_destino">Conta</label>
                     <select name="nome_conta_destino" id="nome_conta_destino" class="form-control" required>
                         <option value=>Selecione uma conta</option>
-                        <option value="Teste 01">Teste 01</option>
-                        <option value="Teste 02">Teste 02</option>
+
+                        @foreach ($contas as $nome => $nomeCompleto)
+                            <option value="{{ $nome }}">{{ ucfirst($nomeCompleto) }}</option>
+                        @endforeach
                     </select>
-                    <input type="text" id="nome_conta_destino" name="nome_conta_destino" class="form-control" placeholder="Conta" required />
                 </div>
             </div>
 

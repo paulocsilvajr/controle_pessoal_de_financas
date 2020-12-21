@@ -17,6 +17,10 @@ class ContaController extends Controller
             if ($resposta->successful()) {
                 $dados = $resposta['data'];
 
+                $nomesCompletos = $this->geraListaContasCompleto($dados);
+
+                $request->session()->put('contas', $nomesCompletos);
+
                 return view(
                     'Conta.conta',
                     compact(
@@ -63,14 +67,25 @@ class ContaController extends Controller
             $mensagem = '';
             $tipoMensagem = '';
 
-            return view(
-                'Conta.cadastroLancamento',
-                compact(
-                    'nomeConta',
-                    'mensagem',
-                    'tipoMensagem',
-                )
-            );
+            $usuario = $request->session()->get('usuario');
+            $resposta = $http->get("/pessoas/$usuario");
+
+            if ($resposta->successful()) {
+                $cpf = $resposta['data']['cpf'];
+                $contas = $request->session()->get('contas');
+
+                return view(
+                    'Conta.cadastroLancamento',
+                    compact(
+                        'nomeConta',
+                        'mensagem',
+                        'tipoMensagem',
+                        'cpf',
+                        'contas',
+                    )
+                );
+            }
+            return redirect()->route('home');
         } else {
             return redirect()->route('login');
         }
@@ -101,5 +116,42 @@ Tipo: $tipo
             'contaEspecifica',
             ['nomeConta' => $nome_conta_origem]
         );
+    }
+
+    private function geraListaContasCompleto(array $contas): array{
+        $lista = array();
+
+        foreach ($contas as $conta) {
+            if (empty($conta['conta_pai'])) {
+                $nomeCompleto = $conta['nome'];
+                $lista[$conta['nome']] = $conta['nome'];
+            } else {
+                $nomeCompleto = $conta['conta_pai'] . '>' . $conta['nome'];
+
+                // foreach ($contas as $conta2) {
+                //     if (empty($conta2['conta_pai'])) {
+                //         continue;
+                //     } else if ($conta2['nome'] == $conta['conta_pai']) {
+                //         $nomeCompleto = $conta2['conta_pai'] . '>' . $nomeCompleto;
+                //     }
+                // }
+                $this->geraNomeCompletoR($contas, $conta['conta_pai'], $nomeCompleto);
+
+                $lista[$conta['nome']] = $nomeCompleto;
+            }
+        }
+        return $lista;
+    }
+
+    private function geraNomeCompletoR(array $contas, string $contaPaiAnterior, string &$nomeCompleto) {
+        foreach ($contas as $conta) {
+            if (empty($conta['conta_pai'])) {
+                continue;
+            } else if ($conta['nome'] == $contaPaiAnterior) {
+                $nomeCompleto = $conta['conta_pai'] . '>' . $nomeCompleto;
+
+                $this->geraNomeCompletoR($contas, $conta['conta_pai'], $nomeCompleto);
+            }
+        }
     }
 }

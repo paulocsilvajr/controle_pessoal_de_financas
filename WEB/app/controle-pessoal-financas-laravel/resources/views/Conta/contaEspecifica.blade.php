@@ -39,11 +39,11 @@
                 <tbody>
                     @foreach ($dados as $dado)
                         <tr>
-                            <th scope="row">{{ $id }}</th>
+                            <th scope="row">{{ $dado['id'] }}</th>
                             <td>{{ $dado['data'] }}</td>
                             <td>{{ $dado['numero'] }}</td>
                             <td><strong>{{ $dado['descricao'] }}</strong></td>
-                            <td>{{ $dado['nome-conta-destino'] }}</td>
+                            <td>{{ $dado['nome_conta_destino'] }}</td>
                             <td>{{ $dado['debito'] }}</td>
                             <td>{{ $dado['credito'] }}</td>
                         </tr>

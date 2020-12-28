@@ -15,25 +15,25 @@
         <form method="post" action="/conta/{{ $nomeConta }}/cadastroLancamento">
             @csrf
 
-            <input type="hidden" id="cpf_pessoa" name="cpf_pessoa" value="{{ $cpf ?? 'Enviar CPF para cá' }}">
+            <input type="hidden" id="cpf_pessoa" name="cpf_pessoa" value="{{ $cpf ?? '' }}">
 
             <input type="hidden" id="nome_conta_origem" name="nome_conta_origem" value="{{ $nomeConta }}">
 
             <div class="row">
                 <div class="col-sm mb-2">
                     <label for="data">Data</label>
-                    <input type="date" id="data" name="data" class="form-control" placeholder="Data" required autofocus />
+                    <input type="date" id="data" name="data" class="form-control" placeholder="Data" value="{{ $data ?? '' }}" required autofocus />
                 </div>
                 <div class="col-sm mb-2">
                     <label for="numero">Número</label>
-                    <input type="text" id="numero" name="numero" class="form-control" placeholder="Número" required />
+                    <input type="text" id="numero" name="numero" class="form-control" placeholder="Número" value="{{ $numero ?? '' }}" required />
                 </div>
             </div>
 
             <div class="row">
                 <div class="col mb-2">
                     <label for="descricao">Descrição</label>
-                    <input type="text" id="descricao" name="descricao" class="form-control" placeholder="Descrição" required />
+                    <input type="text" id="descricao" name="descricao" class="form-control" placeholder="Descrição" value="{{ $descricao ?? '' }}" required />
                 </div>
             </div>
 
@@ -44,7 +44,9 @@
                         <option value=>Selecione uma conta</option>
 
                         @foreach ($contas as $nome => $nomeCompleto)
-                            <option value="{{ $nome }}">{{ ucfirst($nomeCompleto) }}</option>
+                            <option value="{{ $nome }}"
+                            {{ ($destino == $nome) ? 'selected':'' }}
+                            >{{ ucfirst($nomeCompleto) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -53,14 +55,18 @@
             <div class="row">
                 <div class="col-sm mb-2">
                     <label for="valor">Valor</label>
-                    <input type="number" min=".01" step=".01" id="valor" name="valor" class="form-control" placeholder="Valor" required />
+                    <input type="number" min=".01" step=".01" id="valor" name="valor" class="form-control" placeholder="Valor" value="{{ $valor ?? '' }}" required />
                 </div>
 
                 <div class="col-sm mb-2">
                     <label for="tipo">Tipo</label>
                     <select name="tipo" id="tipo" class="form-control">
-                        <option value="debito">Débito</option>
-                        <option value="credito">Crédito</option>
+                        <option value="debito"
+                        {{ ($tipo == 'debito') ? "selected":'' }}
+                        >Débito</option>
+                        <option value="credito"
+                        {{ ($tipo == 'credito') ? "selected":'' }}
+                        >Crédito</option>
                     </select>
                 </div>
             </div>

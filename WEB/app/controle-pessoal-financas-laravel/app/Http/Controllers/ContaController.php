@@ -72,7 +72,9 @@ class ContaController extends Controller
 
             if ($resposta->successful()) {
                 $cpf = $resposta['data']['cpf'];
+
                 $contas = $request->session()->get('contas');
+                $contas = $this->filtraContas($contas, $nomeConta);
 
                 return view(
                     'Conta.cadastroLancamento',
@@ -146,5 +148,14 @@ Tipo: $tipo
                 $this->geraNomeCompletoR($contas, $conta['conta_pai'], $nomeCompleto);
             }
         }
+    }
+
+    /**
+     * filtraContas remove do array(associativo) $contas a conta com a chave informada na string $nomeConta
+     */
+    private function filtraContas(array $contas, string $nomeConta): array {
+        return array_filter($contas, function($conta) use(&$nomeConta){
+            return $conta !== $nomeConta;
+        }, ARRAY_FILTER_USE_KEY);
     }
 }

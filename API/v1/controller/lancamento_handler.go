@@ -1,10 +1,6 @@
 package controller
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -15,6 +11,11 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 
 	"github.com/gorilla/mux"
 )
@@ -539,6 +540,8 @@ func LancamentoPorConta(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// fmt.Printf(">>>%v\n", listaLancamentosPersJSON[0])
+
 	status = http.StatusOK
 	funcao := "LancamentoPorConta"
 	DefineHeaderRetornoDados(
@@ -631,9 +634,9 @@ func empacotaParaLancPersJSONPorCpf(db *sql.DB, cpfPessoa string, todosOsRegistr
 func empacotaParaLancPersJSONPorCpfEConta(db *sql.DB, cpfPessoa, conta string, todosOsRegistros bool) (listaLancamentosPersJSON LancamentosPersJSON, err error) {
 	var listaLancamentos lancamento.Lancamentos
 	if todosOsRegistros {
-		listaLancamentos, err = dao.CarregaLancamentosPorCpf(db, cpfPessoa)
+		listaLancamentos, err = dao.CarregaLancamentosPorCpfEConta(db, cpfPessoa, conta)
 	} else {
-		listaLancamentos, err = dao.CarregaLancamentosAtivoPorCpf(db, cpfPessoa)
+		listaLancamentos, err = dao.CarregaLancamentosAtivoPorCpfEConta(db, cpfPessoa, conta)
 	}
 	if err != nil {
 		return

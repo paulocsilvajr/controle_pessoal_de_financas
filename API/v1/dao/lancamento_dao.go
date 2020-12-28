@@ -1,10 +1,11 @@
 package dao
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 	"database/sql"
 	"fmt"
 	"strconv"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 )
 
 var (
@@ -115,6 +116,24 @@ WHERE
 	query := getTemplateQuery("CarregaLancamentosInativoPorCpf", lancamentoDB, sql)
 
 	return carregaLancamentos(db, query, cpf)
+}
+
+// CarregaLancamentosPorCpfEConta retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
+func CarregaLancamentosPorCpfEConta(db *sql.DB, cpf, conta string) (lancamentos lancamento.Lancamentos, err error) {
+	sql := `
+SELECT
+	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+FROM
+	{{.tabela}}
+INNER JOIN
+	{{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}
+WHERE
+	{{.cpfPessoa}} = $1 AND {{.nomeConta}} = $2
+`
+
+	query := getTemplateQuery("CarregaLancamentosPorCpfEConta", lancamentoDB, sql)
+
+	return carregaLancamentos(db, query, cpf, conta)
 }
 
 // CarregaLancamentosAtivoPorCpfEConta retorna uma listagem de todos os lancamentos ativos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)

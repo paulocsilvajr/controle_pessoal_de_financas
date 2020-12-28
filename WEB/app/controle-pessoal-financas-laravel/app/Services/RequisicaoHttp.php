@@ -37,7 +37,7 @@ class RequisicaoHttp
         return $this->rotaBase;
     }
 
-    public function post(string $rota, array $body = []): Response
+    public function postWithoutToken(string $rota, array $body = []): Response
     {
         $this->verificaRota($rota);
 
@@ -46,6 +46,22 @@ class RequisicaoHttp
         ];
         return $this->requisicao
             ->withHeaders($headers)
+            ->post($this->rotaBase . $rota, $body);
+    }
+
+    public function post(string $rota, array $body = []): Response
+    {
+        $this->verificaRota($rota);
+
+        $headers = [
+            'Content-Type' => 'application:json'
+        ];
+
+        $token = $this->request->session()->get('token');
+
+        return $this->requisicao
+            ->withHeaders($headers)
+            ->withToken($token)
             ->post($this->rotaBase . $rota, $body);
     }
 

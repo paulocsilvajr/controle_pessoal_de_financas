@@ -47,6 +47,10 @@ class ContaController extends Controller
 
                 $dados = $resposta['data'];
 
+                // if (isset($dados)) {
+                //     Imprime::console2($dados);
+                // }
+
                 return view(
                     'Conta.contaEspecifica',
                     compact(
@@ -76,6 +80,9 @@ class ContaController extends Controller
                 $contas = $request->session()->get('contas');
                 $contas = $this->filtraContas($contas, $nomeConta);
 
+                $destino = '';
+                $tipo = 'debito';
+
                 return view(
                     'Conta.cadastroLancamento',
                     compact(
@@ -84,6 +91,8 @@ class ContaController extends Controller
                         'tipoMensagem',
                         'cpf',
                         'contas',
+                        'destino',
+                        'tipo'
                     )
                 );
             }
@@ -103,20 +112,69 @@ class ContaController extends Controller
         $valor = $request->valor;
         $tipo = $request->tipo;
 
-        Imprime::console("<<<
-CPF: $cpf
-Origem: $nome_conta_origem
-Data: $data
-Número: $numero
-Descrição: $descricao
-Destino: $nome_conta_destino
-Valor: $valor
-Tipo: $tipo
->>>");
+        $dataFormatada = $this->formataData($data);
 
-        return redirect()->route(
-            'contaEspecifica',
-            ['nomeConta' => $nome_conta_origem]
+        $debito = 0.0;
+        $credito = 0.0;
+        if ($tipo == 'debito') {
+            $debito = floatval($valor);
+        } else {
+            $credito = floatval($valor);
+        }
+
+        $resposta = $http->post(
+            "/lancamentos",
+            [
+                'cpf_pessoa' => $cpf,
+                'nome_conta_origem' => $nome_conta_origem,
+                'data' => $dataFormatada,
+                'numero' => $numero,
+                'descricao' => $descricao,
+                'nome_conta_destino' => $nome_conta_destino,
+                'debito' => $debito,
+                'credito' => $credito
+            ]
+        );
+
+        if ($resposta->successful()) {
+            $mensagem = "Lançamento '$descricao' cadastrado com sucesso";
+            $tipoMensagem = 'success';
+
+            return redirect()->route(
+                'contaEspecifica',
+                [
+                    'nomeConta' => $nome_conta_origem,
+                    'mensagem' => $mensagem,
+                    'tipoMensagem' => $tipoMensagem
+                ]
+            );
+        }
+
+        $mensagem = "$resposta";
+        $tipoMensagem = 'danger';
+
+        $nomeConta = $nome_conta_origem;
+        $contas = $request->session()->get('contas');
+        $contas = $this->filtraContas($contas, $nomeConta);
+
+        $destino =  $nome_conta_destino;
+
+        return view(
+            'Conta.cadastroLancamento',
+            compact(
+                'nomeConta',
+                'mensagem',
+                'tipoMensagem',
+                'cpf',
+                'contas',
+                'cpf',
+                'data',
+                'numero',
+                'descricao',
+                'destino',
+                'valor',
+                'tipo'
+            )
         );
     }
 
@@ -157,5 +215,9 @@ Tipo: $tipo
         return array_filter($contas, function($conta) use(&$nomeConta){
             return $conta !== $nomeConta;
         }, ARRAY_FILTER_USE_KEY);
+    }
+
+    private function formataData(string $data): string {
+        return "${data}T00:00:00Z";
     }
 }

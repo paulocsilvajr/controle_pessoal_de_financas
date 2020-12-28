@@ -31,7 +31,7 @@ class EntrarController extends Controller
         $usuario = $request->usuario;
         $senha = $request->senha;
 
-        $resposta = $http->post(
+        $resposta = $http->postWithoutToken(
             "/login/{$usuario}",
             [
                 'usuario' => $usuario,

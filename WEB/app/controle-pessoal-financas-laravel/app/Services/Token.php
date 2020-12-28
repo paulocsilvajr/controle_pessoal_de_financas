@@ -43,7 +43,7 @@ final class Token
 
     private function renovar(RequisicaoHttp $http, string $usuario, string $senha): Response
     {
-        return $http->post(
+        return $http->postWithoutToken(
             "/login/{$usuario}",
             [
                 'usuario' => $usuario,

@@ -31,12 +31,9 @@ Route::get('/api', 'RotasApiController@index')
 
 Route::get('/conta', 'ContaController@index')->name('conta')
     ->middleware('autenticador');
-
 Route::get('/conta/{nomeConta}', 'ContaController@contaEspecifica')->name('contaEspecifica')
     ->middleware('autenticador');
-
 Route::get('/conta/{nomeConta}/cadastroLancamento', 'ContaController@carregaCadastroLancamento')->name('contaCadastroLancamento')
     ->middleware('autenticador');
-
 Route::post('/conta/{nomeConta}/cadastroLancamento', 'ContaController@cadastraLancamento')
     ->middleware('autenticador');

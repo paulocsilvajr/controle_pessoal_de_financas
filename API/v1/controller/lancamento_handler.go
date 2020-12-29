@@ -640,7 +640,7 @@ func empacotaParaLancPersJSONPorCpfEConta(db *sql.DB, cpfPessoa, conta string, t
 		return
 	}
 
-	return empacotaParaLancamentoPersJSON(db, listaLancamentos...)
+	return empacotaParaLancamentoPersJSONPorConta(db, conta, listaLancamentos...)
 }
 
 func empacotaParaLancamentoPersJSON(db *sql.DB, lancamentos ...*lancamento.Lancamento) (listaLancamentosPersJSON LancamentosPersJSON, err error) {
@@ -663,6 +663,43 @@ func empacotaParaLancamentoPersJSON(db *sql.DB, lancamentos ...*lancamento.Lanca
 		lancPersJSON.NomeContaDestino = detalheLancamentos[1].NomeConta
 		lancPersJSON.Debito = detalheLancamentos[0].Debito
 		lancPersJSON.Credito = detalheLancamentos[0].Credito
+		lancPersJSON.DataCriacao = lancamento.DataCriacao
+		lancPersJSON.DataModificacao = lancamento.DataModificacao
+		lancPersJSON.Estado = lancamento.Estado
+
+		listaLancamentosPersJSON = append(listaLancamentosPersJSON, lancPersJSON)
+	}
+
+	return
+}
+
+func empacotaParaLancamentoPersJSONPorConta(db *sql.DB, conta string, lancamentos ...*lancamento.Lancamento) (listaLancamentosPersJSON LancamentosPersJSON, err error) {
+	for _, lancamento := range lancamentos {
+		lancPersJSON := new(LancamentoPersJSON)
+
+		detalheLancamentos, err := dao.CarregaDetalheLancamentosPorIDLancamento(db, lancamento.ID)
+		// todo o lancamento deve ter 2 detalhes lancamento obrigatóriamente. Caso contrário, o laço é quebrado e retorna o erro personalizado
+		if err != nil && len(detalheLancamentos) != 2 {
+			err = errors.New("Lancamentos devem ser obrigatoriamente em par, representando o valor em débito e crédito de cada conta")
+			break
+		}
+
+		lancPersJSON.ID = lancamento.ID
+		lancPersJSON.CpfPessoa = lancamento.CpfPessoa
+		lancPersJSON.NomeContaOrigem = detalheLancamentos[0].NomeConta
+		lancPersJSON.Data = lancamento.Data
+		lancPersJSON.Numero = lancamento.Numero
+		lancPersJSON.Descricao = lancamento.Descricao
+		lancPersJSON.NomeContaDestino = detalheLancamentos[1].NomeConta
+
+		if conta == lancPersJSON.NomeContaOrigem {
+			lancPersJSON.Debito = detalheLancamentos[0].Debito
+			lancPersJSON.Credito = detalheLancamentos[0].Credito
+		} else {
+			lancPersJSON.Debito = detalheLancamentos[1].Debito
+			lancPersJSON.Credito = detalheLancamentos[1].Credito
+		}
+
 		lancPersJSON.DataCriacao = lancamento.DataCriacao
 		lancPersJSON.DataModificacao = lancamento.DataModificacao
 		lancPersJSON.Estado = lancamento.Estado

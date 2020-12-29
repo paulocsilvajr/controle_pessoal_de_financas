@@ -47,10 +47,6 @@ class ContaController extends Controller
 
                 $dados = $resposta['data'];
 
-                // if (isset($dados)) {
-                //     Imprime::console2($dados);
-                // }
-
                 return view(
                     'Conta.contaEspecifica',
                     compact(

@@ -31,6 +31,7 @@
                         <th scope="col">Data</th>
                         <th scope="col">Número</th>
                         <th scope="col">Descrição</th>
+                        <th scope="col">Origem</th>
                         <th scope="col">Destino</th>
                         <th scope="col">Débito</th>
                         <th scope="col">Crédito</th>
@@ -43,6 +44,7 @@
                             <td>{{ $dado['data'] }}</td>
                             <td>{{ $dado['numero'] }}</td>
                             <td><strong>{{ $dado['descricao'] }}</strong></td>
+                            <td>{{ $dado['nome_conta_origem'] }}</td>
                             <td>{{ $dado['nome_conta_destino'] }}</td>
                             <td>{{ $dado['debito'] }}</td>
                             <td>{{ $dado['credito'] }}</td>

@@ -24,34 +24,38 @@
             @endphp
             @include('mensagem', ['mensagem' => $mensagem, 'tipo' => 'danger' ])
         @else
-            <table class="table table-striped table-hover table-responsive mt-3">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Data</th>
-                        <th scope="col">Número</th>
-                        <th scope="col">Descrição</th>
-                        <th scope="col">Origem</th>
-                        <th scope="col">Destino</th>
-                        <th scope="col">Débito</th>
-                        <th scope="col">Crédito</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($dados as $dado)
+            <div class="table-responsive">
+
+                <table class="table table-striped table-hover mt-3">
+                    <thead class="thead-dark">
                         <tr>
-                            <th scope="row">{{ $dado['id'] }}</th>
-                            <td>{{ $dado['data'] }}</td>
-                            <td>{{ $dado['numero'] }}</td>
-                            <td><strong>{{ $dado['descricao'] }}</strong></td>
-                            <td>{{ $dado['nome_conta_origem'] }}</td>
-                            <td>{{ $dado['nome_conta_destino'] }}</td>
-                            <td>{{ $dado['debito'] }}</td>
-                            <td>{{ $dado['credito'] }}</td>
+                            <th scope="col">#</th>
+                            <th scope="col">Data</th>
+                            <th scope="col">Número</th>
+                            <th scope="col">Descrição</th>
+                            <th scope="col">Origem</th>
+                            <th scope="col">Destino</th>
+                            <th scope="col">Débito</th>
+                            <th scope="col">Crédito</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($dados as $dado)
+                            <tr>
+                                <th scope="row">{{ $dado['id'] }}</th>
+                                <td>{{ $dado['data'] }}</td>
+                                <td>{{ $dado['numero'] }}</td>
+                                <td><strong>{{ $dado['descricao'] }}</strong></td>
+                                <td>{{ $dado['nome_conta_origem'] }}</td>
+                                <td>{{ $dado['nome_conta_destino'] }}</td>
+                                <td>{{ $dado['debito'] }}</td>
+                                <td>{{ $dado['credito'] }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+            </div>
         @endif
 
     </div>

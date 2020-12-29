@@ -595,37 +595,6 @@ func empacotaParaLancPersJSONPorCpf(db *sql.DB, cpfPessoa string, todosOsRegistr
 		return
 	}
 
-	// substituido código comentado pela função "empacotaParaLancamentoPersJSON"
-	// for _, lancamento := range listaLancamentos {
-	// 	var lancPersJSON *LancamentoPersJSON
-
-	// 	detalheLancamentos, err := dao.CarregaDetalheLancamentosPorIDLancamento(db, lancamento.ID)
-	// 	// todo o lancamento deve ter 2 detalhes lancamento obrigatóriamente. Caso contrário, o laço é quebrado e retorna o erro personalizado
-	// 	if err != nil && len(detalheLancamentos) != 2 {
-	// 		err = errors.New("Lancamentos devem ser obrigatoriamente em par, representando o valor em débito e crédito de cada conta")
-	// 		break
-	// 	}
-
-	// 	lancPersJSON.ID = lancamento.ID
-	// 	lancPersJSON.CpfPessoa = lancamento.CpfPessoa
-	// 	lancPersJSON.NomeContaOrigem = detalheLancamentos[0].NomeConta
-	// 	lancPersJSON.Data = lancamento.Data
-	// 	lancPersJSON.Numero = lancamento.Numero
-	// 	lancPersJSON.Descricao = lancamento.Descricao
-	// 	lancPersJSON.NomeContaDestino = detalheLancamentos[1].NomeConta
-	// 	lancPersJSON.Debito = detalheLancamentos[0].Debito
-	// 	lancPersJSON.Credito = detalheLancamentos[0].Credito
-	// 	lancPersJSON.DataCriacao = lancamento.DataCriacao
-	// 	lancPersJSON.DataModificacao = lancamento.DataModificacao
-	// 	lancPersJSON.Estado = lancamento.Estado
-
-	// 	listaLancamentosPersJSON = append(listaLancamentosPersJSON, lancPersJSON)
-	// }
-	// // if err != nil {
-	// // 	return
-	// // }
-
-	// return
 	return empacotaParaLancamentoPersJSON(db, listaLancamentos...)
 }
 

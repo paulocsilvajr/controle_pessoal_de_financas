@@ -540,8 +540,6 @@ func LancamentoPorConta(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// fmt.Printf(">>>%v\n", listaLancamentosPersJSON[0])
-
 	status = http.StatusOK
 	funcao := "LancamentoPorConta"
 	DefineHeaderRetornoDados(

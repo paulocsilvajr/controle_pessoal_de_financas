@@ -36,22 +36,27 @@
                             <th scope="col">Conta</th>
                             <th scope="col">Débito</th>
                             <th scope="col">Crédito</th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($dados as $dado)
                             <tr>
-                                <th scope="row">{{ $dado['id'] }}</th>
-                                <td>{{ App\Helpers\Formata::textoParaDataBrasil($dado['data']) }}</td>
-                                <td>{{ $dado['numero'] }}</td>
-                                <td><strong>{{ $dado['descricao'] }}</strong></td>
+                                <th scope="row" class="align-middle">{{ $dado['id'] }}</th>
+                                <td class="align-middle">{{ App\Helpers\Formata::textoParaDataBrasil($dado['data']) }}</td>
+                                <td class="align-middle">{{ $dado['numero'] }}</td>
+                                <td class="align-middle"><strong>{{ $dado['descricao'] }}</strong></td>
                                 @if ($dado['nome_conta_origem'] == $nomeConta)
-                                    <td>{{ ucfirst($dado['nome_conta_destino']) }}</td>
+                                    <td class="align-middle">{{ ucfirst($dado['nome_conta_destino']) }}</td>
                                 @else
-                                    <td>{{ ucfirst($dado['nome_conta_origem']) }}</td>
+                                    <td class="align-middle">{{ ucfirst($dado['nome_conta_origem']) }}</td>
                                 @endif
-                                <td class="alinhamento-numeros-tabela">{{ App\Helpers\Formata::valorParaMonetarioBrasil($dado['debito']) }}</td>
-                                <td class="alinhamento-numeros-tabela">{{ App\Helpers\Formata::valorParaMonetarioBrasil($dado['credito']) }}</td>
+                                <td class="alinhamento-numeros-tabela align-middle">{{ App\Helpers\Formata::valorParaMonetarioBrasil($dado['debito']) }}</td>
+                                <td class="alinhamento-numeros-tabela align-middle">{{ App\Helpers\Formata::valorParaMonetarioBrasil($dado['credito']) }}</td>
+                                <td class="text-center">
+                                    <input name="" id="" class="btn btn-primary" type="button" value="Detalhes">
+                                    <input name="" id="" class="btn btn-danger" type="button" value="Remover">
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

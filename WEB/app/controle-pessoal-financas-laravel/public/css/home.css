@@ -17,6 +17,10 @@
     margin-top: 5rem;
 }
 
+.alinhamento-numeros-tabela {
+    text-align: right;
+}
+
 @media screen and (max-width: 576px) {
     .titulo-conta-sm {
         margin-bottom: 1.5rem;

@@ -42,16 +42,16 @@
                         @foreach ($dados as $dado)
                             <tr>
                                 <th scope="row">{{ $dado['id'] }}</th>
-                                <td>{{ $dado['data'] }}</td>
+                                <td>{{ App\Helpers\Formata::textoParaDataBrasil($dado['data']) }}</td>
                                 <td>{{ $dado['numero'] }}</td>
                                 <td><strong>{{ $dado['descricao'] }}</strong></td>
                                 @if ($dado['nome_conta_origem'] == $nomeConta)
-                                    <td>{{ $dado['nome_conta_destino'] }}</td>
+                                    <td>{{ ucfirst($dado['nome_conta_destino']) }}</td>
                                 @else
-                                    <td>{{ $dado['nome_conta_origem'] }}</td>
+                                    <td>{{ ucfirst($dado['nome_conta_origem']) }}</td>
                                 @endif
-                                <td>{{ $dado['debito'] }}</td>
-                                <td>{{ $dado['credito'] }}</td>
+                                <td class="alinhamento-numeros-tabela">{{ App\Helpers\Formata::valorParaMonetarioBrasil($dado['debito']) }}</td>
+                                <td class="alinhamento-numeros-tabela">{{ App\Helpers\Formata::valorParaMonetarioBrasil($dado['credito']) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

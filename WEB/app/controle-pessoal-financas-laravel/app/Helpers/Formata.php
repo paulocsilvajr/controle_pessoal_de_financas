@@ -12,6 +12,9 @@ final class Formata
         return number_format($valor, 2, ',', '.');
     }
 
+    /**
+     * textoParaDataBrasil formata a data no formato texto YYYY-MM-DDTHH:mm:SSZ obtido via JSON da API para o formato brasileiro DD/MM/YYYY
+     */
     public static function textoParaDataBrasil(string $dataCompleta): string
     {
         $data = explode('T', $dataCompleta); // separado a data

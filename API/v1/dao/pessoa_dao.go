@@ -1,9 +1,10 @@
 package dao
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"database/sql"
 	"errors"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 )
 
 var (
@@ -366,6 +367,8 @@ func registrosPessoas01(rows *sql.Rows, registros []interface{}) (novosRegistros
 	if err != nil {
 		return
 	}
+	pessoaAtual.CorrigeData()
+
 	novosRegistros = append(registros, pessoaAtual)
 
 	return
@@ -377,6 +380,8 @@ func registrosPessoas02(rows *sql.Rows, registros []interface{}) (novosRegistros
 	if err != nil {
 		return
 	}
+	pessoaAtual.CorrigeData()
+
 	novosRegistros = append(registros, pessoaAtual)
 
 	return

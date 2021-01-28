@@ -1,11 +1,12 @@
 package detalhe_lancamento
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
 	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
 )
 
 // IDetalheLancamento é uma interface que exige a implementação dos métodos origatórios em DetalheLancamento

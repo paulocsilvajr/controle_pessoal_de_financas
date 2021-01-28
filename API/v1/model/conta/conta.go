@@ -1,10 +1,11 @@
 package conta
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 )
 
 // IConta é uma interface que exige a implementação dos métodos obrigatórios em Conta
@@ -16,6 +17,7 @@ type IConta interface {
 	AlteraCampos(map[string]string) error
 	Ativa()
 	Inativa()
+	CorrigeData()
 }
 
 // Conta é uma struct que representa uma conta. Possui notação para JSON para cada campo
@@ -170,6 +172,12 @@ func (c *Conta) Ativa() {
 // Inativa é um método que define a Conta como inativa e atualiza a sua data de modificação
 func (c *Conta) Inativa() {
 	c.alteraEstado(false)
+}
+
+// CorrigeData é um método que converte a data(Time) no formato do timezone local
+func (c *Conta) CorrigeData() {
+	c.DataCriacao = c.DataCriacao.Local()
+	c.DataModificacao = c.DataModificacao.Local()
 }
 
 // ProcuraConta é um método que retorna uma Conta a partir da busca em uma listagem de Contas. Caso não seja encontrado a Conta, retorna um erro != nil. A interface IContas exige a implementação desse método

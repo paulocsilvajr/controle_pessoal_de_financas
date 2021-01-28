@@ -18,6 +18,12 @@ func (p *PessoaSimples) GetEmail() string {
 	return p.Email
 }
 
+// CorrigeData é um método que converte a data(Time) no formato do timezone local
+func (p *PessoaSimples) CorrigeData() {
+	p.DataCriacao = p.DataCriacao.Local()
+	p.DataModificacao = p.DataModificacao.Local()
+}
+
 // PessoasSimples é a representação de um conjunto/lista(slice) de pessoas simples(*PessoaSimples)
 type PessoasSimples []*PessoaSimples
 

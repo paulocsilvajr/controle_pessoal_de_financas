@@ -1,10 +1,11 @@
 package tipo_conta
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/erro"
 	"fmt"
 	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/erro"
 )
 
 // ITipoConta é uma interface que exige a implementação dos métodos obrigatórios em TipoConta
@@ -16,6 +17,7 @@ type ITipoConta interface {
 	AlteraCampos(map[string]string) error
 	Ativa()
 	Inativa()
+	CorrigeData()
 }
 
 // TipoConta é uma struct que representa um tipo de conta. Possui notações JSON para cada campo e tem a composição da interface ITipoConta
@@ -149,6 +151,12 @@ func (t *TipoConta) Ativa() {
 // Inativa é um método que define o TipoConta como inativo e atualiza a sua data de modificação
 func (t *TipoConta) Inativa() {
 	t.alteraEstado(false)
+}
+
+// CorrigeData é um método que converte a data(Time) no formato do timezone local
+func (t *TipoConta) CorrigeData() {
+	t.DataCriacao = t.DataCriacao.Local()
+	t.DataModificacao = t.DataModificacao.Local()
 }
 
 // ProcuraTipoConta é um método que retorna um TipoConta a partir da busca em uma listagem de TiposConta. Caso não seja encontrado o TipoConta, retorna um erro != nil. A interface ITiposConta exige a implementação desse método

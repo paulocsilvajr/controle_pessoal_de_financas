@@ -448,6 +448,8 @@ func registrosLancamento01(rows *sql.Rows, registros []interface{}) (novosRegist
 	if err != nil {
 		return
 	}
+	lancamentoAtual.CorrigeData()
+
 	novosRegistros = append(registros, lancamentoAtual)
 
 	return

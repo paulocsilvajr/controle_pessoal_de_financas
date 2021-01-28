@@ -1,9 +1,10 @@
 package dao
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
 	"database/sql"
 	"errors"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
 )
 
 var (
@@ -263,6 +264,8 @@ func registrosTipoConta01(rows *sql.Rows, registros []interface{}) (novosRegistr
 	if err != nil {
 		return
 	}
+	tipoContaAtual.CorrigeData()
+
 	novosRegistros = append(registros, tipoContaAtual)
 
 	return

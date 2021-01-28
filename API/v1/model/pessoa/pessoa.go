@@ -1,11 +1,12 @@
 package pessoa
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/erro"
 	"fmt"
 	"regexp"
 	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/erro"
 )
 
 // Pessoa é uma struct que representa uma pessoa. Possui notações para JSON para cada campo
@@ -54,6 +55,7 @@ type Pessoas []*Pessoa
 // IPessoa é uma interface que exibe o método GetMail para representar uma pessoa genérica(Pessoa e PessoaSimples)
 type IPessoa interface {
 	GetEmail() string
+	CorrigeData()
 }
 
 // IPessoas é uma interface que exige a implementação dos métodos ProcuraPessoaPorUsuario e Len para representar um conjunto/lista(slice) de pessoas genéricas(Pessoas e PessoasSimples)
@@ -89,6 +91,12 @@ func NewPessoaAdmin(cpf, nome, usuario, senha, email string) (*Pessoa, error) {
 // GetEmail é um método que retorna uma string com o email atribuído a pessoa. A interface IPessoa exige a implementação desse método
 func (p *Pessoa) GetEmail() string {
 	return p.Email
+}
+
+// CorrigeData é um método que converte a data(Time) no formato do timezone local
+func (p *Pessoa) CorrigeData() {
+	p.DataCriacao = p.DataCriacao.Local()
+	p.DataModificacao = p.DataModificacao.Local()
 }
 
 // Altera é um método que modifica os dados da pessoa a partir dos parâmetros informados depois da verificação de cada parâmetro e atualiza a data de modificação dela. Retorna um erro != nil, caso algum parâmetro seja inválido

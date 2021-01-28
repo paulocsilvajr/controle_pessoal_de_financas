@@ -1,12 +1,13 @@
 package lancamento
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 )
 
 // ILancamento é uma interface que exige a implementação dos métodos obrigatórios em Lancamento
@@ -18,6 +19,7 @@ type ILancamento interface {
 	AlteraCampos(map[string]interface{}) error
 	Ativa()
 	Inativa()
+	CorrigeData()
 }
 
 // Lancamento é uma struct que representa um lancamento.
@@ -179,6 +181,12 @@ func (l *Lancamento) Ativa() {
 // Inativa é um método que define o Lancamento como inativo e atualiza a sua data de modificação
 func (l *Lancamento) Inativa() {
 	l.alteraEstado(false)
+}
+
+// CorrigeData é um método que converte a data(Time) no formato do timezone local
+func (l *Lancamento) CorrigeData() {
+	l.DataCriacao = l.DataCriacao.Local()
+	l.DataModificacao = l.DataModificacao.Local()
 }
 
 // ProcuraLancamentoID é um método que retorna um Lancamento a partir da busca em uma listagem de Lancamentos por um id informado. Caso não seja encontrado o Lancamento, retorna um erro != nil. A interface ILancamentos exige a implementação desse método

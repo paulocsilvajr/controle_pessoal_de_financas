@@ -18,6 +18,7 @@
                     <th scope="col">Tipo</th>
                     <th scope="col">Rota</th>
                     <th scope="col">Descrição</th>
+                    <th scope="col">Retorno</th>
                     <th scope="col">Documentação</th>
                 </tr>
             </thead>
@@ -29,6 +30,7 @@
                         <td>{{ $dados[$nome]['Tipo'] }}</td>
                         <td><strong>{{ $dados[$nome]['Rota'] }}</strong></td>
                         <td>{{ $dados[$nome]['Descricao'] }}</td>
+                        <td>{{ $dados[$nome]['Retorno'] }}</td>
                         <td>{{ $dados[$nome]['Documentacao'] }}</td>
                     </tr>
                 @endforeach

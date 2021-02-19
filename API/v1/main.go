@@ -94,7 +94,7 @@ func verificaParametrosInicializacao() {
 Inicia a API do "Controle Pessoa de Finanças"
 Argumentos:
   -i, --init         cria o usuário administrador inicial "admin" com senha "admin"
-  -r, --rotes        exibe as métodos/rotas cadastradas na API
+  -r, --routes        exibe as métodos/rotas cadastradas na API
   -h, --help         exibe essa ajuda
 `, args[0])
 			os.Exit(1)

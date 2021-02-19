@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jedib0t/go-pretty/table"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
@@ -85,16 +86,33 @@ func verificaParametrosInicializacao() {
 		switch args[1] {
 		case "--init", "-i":
 			criarUsuarioAdminInicial()
+		case "--rotes", "-r":
+			imprimeRotas()
+			os.Exit(0)
 		case "--help", "-h":
 			fmt.Printf(`Uso: %s [ -h | --help | -i | --init ]
 Inicia a API do "Controle Pessoa de Finanças"
 Argumentos:
   -i, --init         cria o usuário administrador inicial "admin" com senha "admin"
+  -r, --rotes        exibe as métodos/rotas cadastradas na API
   -h, --help         exibe essa ajuda
 `, args[0])
 			os.Exit(1)
 		}
 	}
+}
+
+func imprimeRotas() {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"TIPO", "ROTA"})
+	for _, rota := range config.Rotas {
+		t.AppendRow([]interface{}{rota.Tipo, rota.Rota})
+		t.AppendSeparator()
+	}
+	t.Render()
+
+	fmt.Println(`Para mais detalhes de cada rota, logue na API pelo rota '/login/{usuario}' com o corpo '{"usuario":"string", "senha":"string"}', armazene o token associado ao seu usuário e consulte a rota '/'`)
 }
 
 func inputString(prompt string) string {

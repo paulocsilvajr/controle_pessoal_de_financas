@@ -1,9 +1,6 @@
 package controller
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -12,6 +9,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 
 	"github.com/gorilla/mux"
 )
@@ -350,6 +351,20 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &pessoaFromJSON)
 	status = http.StatusUnprocessableEntity // 422
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	usuarioParaAlterar, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	status = http.StatusInternalServerError // 500
+	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
+	if err != nil {
+		return
+	}
+
+	status = http.StatusUnprocessableEntity // 422
+	verificacaoCPF := usuarioParaAlterar.Cpf != pessoaFromJSON.Cpf
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verificacaoCPF, status, errors.New("CPF informado em JSON diferente do cadastrado no Banco de dados"))
 	if err != nil {
 		return
 	}

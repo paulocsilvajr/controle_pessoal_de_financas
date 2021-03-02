@@ -173,7 +173,7 @@ func API(w http.ResponseWriter, r *http.Request) {
 		status,
 		map[string]string{"API OnLine": fmt.Sprintf("%.2d rota(s) cadastrada(s)", len(config.Rotas))},
 		"API",
-		"API Online, faça o login pela rota [POST] '/login/{usuario}' e consulte todas as rotas em [GET] '/'",
+		`API Online, faça o login pela rota [POST] '/login/{usuario}' informando no corpo da requisição o JSON '{"usuario":"nome do usuário",  "senha":"senha do usuário"}' e consulte todas as rotas em [GET] '/'`,
 		"API Online")
 }
 

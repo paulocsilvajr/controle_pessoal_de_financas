@@ -251,7 +251,7 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Enviando dados de pessoa '%s'", p.Usuario))
 }
 
-// PessoaRemove é um handler/controller que responde a rota '[DELETE] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que o usuário informado na rota seja diferente ao do token e seja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500)
+// PessoaRemove é um handler/controller que responde a rota '[DELETE] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que o usuário informado na rota seja diferente ao do token e seja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusNotFound(404) caso não encontre o registro para remoção
 func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusInternalServerError // 500
 
@@ -288,6 +288,7 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	status = http.StatusNotFound // 404
 	err = dao.RemovePessoaPorUsuario(db, usuarioRemocao)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {

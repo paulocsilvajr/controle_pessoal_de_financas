@@ -1,8 +1,9 @@
 package dao
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
 	"testing"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
 )
 
 type detLanc struct {
@@ -77,8 +78,8 @@ func TestCarregaDetalheLancamento(t *testing.T) {
 		t.Error(listaDetalhesLancamento)
 	}
 
-	if len(listaDetalhesLancamento) != 4 {
-		t.Error(listaDetalhesLancamento)
+	if len(listaDetalhesLancamento) < 4 {
+		t.Errorf("%d elementos\n%v", len(listaDetalhesLancamento), listaDetalhesLancamento)
 	}
 
 	listaDetalhesLancamento, err = CarregaDetalheLancamentosPorIDLancamento(db, numLanc01)

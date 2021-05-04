@@ -215,14 +215,14 @@ func TestPessoaAlter(t *testing.T) {
 		t.Error(res, string(body))
 	}
 
-	// pessoa(teste99) não pôde ser alterada por não existir no BD - 304
+	// pessoa(teste99) não pôde ser alterada por não existir no BD - 500
 	admin = "teste01"
 	tokenPessoaAdmin, _ = getToken(admin, "123456")
 	usuario = "teste99"
 	rota = fmt.Sprintf("/pessoas/%s", usuario)
 	res, body, _ = put(rota, `{"cpf":"00000002020",  "nome_completo":"Teste 20", "usuario":"teste20", "senha":"2020123456", "email":"teste2020@email.com"}`, tokenPessoaAdmin)
 	status = res.StatusCode
-	if status != 304 {
+	if status != 500 {
 		t.Error(res, string(body))
 	}
 
@@ -353,14 +353,14 @@ func TestPessoaRemove(t *testing.T) {
 		t.Error(res, string(body))
 	}
 
-	// remove pessoa não cadastrada com usuário admin - 500
+	// remove pessoa não cadastrada com usuário admin - 404
 	admin = "teste01"
 	tokenPessoaAdmin, _ = getToken(admin, "123456")
 	usuario = "testeABC"
 	rota = fmt.Sprintf("/pessoas/%s", usuario)
 	res, body, _ = delete(rota, tokenPessoaAdmin)
 	status = res.StatusCode
-	if status != 500 {
+	if status != 404 {
 		t.Error(res, string(body))
 	}
 

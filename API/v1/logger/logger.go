@@ -1,13 +1,14 @@
 package logger
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 )
 
 const dirLOG = "logs"
@@ -22,8 +23,10 @@ func ServeHTTPAndLog(inner http.Handler, name string) http.Handler {
 
 			inner.ServeHTTP(w, r)
 
+			// IP:Porta	MétodoHTTP	Rota	NomeRota	Duração
 			msg := fmt.Sprintf(
-				"%s\t%s\t%s\t%s",
+				"%s\t%s\t%s\t%s\t%s",
+				r.RemoteAddr,
 				r.Method,
 				r.RequestURI,
 				name,

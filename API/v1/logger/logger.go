@@ -32,14 +32,12 @@ func ServeHTTPAndLog(inner http.Handler, name string) http.Handler {
 				"%s",
 				"%s",
 				"%s",
-				"%s",
 			},
 				"\t")
 			msg := fmt.Sprintf(
 				mascara,
 				r.RemoteAddr,
 				r.Method,
-				r.RequestURI,
 				r.URL.Path,
 				name,
 				time.Since(start),

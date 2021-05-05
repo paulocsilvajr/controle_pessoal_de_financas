@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
@@ -24,11 +25,22 @@ func ServeHTTPAndLog(inner http.Handler, name string) http.Handler {
 			inner.ServeHTTP(w, r)
 
 			// IP:Porta	MétodoHTTP	Rota	NomeRota	Duração
+
+			mascara := strings.Join([]string{
+				"%s",
+				"%s",
+				"%s",
+				"%s",
+				"%s",
+				"%s",
+			},
+				"\t")
 			msg := fmt.Sprintf(
-				"%s\t%s\t%s\t%s\t%s",
+				mascara,
 				r.RemoteAddr,
 				r.Method,
 				r.RequestURI,
+				r.URL.Path,
 				name,
 				time.Since(start),
 			)

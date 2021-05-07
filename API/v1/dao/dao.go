@@ -8,31 +8,35 @@ import (
 	"log"
 	"time"
 
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
 
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
-
-	_ "github.com/lib/pq" // pacote para comunicação com o Banco de Dados PostgreSQL
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // funcSetValores é um tipo representando a função para setar os valores para a alteração de um dado no BD. ...interface{} representa todos os campos chave(primária). Veja o exemplo de aplicação em detalhe_lancamento_dao.go na função setValoresDetalheLancamento03. Tipo usado pela função altera2
 type funcSetValores func(*sql.Stmt, interface{}, ...interface{}) (sql.Result, error)
 
 // GetDB retorna uma conexão com o banco de dados de acordo com as informações obtida de configurações
-func GetDB() *sql.DB {
+func GetDB() *gorm.DB {
 	config := config.AbrirConfiguracoes()
 	connStr := getStringConexao(config)
-	db, err := sql.Open(config["DB"], connStr)
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  connStr,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
 
 	if err != nil {
 		logger.GeraLogFS(
-			fmt.Sprintf("Erro ao conectar em servidor do Banco de dados"),
+			fmt.Sprintf("Erro ao conectar em servidor do Banco de dados[%s]", err),
 			time.Now(),
 		)
 		log.Fatal(err)
 	}
 
-	if err := db.Ping(); err != nil {
+	db2, _ := db.DB()
+	if err := db2.Ping(); err != nil {
 		logger.GeraLogFS(
 			fmt.Sprintf("Erro em PING em servidor de Banco de Dados[%s]", err),
 			time.Now(),

@@ -7,7 +7,7 @@ var (
 )
 
 func TestGetDB(t *testing.T) {
-	db := GetDB()
+	db, _ := GetDB().DB()
 	err := db.Ping()
 
 	if err != nil {

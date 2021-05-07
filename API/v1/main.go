@@ -73,7 +73,7 @@ func criarUsuarioAdminInicial() {
 		}
 	}
 
-	err = db.Close()
+	err = dao.CloseDB(db)
 	if err != nil {
 		log.Fatal(err)
 	}

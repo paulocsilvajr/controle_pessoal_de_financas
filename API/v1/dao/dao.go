@@ -46,6 +46,11 @@ func GetDB() *gorm.DB {
 	return db
 }
 
+func CloseDB(db *gorm.DB) error {
+	db2, _ := db.DB()
+	return db2.Close()
+}
+
 func getStringConexao(config config.Configuracoes) string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", config["DBhost"], config["DBporta"], config["DBusuario"], config["DBsenha"], config["DBnome"])
 }

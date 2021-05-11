@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
@@ -13,13 +14,15 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	_ "github.com/lib/pq"
 )
 
 // funcSetValores é um tipo representando a função para setar os valores para a alteração de um dado no BD. ...interface{} representa todos os campos chave(primária). Veja o exemplo de aplicação em detalhe_lancamento_dao.go na função setValoresDetalheLancamento03. Tipo usado pela função altera2
 type funcSetValores func(*sql.Stmt, interface{}, ...interface{}) (sql.Result, error)
 
-// GetDB retorna uma conexão com o banco de dados de acordo com as informações obtida de configurações
-func GetDB() *gorm.DB {
+// GetDB2 retorna uma conexão com o banco de dados(*gorm.DB) de acordo com as informações obtida de configurações
+func GetDB02() *gorm.DB {
 	config := config.AbrirConfiguracoes()
 	connStr := getStringConexao(config)
 	db, err := gorm.Open(postgres.New(postgres.Config{
@@ -35,15 +38,44 @@ func GetDB() *gorm.DB {
 		log.Fatal(err)
 	}
 
-	db2, _ := db.DB()
-	if err := db2.Ping(); err != nil {
+	if err := PingDB(db); err != nil {
 		logger.GeraLogFS(
 			fmt.Sprintf("Erro em PING em servidor de Banco de Dados[%s]", err),
 			time.Now(),
 		)
+		log.Fatal(err)
 	}
 
 	return db
+}
+
+func CreateDB() error {
+	// Fonte: https://stackoverflow.com/questions/55555836/is-it-possible-to-create-postgresql-databases-with-dynamic-names-with-the-help-o
+	config := config.AbrirConfiguracoes()
+	conninfo := getStringConexao2(config)
+
+	db, err := sql.Open("postgres", conninfo)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbName := config["DBnome"]
+	_, err = db.Exec("CREATE DATABASE " + dbName)
+	if err != nil {
+		bancoDadosJaExiste := fmt.Sprintf("database \"%s\" already exists", dbName)
+		if strings.Contains(err.Error(), bancoDadosJaExiste) {
+			logger.GeraLogFS(
+				fmt.Sprintf("Banco de Dados \"%s\" já existe", dbName),
+				time.Now(),
+			)
+
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func CloseDB(db *gorm.DB) error {
@@ -51,8 +83,20 @@ func CloseDB(db *gorm.DB) error {
 	return db2.Close()
 }
 
+func PingDB(db *gorm.DB) error {
+	db2, _ := db.DB()
+
+	return db2.Ping()
+}
+
+// getStringConexao retorna uma string contendo os dados para se conectar ao banco de dados de acordo com configurações(config.Configuracoes) informadas como parâmetro
 func getStringConexao(config config.Configuracoes) string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", config["DBhost"], config["DBporta"], config["DBusuario"], config["DBsenha"], config["DBnome"])
+}
+
+// getStringConexao2 retorna uma string contendo os dados para se conectar ao banco de dados de acordo com configurações(config.Configuracoes) informadas como parâmetro, mas SEM conter o nome do banco(dbname)
+func getStringConexao2(config config.Configuracoes) string {
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s sslmode=disable", config["DBhost"], config["DBporta"], config["DBusuario"], config["DBsenha"])
 }
 
 func getTemplateQuery(nome string, campos map[string]string, sql string) string {
@@ -240,4 +284,28 @@ func altera2T(transacao *sql.Tx, novoRegistro interface{}, query string, setValo
 	r = novoRegistro
 
 	return
+}
+
+// GetDB retorna uma conexão com o banco de dados(*sql.DB) de acordo com as informações obtida de configurações.
+func GetDB() *sql.DB {
+	config := config.AbrirConfiguracoes()
+	connStr := getStringConexao(config)
+	db, err := sql.Open(config["DB"], connStr)
+
+	if err != nil {
+		logger.GeraLogFS(
+			fmt.Sprintf("Erro ao conectar em servidor do Banco de dados"),
+			time.Now(),
+		)
+		log.Fatal(err)
+	}
+
+	if err := db.Ping(); err != nil {
+		logger.GeraLogFS(
+			fmt.Sprintf("Erro em PING em servidor de Banco de Dados[%s]", err),
+			time.Now(),
+		)
+	}
+
+	return db
 }

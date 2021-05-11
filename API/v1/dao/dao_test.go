@@ -6,8 +6,25 @@ var (
 	db = GetDB()
 )
 
+func TestCreateDB(t *testing.T) {
+	err := CreateDB()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestGetDB02(t *testing.T) {
+	db := GetDB02()
+
+	err := PingDB(db)
+	if err != nil {
+		t.Error("Não foi possível estabelecer conexão com o Banco de Dados", db)
+	}
+}
+
+// TESTES ANTIGOS
 func TestGetDB(t *testing.T) {
-	db, _ := GetDB().DB()
+	db := GetDB()
 	err := db.Ping()
 
 	if err != nil {

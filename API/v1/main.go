@@ -73,7 +73,7 @@ func criarUsuarioAdminInicial() {
 		}
 	}
 
-	err = dao.CloseDB(db)
+	err = db.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,6 +85,7 @@ func verificaParametrosInicializacao() {
 	if len(args) >= 2 {
 		switch args[1] {
 		case "--init", "-i":
+			dao.CreateDB()
 			criarUsuarioAdminInicial()
 		case "--rotes", "-r":
 			imprimeRotas()

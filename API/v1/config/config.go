@@ -301,7 +301,7 @@ func criarConfigPadrao() error {
 	configuracoes["DB"] = "postgres"
 	configuracoes["DBhost"] = "localhost"
 	configuracoes["DBporta"] = "15432"
-	configuracoes["DBnome"] = "controle_pessoal_financas"
+	configuracoes["DBnome"] = "controle_pessoal_financas_2"
 	configuracoes["DBusuario"] = "postgres"
 	configuracoes["DBsenha"] = "Postgres2019!"
 

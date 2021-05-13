@@ -22,12 +22,18 @@ type ITipoConta interface {
 
 // TipoConta é uma struct que representa um tipo de conta. Possui notações JSON para cada campo e tem a composição da interface ITipoConta
 type TipoConta struct {
-	Nome             string    `json:"nome"`
-	DescricaoDebito  string    `json:"descricao_debito"`
-	DescricaoCredito string    `json:"descricao_credito"`
-	DataCriacao      time.Time `json:"data_criacao"`
-	DataModificacao  time.Time `json:"data_modificacao"`
-	Estado           bool      `json:"estado"`
+	Nome             string    `json:"nome" gorm:"primaryKey;size:50;not null"`
+	DescricaoDebito  string    `json:"descricao_debito" gorm:"size:20;not null"`
+	DescricaoCredito string    `json:"descricao_credito" gorm:"size:20;not null"`
+	DataCriacao      time.Time `json:"data_criacao" gorm:"not null;autoCreateTime"`
+	DataModificacao  time.Time `json:"data_modificacao" gorm:"not null;autoUpdateTime"`
+	Estado           bool      `json:"estado" gorm:"not null;default:true"`
+}
+
+type TTipoConta TipoConta
+
+func (TTipoConta) TableName() string {
+	return "tipo_conta"
 }
 
 // MaxNome: tamanho máximo para o nome do tipo de conta

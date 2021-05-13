@@ -11,15 +11,20 @@ import (
 
 // Pessoa é uma struct que representa uma pessoa. Possui notações para JSON para cada campo
 type Pessoa struct {
-	Cpf             string    `json:"cpf"`
-	NomeCompleto    string    `json:"nome_completo"`
-	Usuario         string    `json:"usuario"`
-	Senha           string    `json:"senha"`
-	Email           string    `json:"email"`
-	DataCriacao     time.Time `json:"data_criacao"`
-	DataModificacao time.Time `json:"data_modificacao"`
-	Estado          bool      `json:"estado"`
-	Administrador   bool      `json:"administrador"`
+	Cpf             string    `json:"cpf" gorm:"primaryKey;size:11;not null"`
+	NomeCompleto    string    `json:"nome_completo" gorm:"size:100"`
+	Usuario         string    `json:"usuario" gorm:"size:20;not null;unique"`
+	Senha           string    `json:"senha" gorm:"size:64;not null"`
+	Email           string    `json:"email" gorm:"size:45;not null;unique"`
+	DataCriacao     time.Time `json:"data_criacao" gorm:"not null;autoCreateTime"`
+	DataModificacao time.Time `json:"data_modificacao" gorm:"not null;autoUpdateTime"`
+	Estado          bool      `json:"estado" gorm:"not null;default:true"`
+	Administrador   bool      `json:"administrador" gorm:"not null;default:false"`
+}
+
+// TableName define o nome da tabela ao efetuar o AutoMigrate do GORM
+func (Pessoa) TableName() string {
+	return "pessoa"
 }
 
 // LenCpf: tamanho obrigatório do CPF;

@@ -22,6 +22,8 @@ type Pessoa struct {
 	Administrador   bool      `json:"administrador" gorm:"not null;default:false"`
 }
 
+type TPessoa Pessoa
+
 // TableName define o nome da tabela ao efetuar o AutoMigrate do GORM
 func (Pessoa) TableName() string {
 	return "pessoa"

@@ -18,7 +18,7 @@ func TestCriarTabelaPessoa(t *testing.T) {
 
 func TestCRUDPessoa(t *testing.T) {
 	// Criar - INSERT
-	p1 := pessoa.Pessoa{
+	p1 := pessoa.TPessoa{
 		Cpf:          "12345678910",
 		NomeCompleto: "Teste 01",
 		Usuario:      "teste01",
@@ -26,7 +26,7 @@ func TestCRUDPessoa(t *testing.T) {
 		Email:        "teste01@email.com",
 	}
 
-	p2 := pessoa.Pessoa{
+	p2 := pessoa.TPessoa{
 		Cpf:          "10987654321",
 		NomeCompleto: "Teste 02",
 		Usuario:      "teste02",
@@ -52,7 +52,7 @@ func TestCRUDPessoa(t *testing.T) {
 	// Consultar - SELECT
 	p1Cpf := p1.Cpf
 	p2Cpf := p2.Cpf
-	p1, p2 = pessoa.Pessoa{}, pessoa.Pessoa{}
+	p1, p2 = pessoa.TPessoa{}, pessoa.TPessoa{}
 
 	err = db2.First(&p1, p1Cpf).Error
 	// t.Error(&p1)

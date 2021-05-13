@@ -26,5 +26,5 @@ import (
 // )
 
 func CriarTabelaPessoa(db *gorm.DB) error {
-	return db.AutoMigrate(&pessoa.Pessoa{})
+	return db.AutoMigrate(&pessoa.TPessoa{})
 }

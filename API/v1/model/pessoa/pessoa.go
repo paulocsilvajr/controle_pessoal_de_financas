@@ -25,7 +25,7 @@ type Pessoa struct {
 type TPessoa Pessoa
 
 // TableName define o nome da tabela ao efetuar o AutoMigrate do GORM
-func (Pessoa) TableName() string {
+func (TPessoa) TableName() string {
 	return "pessoa"
 }
 

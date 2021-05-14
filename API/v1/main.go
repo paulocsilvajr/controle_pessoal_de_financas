@@ -109,7 +109,7 @@ func imprimeRotas() {
 	t.AppendHeader(table.Row{"TIPO", "ROTA"})
 	for _, rota := range config.Rotas {
 		t.AppendRow([]interface{}{rota.Tipo, rota.Rota})
-		t.AppendSeparator()
+		// t.AppendSeparator()
 	}
 	t.Render()
 

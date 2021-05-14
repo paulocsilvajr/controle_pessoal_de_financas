@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
 	"gorm.io/gorm"
 )
 
@@ -34,7 +35,12 @@ func TestCRUDPessoa(t *testing.T) {
 		Email:        "teste02@email.com",
 	}
 
-	err := db2.Create(&p2).Error
+	err := db2.Create(&p1).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Create(&p2).Error
 	if err != nil {
 		t.Error(err)
 	}
@@ -73,6 +79,82 @@ func TestCRUDPessoa(t *testing.T) {
 	}
 
 	err = db2.Delete(&p2).Error
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestCriarTabelaTipoConta(t *testing.T) {
+	err := CriarTabelaTipoConta(db2)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestCRUDTipoConta(t *testing.T) {
+	// Criar - INSERT
+	tc1 := tipo_conta.TTipoConta{
+		Nome:             "banco",
+		DescricaoDebito:  "saque",
+		DescricaoCredito: "depósito",
+	}
+
+	tc2 := tipo_conta.TTipoConta{
+		Nome:             "carteira",
+		DescricaoDebito:  "gastar",
+		DescricaoCredito: "receber",
+	}
+
+	err := db2.Create(&tc1).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Create(&tc2).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Alterar - UPDATE
+	tc1.DescricaoDebito = "retiradas"
+
+	err = db2.Save(&tc1).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	tc2.DescricaoDebito = "gastos"
+	tc2.DescricaoCredito = "recebimentos"
+
+	err = db2.Save(&tc2).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Consultar - SELECT
+	tc1Nome := tc1.Nome
+	tc2Nome := tc2.Nome
+	tc1, tc2 = tipo_conta.TTipoConta{}, tipo_conta.TTipoConta{}
+
+	err = db2.Where("nome = ?", tc1Nome).First(&tc1).Error
+	// t.Error(&tc1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Where("nome = ?", tc2Nome).First(&tc2).Error
+	// t.Error(&tc2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Remover - DELETE
+	err = db2.Delete(&tc1).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Delete(&tc2).Error
 	if err != nil {
 		t.Error(err)
 	}

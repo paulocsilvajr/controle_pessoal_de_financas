@@ -20,8 +20,10 @@ import (
 	"strings"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
-	jwtreq "github.com/dgrijalva/jwt-go/request"
+	// jwt "github.com/dgrijalva/jwt-go"  // original
+	// jwtreq "github.com/dgrijalva/jwt-go/request"  // repositório original
+	jwt "github.com/form3tech-oss/jwt-go"            // fork
+	jwtreq "github.com/form3tech-oss/jwt-go/request" //fork
 )
 
 // GetSenhaSha256 retorna uma string hasheada(sha256) da senha informada no parâmetro senha

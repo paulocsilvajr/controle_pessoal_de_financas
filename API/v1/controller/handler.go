@@ -17,7 +17,8 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 
-	"github.com/dgrijalva/jwt-go"
+	// "github.com/dgrijalva/jwt-go"  // repositório original
+	"github.com/form3tech-oss/jwt-go" // fork
 	"github.com/gorilla/mux"
 )
 

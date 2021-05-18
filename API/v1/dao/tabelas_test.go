@@ -159,3 +159,10 @@ func TestCRUDTipoConta(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestCriarTabelaConta(t *testing.T) {
+	err := CriarTabelaConta(db2)
+	if err != nil {
+		t.Error(err)
+	}
+}

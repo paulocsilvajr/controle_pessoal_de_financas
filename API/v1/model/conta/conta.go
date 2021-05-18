@@ -38,6 +38,10 @@ func (TConta) TableName() string {
 	return "conta"
 }
 
+func GetNomeTabelaConta() string {
+	return new(TConta).TableName()
+}
+
 // MaxConta: tamanho máximo para os campos de texto(string) Nome, NomeTipoConta e ContaPai
 // MaxCodigo: tamanho máximo para o Código
 // MaxComentario: tamanho máximo para o Comentário

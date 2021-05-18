@@ -9,7 +9,7 @@ import (
 
 var (
 	contaDB = map[string]string{
-		"tabela":          "conta",
+		"tabela":          conta.GetNomeTabelaConta(),
 		"nome":            "nome",
 		"nomeTipoConta":   "nome_tipo_conta",
 		"codigo":          "codigo",
@@ -17,7 +17,10 @@ var (
 		"comentario":      "comentario",
 		"dataCriacao":     "data_criacao",
 		"dataModificacao": "data_modificacao",
-		"estado":          "estado"}
+		"estado":          "estado",
+		"tabelaTipoConta": tipoContaDB["tabela"],
+		"fkTipoConta":     tipoContaDB["nome"],
+	}
 )
 
 // CarregaContas retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório

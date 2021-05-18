@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
@@ -87,12 +86,21 @@ func CriarTabelaConta(db *gorm.DB) error {
 }
 
 func criarFKTabelaConta(db *gorm.DB) error {
-	conta := conta.TConta{}
-	tipoConta := tipo_conta.TTipoConta{}
+	sql1 := `
+ALTER TABLE {{.tabela}}
+ADD CONSTRAINT tipo_conta_fk FOREIGN KEY ({{.nomeTipoConta}}) REFERENCES {{.tabelaTipoConta}}({{.fkTipoConta}})
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
+`
+	sql1 = getTemplateSQL("tipoContaFK", sql1, contaDB)
 
-	sql1 := fmt.Sprintf("ALTER TABLE %s ADD CONSTRAINT tipo_conta_fk FOREIGN KEY (nome_tipo_conta) REFERENCES %s(nome) ON UPDATE CASCADE ON DELETE RESTRICT;", conta.TableName(), tipoConta.TableName())
-
-	sql2 := fmt.Sprintf("ALTER TABLE %s ADD CONSTRAINT conta_fk FOREIGN KEY (conta_pai) REFERENCES %s(nome) ON UPDATE CASCADE ON DELETE CASCADE;", conta.TableName(), conta.TableName())
+	sql2 := `
+ALTER TABLE {{.tabela}}
+ADD CONSTRAINT conta_fk FOREIGN KEY ({{.contaPai}}) REFERENCES {{.tabela}}({{.nome}})
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+`
+	sql2 = getTemplateSQL("contaFK", sql2, contaDB)
 
 	return db.Exec(strings.Join([]string{sql1, sql2}, "")).Error
 }

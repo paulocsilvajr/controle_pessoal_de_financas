@@ -22,14 +22,20 @@ type IConta interface {
 
 // Conta é uma struct que representa uma conta. Possui notação para JSON para cada campo
 type Conta struct {
-	Nome            string    `json:"nome"`
-	NomeTipoConta   string    `json:"nome_tipo_conta"`
-	Codigo          string    `json:"codigo"`
-	ContaPai        string    `json:"conta_pai"`
-	Comentario      string    `json:"comentario"`
-	DataCriacao     time.Time `json:"data_criacao"`
-	DataModificacao time.Time `json:"data_modificacao"`
-	Estado          bool      `json:"estado"`
+	Nome            string    `json:"nome" gorm:"primaryKey;size:50;not null"`
+	NomeTipoConta   string    `json:"nome_tipo_conta" gorm:"size:50;not null"`
+	Codigo          string    `json:"codigo" gorm:"size:19;unique"`
+	ContaPai        string    `json:"conta_pai" gorm:"size:50;not null"`
+	Comentario      string    `json:"comentario" gorm:"size:150"`
+	DataCriacao     time.Time `json:"data_criacao" gorm:"not null;autoCreateTime"`
+	DataModificacao time.Time `json:"data_modificacao" gorm:"not null;autoUpdateTime"`
+	Estado          bool      `json:"estado" gorm:"not null;default:true"`
+}
+
+type TConta Conta
+
+func (TConta) TableName() string {
+	return "conta"
 }
 
 // MaxConta: tamanho máximo para os campos de texto(string) Nome, NomeTipoConta e ContaPai

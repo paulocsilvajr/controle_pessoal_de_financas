@@ -107,6 +107,10 @@ func getTemplateQuery(nome string, campos map[string]string, sql string) string 
 	return query.String()
 }
 
+func getTemplateSQL(nome string, sql string, campos map[string]string) string {
+	return getTemplateQuery(nome, campos, sql)
+}
+
 func carrega(db *sql.DB, query string, appendRegistros func(rows *sql.Rows, registros []interface{}) (novosRegistros []interface{}, err error), args ...interface{}) (registros []interface{}, err error) {
 	queryStmt, err := db.Prepare(query)
 	if err != nil {

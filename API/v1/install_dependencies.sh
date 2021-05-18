@@ -2,7 +2,7 @@
 
 install(){
     echo "$1:"
-    go get -v $1
+    go get -u -v $1
 }
 
 echo -e "Instalando dependências\n"

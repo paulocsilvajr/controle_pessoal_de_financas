@@ -99,6 +99,16 @@ func getStringConexao2(config config.Configuracoes) string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s sslmode=disable", config["DBhost"], config["DBporta"], config["DBusuario"], config["DBsenha"])
 }
 
+func setNullString(value string) sql.NullString {
+	if len(value) > 0 {
+		return sql.NullString{
+			String: value,
+			Valid:  true,
+		}
+	}
+	return sql.NullString{}
+}
+
 func getTemplateQuery(nome string, campos map[string]string, sql string) string {
 	t := template.Must(template.New(nome).Parse(sql))
 	query := new(bytes.Buffer)

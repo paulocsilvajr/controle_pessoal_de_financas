@@ -1,6 +1,7 @@
 package conta
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -22,17 +23,26 @@ type IConta interface {
 
 // Conta é uma struct que representa uma conta. Possui notação para JSON para cada campo
 type Conta struct {
-	Nome            string    `json:"nome" gorm:"primaryKey;size:50;not null"`
-	NomeTipoConta   string    `json:"nome_tipo_conta" gorm:"size:50;not null"`
-	Codigo          string    `json:"codigo" gorm:"size:19;unique"`
-	ContaPai        string    `json:"conta_pai" gorm:"size:50"`
-	Comentario      string    `json:"comentario" gorm:"size:150"`
-	DataCriacao     time.Time `json:"data_criacao" gorm:"not null;autoCreateTime"`
-	DataModificacao time.Time `json:"data_modificacao" gorm:"not null;autoUpdateTime"`
-	Estado          bool      `json:"estado" gorm:"not null;default:true"`
+	Nome            string    `json:"nome"`
+	NomeTipoConta   string    `json:"nome_tipo_conta"`
+	Codigo          string    `json:"codigo"`
+	ContaPai        string    `json:"conta_pai"`
+	Comentario      string    `json:"comentario"`
+	DataCriacao     time.Time `json:"data_criacao"`
+	DataModificacao time.Time `json:"data_modificacao"`
+	Estado          bool      `json:"estado"`
 }
 
-type TConta Conta
+type TConta struct {
+	Nome            string         `gorm:"primaryKey;size:50;not null"`
+	NomeTipoConta   string         `gorm:"size:50;not null"`
+	Codigo          sql.NullString `gorm:"size:19;unique"`
+	ContaPai        sql.NullString `gorm:"size:50"`
+	Comentario      sql.NullString `gorm:"size:150"`
+	DataCriacao     time.Time      `gorm:"not null;autoCreateTime"`
+	DataModificacao time.Time      `gorm:"not null;autoUpdateTime"`
+	Estado          bool           `gorm:"not null;default:true"`
+}
 
 func (TConta) TableName() string {
 	return "conta"

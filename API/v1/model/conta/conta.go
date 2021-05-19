@@ -25,7 +25,7 @@ type Conta struct {
 	Nome            string    `json:"nome" gorm:"primaryKey;size:50;not null"`
 	NomeTipoConta   string    `json:"nome_tipo_conta" gorm:"size:50;not null"`
 	Codigo          string    `json:"codigo" gorm:"size:19;unique"`
-	ContaPai        string    `json:"conta_pai" gorm:"size:50;not null"`
+	ContaPai        string    `json:"conta_pai" gorm:"size:50"`
 	Comentario      string    `json:"comentario" gorm:"size:150"`
 	DataCriacao     time.Time `json:"data_criacao" gorm:"not null;autoCreateTime"`
 	DataModificacao time.Time `json:"data_modificacao" gorm:"not null;autoUpdateTime"`

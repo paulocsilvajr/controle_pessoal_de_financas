@@ -45,14 +45,13 @@ import (
 //     nome character varying(50) COLLATE pg_catalog."default" NOT NULL,
 //     nome_tipo_conta character varying(50) COLLATE pg_catalog."default" NOT NULL,
 //     codigo character varying(19) COLLATE pg_catalog."default",
-//     conta_pai character varying(50) COLLATE pg_catalog."default" NOT NULL,
+//     conta_pai character varying(50) COLLATE pg_catalog."default",
 //     comentario character varying(150) COLLATE pg_catalog."default",
 //     data_criacao timestamp with time zone NOT NULL,
 //     data_modificacao timestamp with time zone NOT NULL,
 //     estado boolean NOT NULL DEFAULT true,
 //     CONSTRAINT conta_pkey PRIMARY KEY (nome),
-//     CONSTRAINT conta_codigo_key UNIQUE (codigo)
-// ,
+//     CONSTRAINT conta_codigo_key UNIQUE (codigo),
 //     CONSTRAINT conta_fk FOREIGN KEY (conta_pai)
 //         REFERENCES public.conta (nome) MATCH SIMPLE
 //         ON UPDATE CASCADE

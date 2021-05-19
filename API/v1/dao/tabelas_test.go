@@ -3,6 +3,7 @@ package dao
 import (
 	"testing"
 
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
 	"gorm.io/gorm"
@@ -162,6 +163,98 @@ func TestCRUDTipoConta(t *testing.T) {
 
 func TestCriarTabelaConta(t *testing.T) {
 	err := CriarTabelaConta(db2)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestCRUDTabelaConta(t *testing.T) {
+	// Criar - INSERT
+	tc1 := &tipo_conta.TTipoConta{
+		Nome:             "banco",
+		DescricaoDebito:  "saque",
+		DescricaoCredito: "depósito",
+	}
+
+	c1 := &conta.TConta{
+		Nome:          "Juros",
+		NomeTipoConta: tc1.Nome,
+		Codigo:        setNullString("001"),
+		Comentario:    setNullString("teste de conta 001 em banco"),
+	}
+
+	c2 := &conta.TConta{
+		Nome:          "Bradesco - juros",
+		NomeTipoConta: tc1.Nome,
+		Codigo:        setNullString("002"),
+		ContaPai:      setNullString(c1.Nome),
+		Comentario:    setNullString("teste de conta 002 em banco"),
+	}
+
+	err := db2.Create(tc1).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Create(c1).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Create(c2).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Alterar - UPDATE
+	err = db2.Model(c1).Update("nome", "Juros recebidos").Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	// porque foi alterado a chave primária de "c1", é necessário consultar "c2" em BD para pegar a entidade atualizada, com o campo conta_pai atualizado, para quando for fazer update não dê conflito de chave primária. Se não for obtido "c2" em consulta, o GORM tenta inserir um novo pelo método Save
+	err = db2.First(c2).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	c2.Codigo = setNullString("002a")
+	c2.Comentario = setNullString("alteração em conta 002 para conta 002a")
+
+	err = db2.Save(c2).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Consultar - SELECT
+	c1Nome := c1.Nome
+	c2Nome := c2.Nome
+	c1, c2 = nil, nil
+
+	err = db2.Where("nome = ?", c1Nome).First(&c1).Error
+	// t.Error(c1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Where("nome = ?", c2Nome).First(&c2).Error
+	// t.Error(c2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Remover - DELETE
+	err = db2.Delete(c1).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Delete(c2).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db2.Delete(tc1).Error
 	if err != nil {
 		t.Error(err)
 	}

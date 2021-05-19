@@ -48,6 +48,7 @@ func (TConta) TableName() string {
 	return "conta"
 }
 
+// GetNomeTabelaConta retorna o nome da tabela Conta
 func GetNomeTabelaConta() string {
 	return new(TConta).TableName()
 }

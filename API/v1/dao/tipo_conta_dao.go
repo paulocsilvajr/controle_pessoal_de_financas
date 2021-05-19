@@ -9,7 +9,7 @@ import (
 
 var (
 	tipoContaDB = map[string]string{
-		"tabela":           "tipo_conta",
+		"tabela":           tipo_conta.GetNomeTabelaTipoConta(),
 		"nome":             "nome",
 		"descricaoDebito":  "descricao_debito",
 		"descricaoCredito": "descricao_credito",

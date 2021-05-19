@@ -29,6 +29,11 @@ func (TPessoa) TableName() string {
 	return "pessoa"
 }
 
+// GetNomeTabelaPessoa retorna o nome da tabela Pessoa
+func GetNomeTabelaPessoa() string {
+	return new(TPessoa).TableName()
+}
+
 // LenCpf: tamanho obrigatório do CPF;
 // MaxNome: tamanho máximo do Nome
 // MaxUsuario: tamanho máximo do Usuário

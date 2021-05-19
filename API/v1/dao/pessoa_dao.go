@@ -9,7 +9,7 @@ import (
 
 var (
 	pessoaDB = map[string]string{
-		"tabela":          "pessoa",
+		"tabela":          pessoa.GetNomeTabelaPessoa(),
 		"cpf":             "cpf",
 		"nomeCompleto":    "nome_completo",
 		"usuario":         "usuario",

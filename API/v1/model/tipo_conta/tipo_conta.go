@@ -36,6 +36,11 @@ func (TTipoConta) TableName() string {
 	return "tipo_conta"
 }
 
+// GetNomeTabelaTipoConta retorna o nome da tabela TipoConta
+func GetNomeTabelaTipoConta() string {
+	return new(TTipoConta).TableName()
+}
+
 // MaxNome: tamanho máximo para o nome do tipo de conta
 // MaxDescricao: tamanho máximo para as descrições de débito e crédito de tipo de conta
 // MsgErroNome01: mensagem erro padrão 01 para nome

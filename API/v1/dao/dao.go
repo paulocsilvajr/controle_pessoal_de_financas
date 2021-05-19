@@ -298,7 +298,7 @@ func GetDB() *sql.DB {
 
 	if err != nil {
 		logger.GeraLogFS(
-			fmt.Sprintf("Erro ao conectar em servidor do Banco de dados"),
+			"Erro ao conectar em servidor do Banco de dados",
 			time.Now(),
 		)
 		log.Fatal(err)

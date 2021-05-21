@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
 	"gorm.io/gorm"
@@ -84,6 +86,34 @@ func CriarTabelaConta(db *gorm.DB) error {
 	return nil
 }
 
+func CriarTabelaLancamento(db *gorm.DB) error {
+	err := db.AutoMigrate(&lancamento.TLancamento{})
+	if err != nil {
+		return err
+	}
+
+	err = criarFKTabelaLancamento(db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CriarTabelaDetalheLancamento(db *gorm.DB) error {
+	err := db.AutoMigrate(&detalhe_lancamento.TDetalheLancamento{})
+	if err != nil {
+		return err
+	}
+
+	err = criarFKTabelaDetalheLancamento(db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func criarFKTabelaConta(db *gorm.DB) error {
 	sql1 := `
 ALTER TABLE {{.tabela}}
@@ -102,4 +132,36 @@ ON DELETE CASCADE;
 	sql2 = getTemplateSQL("contaFK", sql2, contaDB)
 
 	return db.Exec(strings.Join([]string{sql1, sql2}, "")).Error
+}
+
+func criarFKTabelaLancamento(db *gorm.DB) error {
+	sql := `
+ALTER TABLE {{.tabela}}
+ADD	CONSTRAINT pessoa_lancamento_fk FOREIGN KEY ({{.cpfPessoa}})
+REFERENCES {{.tabelaPessoa}}({{.fkPessoa}})
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+`
+	sql = getTemplateSQL("cpfPessoaFK", sql, lancamentoDB)
+
+	return db.Exec(sql).Error
+}
+
+func criarFKTabelaDetalheLancamento(db *gorm.DB) error {
+	sql := `
+ALTER TABLE {{.tabela}}
+ADD	CONSTRAINT conta_detalhe_lancamento_fk FOREIGN KEY ({{.fkConta}})
+REFERENCES {{.tabelaConta}}({{.fkConta}})
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+ALTER TABLE {{.tabela}}
+ADD	CONSTRAINT lancamento_detalhe_lancamento_fk FOREIGN KEY ({{.fkLancamento}})
+REFERENCES {{.tabelaLancamento}}({{.fkLancamento}})
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+`
+	sql = getTemplateSQL("detalheLancamentoFK", sql, detalheLancamentoDB)
+
+	return db.Exec(sql).Error
 }

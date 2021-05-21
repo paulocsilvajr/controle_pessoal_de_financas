@@ -259,3 +259,17 @@ func TestCRUDTabelaConta(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestCriarTabelaLancamento(t *testing.T) {
+	err := CriarTabelaLancamento(db2)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestCriarTabelaDetalheLancamento(t *testing.T) {
+	err := CriarTabelaDetalheLancamento(db2)
+	if err != nil {
+		t.Error(err)
+	}
+}

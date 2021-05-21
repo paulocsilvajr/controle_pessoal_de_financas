@@ -1,6 +1,7 @@
 package lancamento
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -32,6 +33,25 @@ type Lancamento struct {
 	DataCriacao     time.Time
 	DataModificacao time.Time
 	Estado          bool
+}
+
+type TLancamento struct {
+	ID              int            `gorm:"primaryKey;autoIncrement:true;not null"`
+	CpfPessoa       string         `gorm:"size:11;not null"`
+	Data            time.Time      `gorm:"not null;autoUpdateTime"`
+	Numero          sql.NullString `gorm:"size:19"`
+	Descricao       string         `gorm:"size:100;not null"`
+	DataCriacao     time.Time      `gorm:"not null;autoCreateTime"`
+	DataModificacao time.Time      `gorm:"not null;autoUpdateTime"`
+	Estado          bool           `gorm:"not null;default:true"`
+}
+
+func (TLancamento) TableName() string {
+	return "lancamento"
+}
+
+func GetNomeTabelaLancamento() string {
+	return new(TLancamento).TableName()
 }
 
 // MaxCPFPessoa: tamanho máximo para o campo CpfPessoa, baseado em modelo em model.pessoa

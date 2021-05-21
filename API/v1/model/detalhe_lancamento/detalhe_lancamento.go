@@ -28,6 +28,21 @@ type DetalheLancamento struct {
 	Credito      float64
 }
 
+type TDetalheLancamento struct {
+	IDLancamento int     `gorm:"primaryKey; autoIncrement:false;not null"`
+	NomeConta    string  `gorm:"primaryKey; autoIncrement:false;not null"`
+	Debito       float64 `gorm:"type:decimal(19,3)"`
+	Credito      float64 `gorm:"type:decimal(19,3)"`
+}
+
+func (TDetalheLancamento) TableName() string {
+	return "detalhe_lancamento"
+}
+
+func GetNomeTabelaDetalheLancamento() string {
+	return new(TDetalheLancamento).TableName()
+}
+
 // MaxNomeConta: tamanho máximo para o campo NomeConta, baseado em valor informado em modelo.conta
 const (
 	MaxNomeConta = conta.MaxNome

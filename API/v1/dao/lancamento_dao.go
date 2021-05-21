@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 )
 
 var (
 	lancamentoDB = map[string]string{
-		"tabela":                 "lancamento",
-		"tabelaComplementar01":   detalheLancamentoDB["tabela"],
+		"tabela":                 lancamento.GetNomeTabelaLancamento(),
+		"tabelaComplementar01":   detalhe_lancamento.GetNomeTabelaDetalheLancamento(),
 		"id":                     "id",
 		"cpfPessoa":              "cpf_pessoa",
 		"data":                   "data",
@@ -20,8 +21,11 @@ var (
 		"dataCriacao":            "data_criacao",
 		"dataModificacao":        "data_modificacao",
 		"estado":                 "estado",
-		"idTabelaComplementar01": detalheLancamentoDB["idLancamento"],
-		"nomeConta":              detalheLancamentoDB["nomeConta"]}
+		"idTabelaComplementar01": "id_lancamento",
+		"nomeConta":              "nome_conta",
+		"tabelaPessoa":           pessoaDB["tabela"],
+		"fkPessoa":               pessoaDB["cpf"],
+	}
 )
 
 // CarregaLancamentos retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório

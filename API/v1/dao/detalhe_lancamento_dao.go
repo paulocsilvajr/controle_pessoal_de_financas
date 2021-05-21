@@ -1,19 +1,25 @@
 package dao
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
 	"database/sql"
 	"fmt"
 	"strconv"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
 )
 
 var (
 	detalheLancamentoDB = map[string]string{
-		"tabela":       "detalhe_lancamento",
-		"idLancamento": "id_lancamento",
-		"nomeConta":    "nome_conta",
-		"debito":       "debito",
-		"credito":      "credito"}
+		"tabela":           detalhe_lancamento.GetNomeTabelaDetalheLancamento(),
+		"idLancamento":     "id_lancamento",
+		"nomeConta":        "nome_conta",
+		"debito":           "debito",
+		"credito":          "credito",
+		"tabelaConta":      contaDB["tabela"],
+		"fkConta":          contaDB["nome"],
+		"tabelaLancamento": lancamentoDB["tabela"],
+		"fkLancamento":     lancamentoDB["id"],
+	}
 )
 
 // CarregaDetalheLancamentos retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório

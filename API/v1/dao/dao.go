@@ -24,34 +24,37 @@ type funcSetValores func(*sql.Stmt, interface{}, ...interface{}) (sql.Result, er
 // GetDB2 retorna uma conexão com o banco de dados(*gorm.DB) de acordo com as informações obtida de configurações
 func GetDB02() *gorm.DB {
 	config := config.AbrirConfiguracoes()
-	connStr := getStringConexao(config)
-	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  connStr,
-		PreferSimpleProtocol: true,
-	}), &gorm.Config{})
+	return getDB02(config)
+}
 
-	if err != nil {
-		logger.GeraLogFS(
-			fmt.Sprintf("Erro ao conectar em servidor do Banco de dados[%s]", err),
-			time.Now(),
-		)
-		log.Fatal(err)
-	}
-
-	if err := PingDB(db); err != nil {
-		logger.GeraLogFS(
-			fmt.Sprintf("Erro em PING em servidor de Banco de Dados[%s]", err),
-			time.Now(),
-		)
-		log.Fatal(err)
-	}
-
-	return db
+func GetDB02ParaTestes() *gorm.DB {
+	config := config.AbrirConfiguracoesParaTestes()
+	return getDB02(config)
 }
 
 func CreateDB() error {
-	// Fonte: https://stackoverflow.com/questions/55555836/is-it-possible-to-create-postgresql-databases-with-dynamic-names-with-the-help-o
 	config := config.AbrirConfiguracoes()
+	return createDB(config)
+}
+
+func CreateDBParaTestes() error {
+	config := config.AbrirConfiguracoesParaTestes()
+	return createDB(config)
+}
+
+func CloseDB(db *gorm.DB) error {
+	db2, _ := db.DB()
+	return db2.Close()
+}
+
+func PingDB(db *gorm.DB) error {
+	db2, _ := db.DB()
+
+	return db2.Ping()
+}
+
+func createDB(config config.Configuracoes) error {
+	// Fonte: https://stackoverflow.com/questions/55555836/is-it-possible-to-create-postgresql-databases-with-dynamic-names-with-the-help-o
 	conninfo := getStringConexao2(config)
 
 	db, err := sql.Open("postgres", conninfo)
@@ -78,15 +81,30 @@ func CreateDB() error {
 	return nil
 }
 
-func CloseDB(db *gorm.DB) error {
-	db2, _ := db.DB()
-	return db2.Close()
-}
+func getDB02(config config.Configuracoes) *gorm.DB {
+	connStr := getStringConexao(config)
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  connStr,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
 
-func PingDB(db *gorm.DB) error {
-	db2, _ := db.DB()
+	if err != nil {
+		logger.GeraLogFS(
+			fmt.Sprintf("Erro ao conectar em servidor do Banco de dados[%s]", err),
+			time.Now(),
+		)
+		log.Fatal(err)
+	}
 
-	return db2.Ping()
+	if err := PingDB(db); err != nil {
+		logger.GeraLogFS(
+			fmt.Sprintf("Erro em PING em servidor de Banco de Dados[%s]", err),
+			time.Now(),
+		)
+		log.Fatal(err)
+	}
+
+	return db
 }
 
 // getStringConexao retorna uma string contendo os dados para se conectar ao banco de dados de acordo com configurações(config.Configuracoes) informadas como parâmetro

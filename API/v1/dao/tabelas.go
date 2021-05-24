@@ -63,6 +63,40 @@ import (
 //         ON UPDATE CASCADE
 //         ON DELETE RESTRICT
 // )
+//
+// CREATE TABLE public.lancamento
+// (
+//     id bigint NOT NULL DEFAULT nextval('lancamento_id_seq'::regclass),
+//     cpf_pessoa character varying(11) COLLATE pg_catalog."default" NOT NULL,
+//     data timestamp with time zone NOT NULL,
+//     numero character varying(19) COLLATE pg_catalog."default",
+//     descricao character varying(100) COLLATE pg_catalog."default" NOT NULL,
+//     data_criacao timestamp with time zone NOT NULL,
+//     data_modificacao timestamp with time zone NOT NULL,
+//     estado boolean NOT NULL DEFAULT true,
+//     CONSTRAINT lancamento_pkey PRIMARY KEY (id),
+//     CONSTRAINT pessoa_lancamento_fk FOREIGN KEY (cpf_pessoa)
+//         REFERENCES public.pessoa (cpf) MATCH SIMPLE
+//         ON UPDATE CASCADE
+//         ON DELETE CASCADE
+// )
+//
+// CREATE TABLE public.detalhe_lancamento
+// (
+//     id_lancamento bigint NOT NULL,
+//     nome_conta text COLLATE pg_catalog."default" NOT NULL,
+//     debito numeric(19,3),
+//     credito numeric(19,3),
+//     CONSTRAINT detalhe_lancamento_pkey PRIMARY KEY (id_lancamento, nome_conta),
+//     CONSTRAINT conta_detalhe_lancamento_fk FOREIGN KEY (nome_conta)
+//         REFERENCES public.conta (nome) MATCH SIMPLE
+//         ON UPDATE CASCADE
+//         ON DELETE RESTRICT,
+//     CONSTRAINT lancamento_detalhe_lancamento_fk FOREIGN KEY (id_lancamento)
+//         REFERENCES public.lancamento (id) MATCH SIMPLE
+//         ON UPDATE CASCADE
+//         ON DELETE CASCADE
+// )
 
 func CriarTabelaPessoa(db *gorm.DB) error {
 	return db.AutoMigrate(&pessoa.TPessoa{})
@@ -150,13 +184,13 @@ ON DELETE CASCADE;
 func criarFKTabelaDetalheLancamento(db *gorm.DB) error {
 	sql := `
 ALTER TABLE {{.tabela}}
-ADD	CONSTRAINT conta_detalhe_lancamento_fk FOREIGN KEY ({{.fkConta}})
+ADD	CONSTRAINT conta_detalhe_lancamento_fk FOREIGN KEY ({{.nomeConta}})
 REFERENCES {{.tabelaConta}}({{.fkConta}})
 ON UPDATE CASCADE
-ON DELETE CASCADE;
+ON DELETE RESTRICT;
 
 ALTER TABLE {{.tabela}}
-ADD	CONSTRAINT lancamento_detalhe_lancamento_fk FOREIGN KEY ({{.fkLancamento}})
+ADD	CONSTRAINT lancamento_detalhe_lancamento_fk FOREIGN KEY ({{.idLancamento}})
 REFERENCES {{.tabelaLancamento}}({{.fkLancamento}})
 ON UPDATE CASCADE
 ON DELETE CASCADE;

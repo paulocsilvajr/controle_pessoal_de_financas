@@ -55,7 +55,7 @@ func CriarTabelas() error {
 		return err
 	}
 
-	err = criarFKTabelaLancamento(db2)
+	err = CriarTabelaLancamento(db2)
 	if err != nil {
 		return err
 	}

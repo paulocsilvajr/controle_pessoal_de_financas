@@ -37,6 +37,37 @@ func CreateDB() error {
 	return createDB(config)
 }
 
+func CriarTabelas() error {
+	db2 := GetDB02()
+
+	err := CriarTabelaPessoa(db2)
+	if err != nil {
+		return err
+	}
+
+	err = CriarTabelaTipoConta(db2)
+	if err != nil {
+		return err
+	}
+
+	err = CriarTabelaConta(db2)
+	if err != nil {
+		return err
+	}
+
+	err = criarFKTabelaLancamento(db2)
+	if err != nil {
+		return err
+	}
+
+	err = CriarTabelaDetalheLancamento(db2)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func CreateDBParaTestes() error {
 	config := config.AbrirConfiguracoesParaTestes()
 	return createDB(config)

@@ -38,6 +38,17 @@ func CreateDB() error {
 }
 
 func CriarTabelas() error {
+	err := criarTabelas()
+	if err != nil {
+		jaExiste := "already exists"
+		if strings.Contains(err.Error(), jaExiste) {
+			return nil
+		}
+	}
+	return err
+}
+
+func criarTabelas() error {
 	db2 := GetDB02()
 
 	err := CriarTabelaPessoa(db2)

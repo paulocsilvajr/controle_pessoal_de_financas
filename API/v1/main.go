@@ -85,8 +85,18 @@ func verificaParametrosInicializacao() {
 	if len(args) >= 2 {
 		switch args[1] {
 		case "--init", "-i":
-			dao.CreateDB()
-			criarUsuarioAdminInicial()
+			if err := dao.CreateDB(); err != nil {
+				panic(err)
+			}
+
+			if err := dao.CriarTabelas(); err != nil {
+				panic(err)
+			}
+
+			// criarUsuarioAdminInicial()
+
+			fmt.Println("\nCriado banco de dados, tabelas e usuário Admin.\nReexecute a API sem parâmetros para reconhecer o banco de dados e iniciar o seu uso")
+			os.Exit(0)
 		case "--rotes", "-r":
 			imprimeRotas()
 			os.Exit(0)
@@ -94,7 +104,7 @@ func verificaParametrosInicializacao() {
 			fmt.Printf(`Uso: %s [ -h | --help | -i | --init ]
 Inicia a API do "Controle Pessoa de Finanças"
 Argumentos:
-  -i, --init         cria o usuário administrador inicial "admin" com senha "admin"
+  -i, --init         cria o banco de dados(de acordo com config.json), as tabelas e o usuário administrador inicial "admin" com senha "admin"
   -r, --routes        exibe as métodos/rotas cadastradas na API
   -h, --help         exibe essa ajuda
 `, args[0])

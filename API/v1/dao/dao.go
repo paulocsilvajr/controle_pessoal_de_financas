@@ -127,6 +127,16 @@ func setNullString(value string) sql.NullString {
 	return sql.NullString{}
 }
 
+func setNullFloat64(value float64) sql.NullFloat64 {
+	if value != 0 {
+		return sql.NullFloat64{
+			Float64: value,
+			Valid:   true,
+		}
+	}
+	return sql.NullFloat64{}
+}
+
 func getTemplateQuery(nome string, campos map[string]string, sql string) string {
 	t := template.Must(template.New(nome).Parse(sql))
 	query := new(bytes.Buffer)

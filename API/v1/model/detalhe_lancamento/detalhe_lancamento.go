@@ -1,6 +1,7 @@
 package detalhe_lancamento
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"strconv"
@@ -29,10 +30,10 @@ type DetalheLancamento struct {
 }
 
 type TDetalheLancamento struct {
-	IDLancamento int     `gorm:"primaryKey; autoIncrement:false;not null"`
-	NomeConta    string  `gorm:"primaryKey; autoIncrement:false;not null"`
-	Debito       float64 `gorm:"type:decimal(19,3)"`
-	Credito      float64 `gorm:"type:decimal(19,3)"`
+	IDLancamento int             `gorm:"primaryKey; autoIncrement:false;not null"`
+	NomeConta    string          `gorm:"primaryKey; autoIncrement:false;not null"`
+	Debito       sql.NullFloat64 `gorm:"type:decimal(19,3)"`
+	Credito      sql.NullFloat64 `gorm:"type:decimal(19,3)"`
 }
 
 func (TDetalheLancamento) TableName() string {

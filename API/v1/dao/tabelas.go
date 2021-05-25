@@ -199,3 +199,89 @@ ON DELETE CASCADE;
 
 	return db.Exec(sql).Error
 }
+
+func ConvertePessoaParaTPessoa(p pessoa.Pessoa) pessoa.TPessoa {
+	return pessoa.TPessoa(p)
+}
+
+func ConverteTPessoaParaPessoa(p pessoa.TPessoa) pessoa.Pessoa {
+	return pessoa.Pessoa(p)
+}
+
+func ConverteTipoContaParaTTipoConta(tc tipo_conta.TipoConta) tipo_conta.TTipoConta {
+	return tipo_conta.TTipoConta(tc)
+}
+
+func ConverteTTipoContaParaTipoConta(tc tipo_conta.TTipoConta) tipo_conta.TipoConta {
+	return tipo_conta.TipoConta(tc)
+}
+
+func ConverteContaParaTConta(c conta.Conta) conta.TConta {
+	return conta.TConta{
+		Nome:            c.Nome,
+		NomeTipoConta:   c.NomeTipoConta,
+		Codigo:          setNullString(c.Codigo),
+		ContaPai:        setNullString(c.ContaPai),
+		Comentario:      setNullString(c.Comentario),
+		DataCriacao:     c.DataCriacao,
+		DataModificacao: c.DataModificacao,
+		Estado:          c.Estado,
+	}
+}
+
+func ConverteTContaParaConta(c conta.TConta) conta.Conta {
+	return conta.Conta{
+		Nome:            c.Nome,
+		NomeTipoConta:   c.NomeTipoConta,
+		Codigo:          c.Codigo.String,
+		ContaPai:        c.ContaPai.String,
+		Comentario:      c.Comentario.String,
+		DataCriacao:     c.DataCriacao,
+		DataModificacao: c.DataModificacao,
+		Estado:          c.Estado,
+	}
+}
+
+func ConverteLancamentoParaTLancamento(l lancamento.Lancamento) lancamento.TLancamento {
+	return lancamento.TLancamento{
+		ID:              l.ID,
+		CpfPessoa:       l.CpfPessoa,
+		Data:            l.Data,
+		Numero:          setNullString(l.Numero),
+		Descricao:       l.Descricao,
+		DataCriacao:     l.DataCriacao,
+		DataModificacao: l.DataModificacao,
+		Estado:          l.Estado,
+	}
+}
+
+func ConverteTLancamentoParaLancamento(l lancamento.TLancamento) lancamento.Lancamento {
+	return lancamento.Lancamento{
+		ID:              l.ID,
+		CpfPessoa:       l.CpfPessoa,
+		Data:            l.Data,
+		Numero:          l.Numero.String,
+		Descricao:       l.Descricao,
+		DataCriacao:     l.DataCriacao,
+		DataModificacao: l.DataModificacao,
+		Estado:          l.Estado,
+	}
+}
+
+func ConverteDetalheLancamentoParaTDetalheLancamento(dl detalhe_lancamento.DetalheLancamento) detalhe_lancamento.TDetalheLancamento {
+	return detalhe_lancamento.TDetalheLancamento{
+		IDLancamento: dl.IDLancamento,
+		NomeConta:    dl.NomeConta,
+		Debito:       setNullFloat64(dl.Debito),
+		Credito:      setNullFloat64(dl.Credito),
+	}
+}
+
+func ConverteTDetalheLancamentoParaDetalheLancamento(dl detalhe_lancamento.TDetalheLancamento) detalhe_lancamento.DetalheLancamento {
+	return detalhe_lancamento.DetalheLancamento{
+		IDLancamento: dl.IDLancamento,
+		NomeConta:    dl.NomeConta,
+		Debito:       dl.Debito.Float64,
+		Credito:      dl.Credito.Float64,
+	}
+}

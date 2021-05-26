@@ -98,14 +98,17 @@ import (
 //         ON DELETE CASCADE
 // )
 
+// CriarTabelaPessoa cria a tabela "pessoa" em banco de dados via AutoMigrate de GORM. Deve ser informado obrigatoriamente com parâmetro um *gorm.DB. Retorna um erro != nil caso ocorra um problema
 func CriarTabelaPessoa(db *gorm.DB) error {
 	return db.AutoMigrate(&pessoa.TPessoa{})
 }
 
+// CriarTabelaTipoConta cria a tabela "tipo_conta" em banco de dados via AutoMigrate de GORM. Deve ser informado obrigatoriamente com parâmetro um *gorm.DB. Retorna um erro != nil caso ocorra um problema
 func CriarTabelaTipoConta(db *gorm.DB) error {
 	return db.AutoMigrate(&tipo_conta.TTipoConta{})
 }
 
+// CriarTabelaConta cria a tabela "conta" em banco de dados via AutoMigrate de GORM e altera a tabela para criar as suas chaves estrangeiras. Deve ser informado obrigatoriamente com parâmetro um *gorm.DB. Retorna um erro != nil caso ocorra um problema
 func CriarTabelaConta(db *gorm.DB) error {
 	err := db.AutoMigrate(&conta.TConta{})
 	if err != nil {
@@ -120,6 +123,7 @@ func CriarTabelaConta(db *gorm.DB) error {
 	return nil
 }
 
+// CriarTabelaLancamento cria a tabela "lancamento" em banco de dados via AutoMigrate de GORM e altera a tabela para criar as suas chaves estrangeiras. Deve ser informado obrigatoriamente com parâmetro um *gorm.DB. Retorna um erro != nil caso ocorra um problema
 func CriarTabelaLancamento(db *gorm.DB) error {
 	err := db.AutoMigrate(&lancamento.TLancamento{})
 	if err != nil {
@@ -134,6 +138,7 @@ func CriarTabelaLancamento(db *gorm.DB) error {
 	return nil
 }
 
+// CriarTabelaDetalheLancamento cria a tabela "detalhe_lancamento" em banco de dados via AutoMigrate de GORM e altera a tabela para criar as suas chaves estrangeiras. Deve ser informado obrigatoriamente com parâmetro um *gorm.DB. Retorna um erro != nil caso ocorra um problema
 func CriarTabelaDetalheLancamento(db *gorm.DB) error {
 	err := db.AutoMigrate(&detalhe_lancamento.TDetalheLancamento{})
 	if err != nil {
@@ -200,22 +205,27 @@ ON DELETE CASCADE;
 	return db.Exec(sql).Error
 }
 
+// ConvertePessoaParaTPessoa recebe uma variável do tipo da struct Pessoa como parâmetro e retorna uma variável do tipo TPessoa
 func ConvertePessoaParaTPessoa(p pessoa.Pessoa) pessoa.TPessoa {
 	return pessoa.TPessoa(p)
 }
 
+// ConverteTPessoaParaPessoa recebe uma variável do tipo da struct TPessoa como parâmetro e retorna uma variável do tipo Pessoa
 func ConverteTPessoaParaPessoa(p pessoa.TPessoa) pessoa.Pessoa {
 	return pessoa.Pessoa(p)
 }
 
+// ConverteTipoContaParaTTipoConta recebe uma variável do tipo da struct TipoConta como parâmetro e retorna uma variável do tipo TTipoConta
 func ConverteTipoContaParaTTipoConta(tc tipo_conta.TipoConta) tipo_conta.TTipoConta {
 	return tipo_conta.TTipoConta(tc)
 }
 
+// ConverteTTipoContaParaTipoConta recebe uma variável do tipo da struct TTipoConta como parâmetro e retorna uma variável do tipo TipoConta
 func ConverteTTipoContaParaTipoConta(tc tipo_conta.TTipoConta) tipo_conta.TipoConta {
 	return tipo_conta.TipoConta(tc)
 }
 
+// ConverteContaParaTConta recebe uma variável do tipo da struct Conta como parâmetro e retorna uma variável do tipo TConta
 func ConverteContaParaTConta(c conta.Conta) conta.TConta {
 	return conta.TConta{
 		Nome:            c.Nome,
@@ -229,6 +239,7 @@ func ConverteContaParaTConta(c conta.Conta) conta.TConta {
 	}
 }
 
+// ConverteTContaParaConta recebe uma variável do tipo da struct TConta como parâmetro e retorna uma variável do tipo Conta
 func ConverteTContaParaConta(c conta.TConta) conta.Conta {
 	return conta.Conta{
 		Nome:            c.Nome,
@@ -242,6 +253,7 @@ func ConverteTContaParaConta(c conta.TConta) conta.Conta {
 	}
 }
 
+// ConverteLancamentoParaTLancamento recebe uma variável do tipo da struct Lancamento como parâmetro e retorna uma variável do tipo TLancamento
 func ConverteLancamentoParaTLancamento(l lancamento.Lancamento) lancamento.TLancamento {
 	return lancamento.TLancamento{
 		ID:              l.ID,
@@ -255,6 +267,7 @@ func ConverteLancamentoParaTLancamento(l lancamento.Lancamento) lancamento.TLanc
 	}
 }
 
+// ConverteTLancamentoParaLancamento recebe uma variável do tipo da struct TLancamento como parâmetro e retorna uma variável do tipo Lancamento
 func ConverteTLancamentoParaLancamento(l lancamento.TLancamento) lancamento.Lancamento {
 	return lancamento.Lancamento{
 		ID:              l.ID,
@@ -268,6 +281,7 @@ func ConverteTLancamentoParaLancamento(l lancamento.TLancamento) lancamento.Lanc
 	}
 }
 
+// ConverteDetalheLancamentoParaTDetalheLancamento recebe uma variável do tipo da struct DetalheLancamento como parâmetro e retorna uma variável do tipo TDetalheLancamento
 func ConverteDetalheLancamentoParaTDetalheLancamento(dl detalhe_lancamento.DetalheLancamento) detalhe_lancamento.TDetalheLancamento {
 	return detalhe_lancamento.TDetalheLancamento{
 		IDLancamento: dl.IDLancamento,
@@ -277,6 +291,7 @@ func ConverteDetalheLancamentoParaTDetalheLancamento(dl detalhe_lancamento.Detal
 	}
 }
 
+// ConverteTDetalheLancamentoParaDetalheLancamento recebe uma variável do tipo da struct TDetalheLancamento como parâmetro e retorna uma variável do tipo DetalheLancamento
 func ConverteTDetalheLancamentoParaDetalheLancamento(dl detalhe_lancamento.TDetalheLancamento) detalhe_lancamento.DetalheLancamento {
 	return detalhe_lancamento.DetalheLancamento{
 		IDLancamento: dl.IDLancamento,
@@ -286,6 +301,7 @@ func ConverteTDetalheLancamentoParaDetalheLancamento(dl detalhe_lancamento.TDeta
 	}
 }
 
+// ConverteTPessoasParaPessoas recebe um resultado do tipo *gorm.DB e um slice de TPessoas e retorna um slice de Pessoas e um erro != nil se ocorrer algum problema
 func ConverteTPessoasParaPessoas(resultado *gorm.DB, tpessoas *pessoa.TPessoas) (pessoas pessoa.Pessoas, err error) {
 	err = resultado.Error
 	encontrouRegistros := resultado.RowsAffected > 0

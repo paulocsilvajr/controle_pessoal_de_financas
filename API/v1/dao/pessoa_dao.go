@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
+	"gorm.io/gorm"
 )
 
 var (
@@ -35,6 +36,13 @@ FROM
 	query := getTemplateQuery("CarregaPessoas", pessoaDB, sql)
 
 	return carregaPessoas(db, query)
+}
+
+func CarregaPessoas02(db *gorm.DB) (pessoas pessoa.Pessoas, err error) {
+	var tpessoas pessoa.TPessoas
+	resultado := db.Find(&tpessoas)
+
+	return ConverteTPessoasParaPessoas(resultado, &tpessoas)
 }
 
 // AdicionaPessoa adiciona uma pessoa comum ao BD e retorna a pessoa incluída(*Pessoa) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma pessoa(*Pessoa)

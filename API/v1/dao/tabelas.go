@@ -285,3 +285,17 @@ func ConverteTDetalheLancamentoParaDetalheLancamento(dl detalhe_lancamento.TDeta
 		Credito:      dl.Credito.Float64,
 	}
 }
+
+func ConverteTPessoasParaPessoas(resultado *gorm.DB, tpessoas *pessoa.TPessoas) (pessoas pessoa.Pessoas, err error) {
+	err = resultado.Error
+	encontrouRegistros := resultado.RowsAffected > 0
+
+	if encontrouRegistros {
+		for _, tp := range *tpessoas {
+			p := ConverteTPessoaParaPessoa(*tp)
+			pessoas = append(pessoas, &p)
+		}
+	}
+
+	return pessoas, err
+}

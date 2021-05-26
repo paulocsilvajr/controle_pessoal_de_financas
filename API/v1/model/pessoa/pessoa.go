@@ -78,6 +78,8 @@ type IPessoas interface {
 	Len() int
 }
 
+type FuncaoNewPessoa func(string, string, string, string, string) (*Pessoa, error)
+
 // New retorna uma nova Pessoa(*Pessoa) comum através dos parâmetros informados(cpf, nome, usuario, senha e email). Função equivalente a criação de pessoa via literal &Pessoa{Cpf: ..., NomeCompleto: ..., ...}. Data de criação e modificação são definidos como o horário atual e o estado é definido como ativo. OBS: senha NÃO é hasheada e parâmetros NÃO são validados
 func New(cpf, nome, usuario, senha, email string) *Pessoa {
 	return &Pessoa{

@@ -55,6 +55,16 @@ func AdicionaPessoaAdmin(db *sql.DB, novaPessoa *pessoa.Pessoa) (p *pessoa.Pesso
 	return adicionaPessoaBase(db, novaPessoa, pessoa.NewPessoaAdmin)
 }
 
+// AdicionaPessoa02 adiciona uma pessoa comum ao BD e retorna a pessoa incluída(*Pessoa) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) e uma pessoa(*Pessoa) como parâmetros obrigatórios
+func AdicionaPessoa02(db *gorm.DB, novaPessoa *pessoa.Pessoa) (*pessoa.Pessoa, error) {
+	return adicionaPessoaBase02(db, novaPessoa, pessoa.NewPessoa)
+}
+
+// AdicionaPessoaAdmin02 adiciona uma pessoa administradora ao BD e retorna a pessoa incluída(*Pessoa) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) e uma pessoa(*Pessoa) como parâmetros obrigatórios
+func AdicionaPessoaAdmin02(db *gorm.DB, novaPessoa *pessoa.Pessoa) (*pessoa.Pessoa, error) {
+	return adicionaPessoaBase02(db, novaPessoa, pessoa.NewPessoaAdmin)
+}
+
 // RemovePessoa remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD como parâmetro obrigatório e uma string contendo o CPF da pessoa desejada
 func RemovePessoa(db *sql.DB, cpf string) (err error) {
 	sql := `
@@ -414,4 +424,20 @@ func scanPessoas02(rows *sql.Rows, pessoaAtual *pessoa.PessoaSimples) error {
 		&pessoaAtual.Email,
 		&pessoaAtual.DataCriacao,
 		&pessoaAtual.DataModificacao)
+}
+
+func adicionaPessoaBase02(db *gorm.DB, novaPessoa *pessoa.Pessoa, newPessoa pessoa.FuncaoNewPessoa) (p *pessoa.Pessoa, err error) {
+	p, err = newPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
+	if err != nil {
+		return
+	}
+
+	tpessoa := ConvertePessoaParaTPessoa(*p)
+	err = db.Create(&tpessoa).Error
+	if err != nil {
+		return
+	}
+	pessoa := ConverteTPessoaParaPessoa(tpessoa)
+
+	return &pessoa, nil
 }

@@ -1,5 +1,91 @@
 package dao
 
+import (
+	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
+)
+
+func TestAdicionaPessoa02(t *testing.T) {
+	tpessoa := getTPessoa1()
+	pessoa := ConverteTPessoaParaPessoa(tpessoa)
+
+	p, err := AdicionaPessoa02(db2, &pessoa)
+
+	if err := verificaErroChaveDuplicada(err); err != nil {
+		t.Error(err)
+	}
+
+	if err := verificaCamposPessoa(p, &tpessoa); err != nil {
+		t.Error(err)
+	}
+
+	if p.Administrador != false {
+		t.Error("Pessoa Comum salva com flag Administrador true")
+	}
+}
+
+func TestAdicionaPessoaAdmin02(t *testing.T) {
+	tpessoa := getTPessoaAdmin1()
+	pessoa := ConverteTPessoaParaPessoa(tpessoa)
+
+	p, err := AdicionaPessoaAdmin02(db2, &pessoa)
+
+	if err := verificaErroChaveDuplicada(err); err != nil {
+		t.Error(err)
+	}
+
+	if err := verificaCamposPessoa(p, &tpessoa); err != nil {
+		t.Error(err)
+	}
+
+	if p.Administrador != true {
+		t.Error("Pessoa Administrador salva com flag Adminstrador false")
+	}
+}
+
+func verificaErroChaveDuplicada(err error) error {
+	if err != nil {
+		strErroChaveDuplicada := "duplicate key value violates unique constraint"
+		erroNaoEhChaveDuplicada := !strings.Contains(err.Error(), strErroChaveDuplicada)
+
+		if erroNaoEhChaveDuplicada {
+			return err
+		}
+	}
+	return nil
+}
+
+func verificaCamposPessoa(p *pessoa.Pessoa, tp *pessoa.TPessoa) error {
+	if p.Cpf != tp.Cpf {
+		return fmt.Errorf("Retornou CPF incorreto[%s != %s]", p.Cpf, tp.Cpf)
+	}
+
+	if p.NomeCompleto != tp.NomeCompleto {
+		return fmt.Errorf("Retornou Nome Completo incorreto[%s != %s]", p.NomeCompleto, tp.NomeCompleto)
+	}
+
+	if p.Usuario != tp.Usuario {
+		return fmt.Errorf("Retornou Usuário incorreto[%s != %s]", p.Usuario, tp.Usuario)
+	}
+
+	if p.Senha == tp.Senha {
+		return fmt.Errorf("Retornou Senha sem HASH[%s != %s]", p.Senha, tp.Senha)
+	}
+
+	if p.Email != tp.Email {
+		return fmt.Errorf("Retornou Email incorreto[%s != %s]", p.Email, tp.Email)
+	}
+
+	if p.Estado != true {
+		return fmt.Errorf("Retornou Estado incorreto[%t != %t]", p.Estado, true)
+	}
+
+	return nil
+}
+
 // TESTES ANTIGOS
 // import (
 // 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"

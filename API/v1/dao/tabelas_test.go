@@ -441,6 +441,16 @@ func getTPessoa1() pessoa.TPessoa {
 	}
 }
 
+func getTPessoaAdmin1() pessoa.TPessoa {
+	return pessoa.TPessoa{
+		Cpf:          "00000000000",
+		NomeCompleto: "Administrador 01",
+		Usuario:      "admin01",
+		Senha:        "123456",
+		Email:        "admin01@email.com",
+	}
+}
+
 func getTTipoConta1() tipo_conta.TTipoConta {
 	return tipo_conta.TTipoConta{
 		Nome:             "banco",

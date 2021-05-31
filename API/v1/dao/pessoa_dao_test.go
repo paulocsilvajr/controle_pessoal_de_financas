@@ -10,9 +10,9 @@ import (
 
 func TestAdicionaPessoa02(t *testing.T) {
 	tpessoa := getTPessoa1()
-	pessoa := ConverteTPessoaParaPessoa(tpessoa)
+	pessoa := ConverteTPessoaParaPessoa(&tpessoa)
 
-	p, err := AdicionaPessoa02(db2, &pessoa)
+	p, err := AdicionaPessoa02(db2, pessoa)
 
 	if err := verificaErroChaveDuplicada(err); err != nil {
 		t.Error(err)
@@ -29,9 +29,9 @@ func TestAdicionaPessoa02(t *testing.T) {
 
 func TestAdicionaPessoaAdmin02(t *testing.T) {
 	tpessoa := getTPessoaAdmin1()
-	pessoa := ConverteTPessoaParaPessoa(tpessoa)
+	pessoa := ConverteTPessoaParaPessoa(&tpessoa)
 
-	p, err := AdicionaPessoaAdmin02(db2, &pessoa)
+	p, err := AdicionaPessoaAdmin02(db2, pessoa)
 
 	if err := verificaErroChaveDuplicada(err); err != nil {
 		t.Error(err)

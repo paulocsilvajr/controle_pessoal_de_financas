@@ -38,7 +38,7 @@ FROM
 	return carregaPessoas(db, query)
 }
 
-func CarregaPessoas02(db *gorm.DB) (pessoas pessoa.Pessoas, err error) {
+func CarregaPessoas02(db *gorm.DB) (pessoas *pessoa.Pessoas, err error) {
 	var tpessoas pessoa.TPessoas
 	resultado := db.Find(&tpessoas)
 
@@ -432,12 +432,12 @@ func adicionaPessoaBase02(db *gorm.DB, novaPessoa *pessoa.Pessoa, newPessoa pess
 		return
 	}
 
-	tpessoa := ConvertePessoaParaTPessoa(*p)
+	tpessoa := ConvertePessoaParaTPessoa(p)
 	err = db.Create(&tpessoa).Error
 	if err != nil {
 		return
 	}
 	pessoa := ConverteTPessoaParaPessoa(tpessoa)
 
-	return &pessoa, nil
+	return pessoa, nil
 }

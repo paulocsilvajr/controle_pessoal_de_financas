@@ -205,29 +205,63 @@ ON DELETE CASCADE;
 	return db.Exec(sql).Error
 }
 
-// ConvertePessoaParaTPessoa recebe uma variável do tipo da struct Pessoa como parâmetro e retorna uma variável do tipo TPessoa
-func ConvertePessoaParaTPessoa(p pessoa.Pessoa) pessoa.TPessoa {
-	return pessoa.TPessoa(p)
+// ConvertePessoaParaTPessoa recebe um ponteiro do tipo da struct Pessoa como parâmetro e retorna um ponteiro do tipo TPessoa
+func ConvertePessoaParaTPessoa(p *pessoa.Pessoa) *pessoa.TPessoa {
+	return &pessoa.TPessoa{
+		Cpf:             p.Cpf,
+		NomeCompleto:    p.NomeCompleto,
+		Usuario:         p.Usuario,
+		Senha:           p.Senha,
+		Email:           p.Email,
+		DataCriacao:     p.DataCriacao,
+		DataModificacao: p.DataModificacao,
+		Estado:          p.Estado,
+		Administrador:   p.Administrador,
+	}
 }
 
-// ConverteTPessoaParaPessoa recebe uma variável do tipo da struct TPessoa como parâmetro e retorna uma variável do tipo Pessoa
-func ConverteTPessoaParaPessoa(p pessoa.TPessoa) pessoa.Pessoa {
-	return pessoa.Pessoa(p)
+// ConverteTPessoaParaPessoa recebe um ponteiro do tipo da struct TPessoa como parâmetro e retorna um ponteiro do tipo Pessoa
+func ConverteTPessoaParaPessoa(p *pessoa.TPessoa) *pessoa.Pessoa {
+	return &pessoa.Pessoa{
+		Cpf:             p.Cpf,
+		NomeCompleto:    p.NomeCompleto,
+		Usuario:         p.Usuario,
+		Senha:           p.Senha,
+		Email:           p.Email,
+		DataCriacao:     p.DataCriacao,
+		DataModificacao: p.DataModificacao,
+		Estado:          p.Estado,
+		Administrador:   p.Administrador,
+	}
 }
 
 // ConverteTipoContaParaTTipoConta recebe uma variável do tipo da struct TipoConta como parâmetro e retorna uma variável do tipo TTipoConta
-func ConverteTipoContaParaTTipoConta(tc tipo_conta.TipoConta) tipo_conta.TTipoConta {
-	return tipo_conta.TTipoConta(tc)
+func ConverteTipoContaParaTTipoConta(tc *tipo_conta.TipoConta) *tipo_conta.TTipoConta {
+	return &tipo_conta.TTipoConta{
+		Nome:             tc.Nome,
+		DescricaoDebito:  tc.DescricaoDebito,
+		DescricaoCredito: tc.DescricaoCredito,
+		DataCriacao:      tc.DataCriacao,
+		DataModificacao:  tc.DataModificacao,
+		Estado:           tc.Estado,
+	}
 }
 
-// ConverteTTipoContaParaTipoConta recebe uma variável do tipo da struct TTipoConta como parâmetro e retorna uma variável do tipo TipoConta
-func ConverteTTipoContaParaTipoConta(tc tipo_conta.TTipoConta) tipo_conta.TipoConta {
-	return tipo_conta.TipoConta(tc)
+// ConverteTTipoContaParaTipoConta recebe um ponteiro do tipo da struct TTipoConta como parâmetro e retorna um ponteiro do tipo TipoConta
+func ConverteTTipoContaParaTipoConta(tc *tipo_conta.TTipoConta) *tipo_conta.TipoConta {
+	return &tipo_conta.TipoConta{
+		Nome:             tc.Nome,
+		DescricaoDebito:  tc.DescricaoDebito,
+		DescricaoCredito: tc.DescricaoCredito,
+		DataCriacao:      tc.DataCriacao,
+		DataModificacao:  tc.DataModificacao,
+		Estado:           tc.Estado,
+	}
 }
 
-// ConverteContaParaTConta recebe uma variável do tipo da struct Conta como parâmetro e retorna uma variável do tipo TConta
-func ConverteContaParaTConta(c conta.Conta) conta.TConta {
-	return conta.TConta{
+// ConverteContaParaTConta recebe um ponteiro do tipo da struct Conta como parâmetro e retorna um ponteiro do tipo TConta
+func ConverteContaParaTConta(c *conta.Conta) *conta.TConta {
+	return &conta.TConta{
 		Nome:            c.Nome,
 		NomeTipoConta:   c.NomeTipoConta,
 		Codigo:          setNullString(c.Codigo),
@@ -239,9 +273,9 @@ func ConverteContaParaTConta(c conta.Conta) conta.TConta {
 	}
 }
 
-// ConverteTContaParaConta recebe uma variável do tipo da struct TConta como parâmetro e retorna uma variável do tipo Conta
-func ConverteTContaParaConta(c conta.TConta) conta.Conta {
-	return conta.Conta{
+// ConverteTContaParaConta recebe um ponteiro do tipo da struct TConta como parâmetro e retorna um ponteiro do tipo Conta
+func ConverteTContaParaConta(c *conta.TConta) *conta.Conta {
+	return &conta.Conta{
 		Nome:            c.Nome,
 		NomeTipoConta:   c.NomeTipoConta,
 		Codigo:          c.Codigo.String,
@@ -253,9 +287,9 @@ func ConverteTContaParaConta(c conta.TConta) conta.Conta {
 	}
 }
 
-// ConverteLancamentoParaTLancamento recebe uma variável do tipo da struct Lancamento como parâmetro e retorna uma variável do tipo TLancamento
-func ConverteLancamentoParaTLancamento(l lancamento.Lancamento) lancamento.TLancamento {
-	return lancamento.TLancamento{
+// ConverteLancamentoParaTLancamento recebe um ponteiro do tipo da struct Lancamento como parâmetro e retorna um ponteiro do tipo TLancamento
+func ConverteLancamentoParaTLancamento(l *lancamento.Lancamento) *lancamento.TLancamento {
+	return &lancamento.TLancamento{
 		ID:              l.ID,
 		CpfPessoa:       l.CpfPessoa,
 		Data:            l.Data,
@@ -267,9 +301,9 @@ func ConverteLancamentoParaTLancamento(l lancamento.Lancamento) lancamento.TLanc
 	}
 }
 
-// ConverteTLancamentoParaLancamento recebe uma variável do tipo da struct TLancamento como parâmetro e retorna uma variável do tipo Lancamento
-func ConverteTLancamentoParaLancamento(l lancamento.TLancamento) lancamento.Lancamento {
-	return lancamento.Lancamento{
+// ConverteTLancamentoParaLancamento recebe um ponteiro do tipo da struct TLancamento como parâmetro e retorna um ponteiro do tipo Lancamento
+func ConverteTLancamentoParaLancamento(l *lancamento.TLancamento) *lancamento.Lancamento {
+	return &lancamento.Lancamento{
 		ID:              l.ID,
 		CpfPessoa:       l.CpfPessoa,
 		Data:            l.Data,
@@ -281,9 +315,9 @@ func ConverteTLancamentoParaLancamento(l lancamento.TLancamento) lancamento.Lanc
 	}
 }
 
-// ConverteDetalheLancamentoParaTDetalheLancamento recebe uma variável do tipo da struct DetalheLancamento como parâmetro e retorna uma variável do tipo TDetalheLancamento
-func ConverteDetalheLancamentoParaTDetalheLancamento(dl detalhe_lancamento.DetalheLancamento) detalhe_lancamento.TDetalheLancamento {
-	return detalhe_lancamento.TDetalheLancamento{
+// ConverteDetalheLancamentoParaTDetalheLancamento recebe um ponteiro do tipo da struct DetalheLancamento como parâmetro e retorna um ponteiro do tipo TDetalheLancamento
+func ConverteDetalheLancamentoParaTDetalheLancamento(dl *detalhe_lancamento.DetalheLancamento) *detalhe_lancamento.TDetalheLancamento {
+	return &detalhe_lancamento.TDetalheLancamento{
 		IDLancamento: dl.IDLancamento,
 		NomeConta:    dl.NomeConta,
 		Debito:       setNullFloat64(dl.Debito),
@@ -291,9 +325,9 @@ func ConverteDetalheLancamentoParaTDetalheLancamento(dl detalhe_lancamento.Detal
 	}
 }
 
-// ConverteTDetalheLancamentoParaDetalheLancamento recebe uma variável do tipo da struct TDetalheLancamento como parâmetro e retorna uma variável do tipo DetalheLancamento
-func ConverteTDetalheLancamentoParaDetalheLancamento(dl detalhe_lancamento.TDetalheLancamento) detalhe_lancamento.DetalheLancamento {
-	return detalhe_lancamento.DetalheLancamento{
+// ConverteTDetalheLancamentoParaDetalheLancamento recebe um ponteiro do tipo da struct TDetalheLancamento como parâmetro e retorna um ponteiro do tipo DetalheLancamento
+func ConverteTDetalheLancamentoParaDetalheLancamento(dl *detalhe_lancamento.TDetalheLancamento) *detalhe_lancamento.DetalheLancamento {
+	return &detalhe_lancamento.DetalheLancamento{
 		IDLancamento: dl.IDLancamento,
 		NomeConta:    dl.NomeConta,
 		Debito:       dl.Debito.Float64,
@@ -302,14 +336,14 @@ func ConverteTDetalheLancamentoParaDetalheLancamento(dl detalhe_lancamento.TDeta
 }
 
 // ConverteTPessoasParaPessoas recebe um resultado do tipo *gorm.DB e um slice de TPessoas e retorna um slice de Pessoas e um erro != nil se ocorrer algum problema
-func ConverteTPessoasParaPessoas(resultado *gorm.DB, tpessoas *pessoa.TPessoas) (pessoas pessoa.Pessoas, err error) {
+func ConverteTPessoasParaPessoas(resultado *gorm.DB, tpessoas *pessoa.TPessoas) (pessoas *pessoa.Pessoas, err error) {
 	err = resultado.Error
 	encontrouRegistros := resultado.RowsAffected > 0
 
 	if encontrouRegistros {
 		for _, tp := range *tpessoas {
-			p := ConverteTPessoaParaPessoa(*tp)
-			pessoas = append(pessoas, &p)
+			p := ConverteTPessoaParaPessoa(tp)
+			*pessoas = append(*pessoas, p)
 		}
 	}
 

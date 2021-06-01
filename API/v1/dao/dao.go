@@ -14,6 +14,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	loggerGORM "gorm.io/gorm/logger"
 
 	_ "github.com/lib/pq"
 )
@@ -128,7 +129,9 @@ func getDB02(config config.Configuracoes) *gorm.DB {
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  connStr,
 		PreferSimpleProtocol: true,
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		Logger: loggerGORM.Default.LogMode(loggerGORM.Error),
+	})
 
 	if err != nil {
 		logger.GeraLogFS(

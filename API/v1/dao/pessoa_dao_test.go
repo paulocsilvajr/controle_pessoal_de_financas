@@ -8,11 +8,16 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 )
 
+var (
+	testPessoa01      *pessoa.Pessoa
+	testPessoaAdmin01 *pessoa.Pessoa
+)
+
 func TestAdicionaPessoa02(t *testing.T) {
 	tpessoa := getTPessoa1()
-	pessoa := ConverteTPessoaParaPessoa(&tpessoa)
+	testPessoa01 = ConverteTPessoaParaPessoa(&tpessoa)
 
-	p, err := AdicionaPessoa02(db2, pessoa)
+	p, err := AdicionaPessoa02(db2, testPessoa01)
 
 	if err := verificaErroChaveDuplicada(err); err != nil {
 		t.Error(err)
@@ -29,9 +34,9 @@ func TestAdicionaPessoa02(t *testing.T) {
 
 func TestAdicionaPessoaAdmin02(t *testing.T) {
 	tpessoa := getTPessoaAdmin1()
-	pessoa := ConverteTPessoaParaPessoa(&tpessoa)
+	testPessoaAdmin01 = ConverteTPessoaParaPessoa(&tpessoa)
 
-	p, err := AdicionaPessoaAdmin02(db2, pessoa)
+	p, err := AdicionaPessoaAdmin02(db2, testPessoaAdmin01)
 
 	if err := verificaErroChaveDuplicada(err); err != nil {
 		t.Error(err)
@@ -43,6 +48,20 @@ func TestAdicionaPessoaAdmin02(t *testing.T) {
 
 	if p.Administrador != true {
 		t.Error("Pessoa Administrador salva com flag Adminstrador false")
+	}
+}
+
+func TestRemovePessoa02(t *testing.T) {
+	err := RemovePessoa02(db2, testPessoaAdmin01.Cpf)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestRemovePessoaPorUsuario02(t *testing.T) {
+	err := RemovePessoaPorUsuario02(db2, testPessoa01.Usuario)
+	if err != nil {
+		t.Error(err)
 	}
 }
 

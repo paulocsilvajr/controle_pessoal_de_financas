@@ -3,6 +3,7 @@ package dao
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 	"gorm.io/gorm"
@@ -97,6 +98,21 @@ WHERE {{.usuario}} = $1
 	}
 
 	return
+}
+
+// RemovePessoa02 remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) e uma string contendo o CPF da pessoa desejada como parâmetros obrigatórios
+func RemovePessoa02(db *gorm.DB, cpf string) (err error) {
+	p := &pessoa.TPessoa{Cpf: cpf}
+
+	return db.Delete(p).Error
+}
+
+// RemovePessoaPorUsuario02 remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) e uma string contendo o USUÁRIO da pessoa desejada como parâmetros obrigatórios
+func RemovePessoaPorUsuario02(db *gorm.DB, usuario string) error {
+	p := new(pessoa.TPessoa)
+
+	sql := fmt.Sprintf("%s = ?", pessoaDB["usuario"])
+	return db.Where(sql, usuario).Delete(p).Error
 }
 
 // ProcuraPessoa localiza uma pessoa no BD e retorna a pessoa procurada(*Pessoa). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um CPF da pessoa desejada

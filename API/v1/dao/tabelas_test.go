@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -163,7 +164,8 @@ func TestCRUDTipoConta(t *testing.T) {
 func TestCriarTabelaConta(t *testing.T) {
 	err := CriarTabelaConta(db2)
 	if err != nil {
-		t.Error(err)
+		// ERROR: constraint "tipo_conta_fk" for relation "conta" already exists (SQLSTATE 42710)
+		verificaErroConstraintExists(err, t)
 	}
 }
 
@@ -251,7 +253,8 @@ func TestCriarTabelaConta(t *testing.T) {
 func TestCriarTabelaLancamento(t *testing.T) {
 	err := CriarTabelaLancamento(db2)
 	if err != nil {
-		t.Error(err)
+		// ERROR: constraint "pessoa_lancamento_fk" for relation "lancamento" already exists (SQLSTATE 42710)
+		verificaErroConstraintExists(err, t)
 	}
 }
 
@@ -307,7 +310,8 @@ func TestCRUDTabelaLancamento(t *testing.T) {
 func TestCriarTabelaDetalheLancamento(t *testing.T) {
 	err := CriarTabelaDetalheLancamento(db2)
 	if err != nil {
-		t.Error(err)
+		// ERROR: constraint "conta_detalhe_lancamento_fk" for relation "detalhe_lancamento" already exists (SQLSTATE 42710)
+		verificaErroConstraintExists(err, t)
 	}
 }
 
@@ -484,5 +488,12 @@ func getTLancamento1(p pessoa.TPessoa) lancamento.TLancamento {
 		CpfPessoa: p.Cpf,
 		Numero:    setNullString("101010"),
 		Descricao: "Lançamento teste 101010",
+	}
+}
+
+func verificaErroConstraintExists(err error, t *testing.T) {
+	erroConstraintExists := strings.Contains(err.Error(), "already exists")
+	if !erroConstraintExists {
+		t.Error(err)
 	}
 }

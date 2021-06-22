@@ -135,7 +135,7 @@ func TestCRUDTipoConta(t *testing.T) {
 	// Consultar - SELECT
 	tc1Nome := tc1.Nome
 	tc2Nome := tc2.Nome
-	tc1, tc2 = tipo_conta.TTipoConta{}, tipo_conta.TTipoConta{}
+	tc1, tc2 = &tipo_conta.TTipoConta{}, tipo_conta.TTipoConta{}
 
 	err = db2.Where("nome = ?", tc1Nome).First(&tc1).Error
 	// t.Error(&tc1)
@@ -170,85 +170,87 @@ func TestCriarTabelaConta(t *testing.T) {
 }
 
 // COMENTADO teste para REVISAR, dando erros
-// func TestCRUDTabelaConta(t *testing.T) {
-// 	// Criar - INSERT
-// 	tc := getTTipoConta1()
-// 	tc1 := &tc
+func TestCRUDTabelaConta(t *testing.T) {
+	// Criar - INSERT
+	tc1 := getTTipoConta1()
 
-// 	c := getTConta1(*tc1)
-// 	c1 := &c
+	// c := getTConta1(*tc1)
+	// c1 := &c
 
-// 	c = getTConta2(tc, c)
-// 	c2 := &c
+	// c = getTConta2(tc, c)
+	// c2 := &c
 
-// 	err := db2.Create(tc1).Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	tx := db2.Create(tc1)
+	err := tx.Error
+	if err != nil {
+		t.Error(err)
+	}
 
-// 	err = db2.Create(c1).Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	verificaQuantidadeLinhasAfetadas(tx, 1, t)
 
-// 	err = db2.Create(c2).Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	// 	err = db2.Create(c1).Error
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
 
-// 	// Alterar - UPDATE
-// 	err = db2.Model(c1).Update("nome", "Juros recebidos").Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	// 	err = db2.Create(c2).Error
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
 
-// 	// porque foi alterado a chave primária de "c1", é necessário consultar "c2" em BD para pegar a entidade atualizada, com o campo conta_pai atualizado, para quando for fazer update não dê conflito de chave primária. Se não for obtido "c2" em consulta, o GORM tenta inserir um novo pelo método Save
-// 	err = db2.First(c2).Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	// 	// Alterar - UPDATE
+	// 	err = db2.Model(c1).Update("nome", "Juros recebidos").Error
+	// 	if err != nil {
+	// 		t.Error(err)
+	// }
 
-// 	c2.Codigo = setNullString("002a")
-// 	c2.Comentario = setNullString("alteração em conta 002 para conta 002a")
+	// 	// porque foi alterado a chave primária de "c1", é necessário consultar "c2" em BD para pegar a entidade atualizada, com o campo conta_pai atualizado, para quando for fazer update não dê conflito de chave primária. Se não for obtido "c2" em consulta, o GORM tenta inserir um novo pelo método Save
+	// 	err = db2.First(c2).Error
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
 
-// 	err = db2.Save(c2).Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	// 	c2.Codigo = setNullString("002a")
+	// 	c2.Comentario = setNullString("alteração em conta 002 para conta 002a")
 
-// 	// Consultar - SELECT
-// 	c1Nome := c1.Nome
-// 	c2Nome := c2.Nome
-// 	c1, c2 = nil, nil
+	// 	err = db2.Save(c2).Error
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
 
-// 	err = db2.Where("nome = ?", c1Nome).First(&c1).Error
-// 	// t.Error(c1)
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	// 	// Consultar - SELECT
+	// 	c1Nome := c1.Nome
+	// 	c2Nome := c2.Nome
+	// 	c1, c2 = nil, nil
 
-// 	err = db2.Where("nome = ?", c2Nome).First(&c2).Error
-// 	// t.Error(c2)
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	// 	err = db2.Where("nome = ?", c1Nome).First(&c1).Error
+	// 	// t.Error(c1)
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
 
-// 	// Remover - DELETE
-// 	err = db2.Delete(c1).Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	// 	err = db2.Where("nome = ?", c2Nome).First(&c2).Error
+	// 	// t.Error(c2)
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
 
-// 	err = db2.Delete(c2).Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
+	// Remover - DELETE
+	// 	err = db2.Delete(c1).Error
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
 
-// 	err = db2.Delete(tc1).Error
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-// }
+	// 	err = db2.Delete(c2).Error
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
+
+	err = db2.Delete(tc1).Error
+	if err != nil {
+		t.Error(err)
+	}
+}
 
 func TestCriarTabelaLancamento(t *testing.T) {
 	err := CriarTabelaLancamento(db2)
@@ -335,13 +337,13 @@ func TestCRUDTabelaDetalheLancamento(t *testing.T) {
 		t.Error(err)
 	}
 
-	c1 := getTConta1(tc1)
+	c1 := getTConta1(*tc1)
 	err = db2.Create(&c1).Error
 	if err != nil {
 		t.Error(err)
 	}
 
-	c2 := getTConta2(tc1, c1)
+	c2 := getTConta2(*tc1, c1)
 	err = db2.Create(&c2).Error
 	if err != nil {
 		t.Error(err)
@@ -456,12 +458,13 @@ func getTPessoaAdmin1() pessoa.TPessoa {
 	}
 }
 
-func getTTipoConta1() tipo_conta.TTipoConta {
-	return tipo_conta.TTipoConta{
-		Nome:             "banco",
-		DescricaoDebito:  "saque",
-		DescricaoCredito: "depósito",
+func getTTipoConta1() *tipo_conta.TTipoConta {
+	tc, err := tipo_conta.NewTipoConta("banco", "saque", "depósito")
+	if err != nil {
+		return nil
 	}
+
+	return ConverteTipoContaParaTTipoConta(tc)
 }
 
 func getTConta1(tc tipo_conta.TTipoConta) conta.TConta {
@@ -495,5 +498,13 @@ func verificaErroConstraintExists(err error, t *testing.T) {
 	erroConstraintExists := strings.Contains(err.Error(), "already exists")
 	if !erroConstraintExists {
 		t.Error(err)
+	}
+}
+
+// verificaQuantidadeLinhasAfetadas Verifica se a quantidade de registros informada no parâmetro n é diferente do retornado por tx.RowAffected. Caso verdadeiro, gera erro ref ao parâmetro t(*testing.T). Caso contrário, não retorna nada
+func verificaQuantidadeLinhasAfetadas(tx *gorm.DB, n int64, t *testing.T) {
+	linhaAfetadas := tx.RowsAffected
+	if linhaAfetadas != n {
+		t.Errorf("Quantidade de registros afetados errada. Esperado %d, afetado %d", n, linhaAfetadas)
 	}
 }

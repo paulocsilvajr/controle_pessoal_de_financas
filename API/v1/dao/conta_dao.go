@@ -23,6 +23,10 @@ var (
 	}
 )
 
+func GetPrimaryKeyConta() string {
+	return contaDB["nome"]
+}
+
 // CarregaContas retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaContas(db *sql.DB) (contas conta.Contas, err error) {
 	sql := `

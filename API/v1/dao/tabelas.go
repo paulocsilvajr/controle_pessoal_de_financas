@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
@@ -348,4 +349,13 @@ func ConverteTPessoasParaPessoas(resultado *gorm.DB, tpessoas *pessoa.TPessoas) 
 	}
 
 	return pessoas, err
+}
+
+// VerificaQuantidadeLinhasAfetadas retorna um erro != nil se a quantidade esperada(quantiadeEsperada int64) for diferente da quantidade realmente afetada obtida a partir do parâmetro tx(*gorm.DB)
+func VerificaQuantidadeRegistrosAfetados(tx *gorm.DB, quantidadeEsperada int64) error {
+	quantidadeAfetada := tx.RowsAffected
+	if quantidadeAfetada != quantidadeEsperada {
+		return fmt.Errorf("quantidade de registros afetados errada. Esperado %d, afetado %d", quantidadeEsperada, quantidadeAfetada)
+	}
+	return nil
 }

@@ -210,7 +210,7 @@ WHERE {{.id}} = $1
 	if len(lancamentos) == 1 {
 		l = lancamentos[0]
 	} else {
-		err = fmt.Errorf("Não foi encontrado um registro com o ID %d", id)
+		err = fmt.Errorf("não foi encontrado um registro com o ID %d", id)
 	}
 
 	return

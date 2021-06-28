@@ -98,7 +98,7 @@ WHERE {{.idLancamento}} = $1 AND {{.nomeConta}} = $2
 	if len(detalheLancamentos) == 1 {
 		dl = detalheLancamentos[0]
 	} else {
-		err = fmt.Errorf("Não foi encontrado um registro com o ID %d e o NomeConta %s", idLancamento, nomeConta)
+		err = fmt.Errorf("não foi encontrado um registro com o ID %d e o NomeConta %s", idLancamento, nomeConta)
 	}
 
 	return

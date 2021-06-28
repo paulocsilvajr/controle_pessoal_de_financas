@@ -95,7 +95,7 @@ func New(id int, cpfPessoa string, data time.Time, numero, descricao string) *La
 		Estado:          true}
 }
 
-// NewLancamento cria uma novo Lancamento semelhante a função New(), mas faz a validação dos campos informados nos parâmetros id, cpfPeddoa, data, numero e descricao
+// NewLancamento cria uma novo Lancamento semelhante a função New(), mas faz a validação dos campos informados nos parâmetros id, cpfPessoa, data, numero e descricao
 func NewLancamento(id int, cpfPessoa string, data time.Time, numero, descricao string) (lancamento *Lancamento, err error) {
 	lancamento = New(id, cpfPessoa, data, numero, descricao)
 
@@ -104,6 +104,11 @@ func NewLancamento(id int, cpfPessoa string, data time.Time, numero, descricao s
 	}
 
 	return
+}
+
+// NewLancamento cria uma novo Lancamento semelhante a função New(), mas faz a validação dos campos informados nos parâmetros cpfPessoa, data, numero e descricao. Inicializa o id como 0
+func NewLancamento02(cpfPessoa string, data time.Time, numero, descricao string) (lancamento *Lancamento, err error) {
+	return NewLancamento(0, cpfPessoa, data, numero, descricao)
 }
 
 // GetLancamentoTest retorna um Lancamento teste usado para os testes em geral

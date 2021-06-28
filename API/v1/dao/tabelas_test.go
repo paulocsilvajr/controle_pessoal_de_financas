@@ -164,9 +164,10 @@ func TestCRUDTipoConta(t *testing.T) {
 
 func TestCriarTabelaConta(t *testing.T) {
 	err := CriarTabelaConta(db2)
-	if err != nil {
-		// ERROR: constraint "tipo_conta_fk" for relation "conta" already exists (SQLSTATE 42710)
-		verificaErroConstraintExists(err, t)
+
+	// ERROR: constraint "tipo_conta_fk" for relation "conta" already exists (SQLSTATE 42710)
+	if err := verificaErroConstraintExists(err); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -283,9 +284,10 @@ func TestCRUDTabelaConta(t *testing.T) {
 
 func TestCriarTabelaLancamento(t *testing.T) {
 	err := CriarTabelaLancamento(db2)
-	if err != nil {
-		// ERROR: constraint "pessoa_lancamento_fk" for relation "lancamento" already exists (SQLSTATE 42710)
-		verificaErroConstraintExists(err, t)
+
+	// ERROR: constraint "pessoa_lancamento_fk" for relation "lancamento" already exists (SQLSTATE 42710)
+	if err := verificaErroConstraintExists(err); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -340,9 +342,10 @@ func TestCRUDTabelaLancamento(t *testing.T) {
 
 func TestCriarTabelaDetalheLancamento(t *testing.T) {
 	err := CriarTabelaDetalheLancamento(db2)
-	if err != nil {
-		// ERROR: constraint "conta_detalhe_lancamento_fk" for relation "detalhe_lancamento" already exists (SQLSTATE 42710)
-		verificaErroConstraintExists(err, t)
+
+	// ERROR: constraint "conta_detalhe_lancamento_fk" for relation "detalhe_lancamento" already exists (SQLSTATE 42710)
+	if err := verificaErroConstraintExists(err); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -520,9 +523,10 @@ func getTLancamento1(p pessoa.TPessoa) lancamento.TLancamento {
 	}
 }
 
-func verificaErroConstraintExists(err error, t *testing.T) {
+func verificaErroConstraintExists(err error) error {
 	erroConstraintExists := strings.Contains(err.Error(), "already exists")
 	if !erroConstraintExists {
-		t.Error(err)
+		return err
 	}
+	return nil
 }

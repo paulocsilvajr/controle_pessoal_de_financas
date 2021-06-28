@@ -15,7 +15,7 @@ var (
 
 func TestAdicionaPessoa02(t *testing.T) {
 	tpessoa := getTPessoa1()
-	testPessoa01 = ConverteTPessoaParaPessoa(&tpessoa)
+	testPessoa01 = ConverteTPessoaParaPessoa(tpessoa)
 
 	p, err := AdicionaPessoa02(db2, testPessoa01)
 
@@ -23,7 +23,7 @@ func TestAdicionaPessoa02(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err := verificaCamposPessoa(p, &tpessoa); err != nil {
+	if err := verificaCamposPessoa(p, tpessoa); err != nil {
 		t.Error(err)
 	}
 
@@ -34,7 +34,7 @@ func TestAdicionaPessoa02(t *testing.T) {
 
 func TestAdicionaPessoaAdmin02(t *testing.T) {
 	tpessoa := getTPessoaAdmin1()
-	testPessoaAdmin01 = ConverteTPessoaParaPessoa(&tpessoa)
+	testPessoaAdmin01 = ConverteTPessoaParaPessoa(tpessoa)
 
 	p, err := AdicionaPessoaAdmin02(db2, testPessoaAdmin01)
 
@@ -42,7 +42,7 @@ func TestAdicionaPessoaAdmin02(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err := verificaCamposPessoa(p, &tpessoa); err != nil {
+	if err := verificaCamposPessoa(p, tpessoa); err != nil {
 		t.Error(err)
 	}
 

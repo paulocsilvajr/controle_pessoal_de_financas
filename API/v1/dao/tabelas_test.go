@@ -33,7 +33,7 @@ func TestCRUDPessoa(t *testing.T) {
 	// Criar - INSERT
 	p1 := getTPessoa1()
 
-	p2 := pessoa.TPessoa{
+	p2 := &pessoa.TPessoa{
 		Cpf:          "10987654321",
 		NomeCompleto: "Teste 02",
 		Usuario:      "teste02",
@@ -64,7 +64,8 @@ func TestCRUDPessoa(t *testing.T) {
 	// Consultar - SELECT
 	p1Cpf := p1.Cpf
 	p2Cpf := p2.Cpf
-	p1, p2 = pessoa.TPessoa{}, pessoa.TPessoa{}
+	p1 = new(pessoa.TPessoa)
+	p2 = new(pessoa.TPessoa)
 
 	err = db2.First(&p1, p1Cpf).Error
 	// t.Error(&p1)
@@ -300,8 +301,7 @@ func TestCRUDTabelaLancamento(t *testing.T) {
 		t.Error(err)
 	}
 
-	l := getTLancamento1(p1)
-	l1 := &l
+	l1 := getTLancamento1(p1)
 
 	err = db2.Create(l1).Error
 	if err != nil {
@@ -470,24 +470,20 @@ func TestCRUDTabelaDetalheLancamento(t *testing.T) {
 
 }
 
-func getTPessoa1() pessoa.TPessoa {
-	return pessoa.TPessoa{
-		Cpf:          "12345678910",
-		NomeCompleto: "Teste 01",
-		Usuario:      "teste01",
-		Senha:        "123456",
-		Email:        "teste01@email.com",
+func getTPessoa1() *pessoa.TPessoa {
+	p, err := pessoa.NewPessoa("12345678910", "Teste 01", "teste01", "123456", "teste01@email.com")
+	if err != nil {
+		return nil
 	}
+	return ConvertePessoaParaTPessoa(p)
 }
 
-func getTPessoaAdmin1() pessoa.TPessoa {
-	return pessoa.TPessoa{
-		Cpf:          "00000000000",
-		NomeCompleto: "Administrador 01",
-		Usuario:      "admin01",
-		Senha:        "123456",
-		Email:        "admin01@email.com",
+func getTPessoaAdmin1() *pessoa.TPessoa {
+	p, err := pessoa.NewPessoaAdmin("00000000000", "Administrador 01", "admin01", "123456", "admin01@email.com")
+	if err != nil {
+		return nil
 	}
+	return ConvertePessoaParaTPessoa(p)
 }
 
 func getTTipoConta1() *tipo_conta.TTipoConta {
@@ -515,12 +511,12 @@ func getTConta2(tc *tipo_conta.TTipoConta, cp *conta.TConta) *conta.TConta {
 	return ConverteContaParaTConta(c)
 }
 
-func getTLancamento1(p pessoa.TPessoa) lancamento.TLancamento {
-	return lancamento.TLancamento{
-		CpfPessoa: p.Cpf,
-		Numero:    setNullString("101010"),
-		Descricao: "Lançamento teste 101010",
+func getTLancamento1(p *pessoa.TPessoa) *lancamento.TLancamento {
+	l, err := lancamento.NewLancamento02(p.Cpf, time.Now(), "101010", "Lançamento teste 101010")
+	if err != nil {
+		return nil
 	}
+	return ConverteLancamentoParaTLancamento(l)
 }
 
 func verificaErroConstraintExists(err error) error {

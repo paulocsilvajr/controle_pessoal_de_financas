@@ -101,10 +101,21 @@ WHERE {{.usuario}} = $1
 }
 
 // RemovePessoa02 remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) e uma string contendo o CPF da pessoa desejada como parâmetros obrigatórios
-func RemovePessoa02(db *gorm.DB, cpf string) (err error) {
+func RemovePessoa02(db *gorm.DB, cpf string) error {
 	p := &pessoa.TPessoa{Cpf: cpf}
 
-	return db.Delete(p).Error
+	tx := db.Delete(p)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de pessoa com CPF '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", cpf, esperado, linhaAfetadas)
+	}
+
+	return nil
 }
 
 // RemovePessoaPorUsuario02 remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) e uma string contendo o USUÁRIO da pessoa desejada como parâmetros obrigatórios
@@ -112,7 +123,19 @@ func RemovePessoaPorUsuario02(db *gorm.DB, usuario string) error {
 	p := new(pessoa.TPessoa)
 
 	sql := fmt.Sprintf("%s = ?", pessoaDB["usuario"])
-	return db.Where(sql, usuario).Delete(p).Error
+
+	tx := db.Where(sql, usuario).Delete(p)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de pessoa por usuário '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", usuario, esperado, linhaAfetadas)
+	}
+
+	return nil
 }
 
 // ProcuraPessoa localiza uma pessoa no BD e retorna a pessoa procurada(*Pessoa). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um CPF da pessoa desejada
@@ -155,6 +178,52 @@ WHERE {{.usuario}} = $1
 	}
 
 	return
+}
+
+// ProcuraPessoa02 localiza uma pessoa no BD e retorna a pessoa procurada(*Pessoa). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um CPF(string) da pessoa desejada
+func ProcuraPessoa02(db *gorm.DB, cpf string) (*pessoa.Pessoa, error) {
+	tp := new(pessoa.TPessoa)
+
+	tx := db.First(&tp, cpf)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
+// ProcuraPessoaPorUsuario02 localiza uma pessoa no BD e retorna a pessoa procurada(*Pessoa). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma string contendo o USUÁRIO da pessoa desejada
+func ProcuraPessoaPorUsuario02(db *gorm.DB, usuario string) (*pessoa.Pessoa, error) {
+	// 	sql := `
+	// SELECT
+	// 	{{.cpf}}, {{.nomeCompleto}}, {{.usuario}}, {{.senha}}, {{.email}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}, {{.administrador}}
+	// FROM
+	// 	{{.tabela}}
+	// WHERE {{.usuario}} = $1
+	// `
+	// 	query := getTemplateQuery("ProcuraPessoaPorUsuario", pessoaDB, sql)
+
+	// 	pessoas, err := carregaPessoas(db, query, usuario)
+	// 	if len(pessoas) == 1 {
+	// 		p = pessoas[0]
+	// 	} else {
+	// 		err = errors.New("Não foi encontrado um registro com o usuário " + usuario)
+	// 	}
+
+	// 	return
+	tp := new(pessoa.TPessoa)
+
+	sql := getTemplateSQL(
+		"ProcuraPessoaPorUsuario02",
+		"{{.usuario}} = ?",
+		pessoaDB,
+	)
+	tx := db.Where(sql, usuario).First(&tp)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
 }
 
 // AlteraPessoa altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa. Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.

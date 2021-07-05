@@ -51,6 +51,34 @@ func TestAdicionaPessoaAdmin02(t *testing.T) {
 	}
 }
 
+func TestProcuraPessoa02(t *testing.T) {
+	cpfProcurado := testPessoa01.Cpf
+	p, err := ProcuraPessoa02(db2, cpfProcurado)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	cpfEncontrado := p.Cpf
+	if cpfEncontrado != cpfProcurado {
+		t.Errorf("CPF procurado diferente de CPF encontrado. Esperado: '%s', encontrado: '%s'", cpfProcurado, cpfEncontrado)
+	}
+}
+
+func TestProcuraPessoaPorUsuario02(t *testing.T) {
+	usuarioProcurado := testPessoaAdmin01.Usuario
+	p, err := ProcuraPessoaPorUsuario02(db2, usuarioProcurado)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	usuarioEncontrado := p.Usuario
+	if usuarioEncontrado != usuarioProcurado {
+		t.Errorf("Usuário procurado diferente de usuário encontrado. Esperado: '%s', encontrado: '%s'", usuarioProcurado, usuarioEncontrado)
+	}
+}
+
 func TestRemovePessoa02(t *testing.T) {
 	err := RemovePessoa02(db2, testPessoaAdmin01.Cpf)
 	if err != nil {

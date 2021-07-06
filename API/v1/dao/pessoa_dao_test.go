@@ -79,6 +79,73 @@ func TestProcuraPessoaPorUsuario02(t *testing.T) {
 	}
 }
 
+func TestAlteraPessoa02(t *testing.T) {
+	cpf := testPessoa01.Cpf
+	novoNomeCompleto := "teste alteração"
+	novoUsuario := "testeAlt01"
+	novoEmail := "novoemail@gmail.com"
+
+	testPessoa01.NomeCompleto = novoNomeCompleto
+	testPessoa01.Usuario = novoUsuario
+	testPessoa01.Email = novoEmail
+
+	p, err := AlteraPessoa02(db2, cpf, testPessoa01)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if p == nil {
+		// feito RETURN para evitar PANIC por ponteiro vazio nas próximas verificações
+		t.Errorf("Alteração retornou um ponteiro vazio[%v]", p)
+		return
+	}
+
+	nomeCompleto := p.NomeCompleto
+	if nomeCompleto != novoNomeCompleto {
+		t.Errorf("Alteração de pessoa com CPF %s retornou um 'Nome Completo' diferente do esperado. Esperado: '%s', retorno: '%s'", cpf, novoNomeCompleto, nomeCompleto)
+	}
+
+	usuario := p.Usuario
+	if usuario != novoUsuario {
+		t.Errorf("Alteração de pessoa com CPF %s retornou um 'Usuário' diferente do esperado. Esperado: '%s', retorno: '%s'", cpf, novoUsuario, usuario)
+	}
+
+	email := p.Email
+	if email != novoEmail {
+		t.Errorf("Alteração de pessoa com CPF %s retornou um 'Email' diferente do esperado. Esperado: '%s', retorno: '%s'", cpf, novoEmail, email)
+	}
+}
+
+func TestAlteraPessoaPorUsuario02(t *testing.T) {
+	usuario := testPessoaAdmin01.Usuario
+	novoNomeCompleto := "teste alteração admin"
+	novoEmail := "novoemailadmin@gmail.com"
+
+	testPessoaAdmin01.NomeCompleto = novoNomeCompleto
+	testPessoaAdmin01.Email = novoEmail
+
+	p, err := AlteraPessoaPorUsuario02(db2, usuario, testPessoaAdmin01)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if p == nil {
+		// feito RETURN para evitar PANIC por ponteiro vazio nas próximas verificações
+		t.Errorf("Alteração retornou um ponteiro vazio[%v]", p)
+		return
+	}
+
+	nomeCompleto := p.NomeCompleto
+	if nomeCompleto != novoNomeCompleto {
+		t.Errorf("Alteração de pessoa com usuário '%s' retornou um 'Nome Completo' diferente do esperado. Esperado: '%s', retorno: '%s'", usuario, novoNomeCompleto, nomeCompleto)
+	}
+
+	email := p.Email
+	if email != novoEmail {
+		t.Errorf("Alteração de pessoa com usuário '%s' retornou um 'Email' diferente do esperado. Esperado: '%s', retorno: '%s'", usuario, novoEmail, email)
+	}
+}
+
 func TestRemovePessoa02(t *testing.T) {
 	err := RemovePessoa02(db2, testPessoaAdmin01.Cpf)
 	if err != nil {

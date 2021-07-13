@@ -146,6 +146,86 @@ func TestAlteraPessoaPorUsuario02(t *testing.T) {
 	}
 }
 
+func TestInativaPessoa02(t *testing.T) {
+	cpf := testPessoa01.Cpf
+
+	p, err := InativaPessoa02(db2, cpf)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if p == nil {
+		// feito RETURN para evitar PANIC por ponteiro vazio nas próximas verificações
+		t.Errorf("Inativação retornou um ponteiro vazio[%v]", p)
+		return
+	}
+
+	estadoObtido := p.Estado
+	estadoEsperado := false
+	if estadoObtido != estadoEsperado {
+		t.Errorf("Inativação de pessoa com CPF '%s' retornou um 'estado' diferente do esperado. Esperado: '%t', obtido: '%t'", cpf, estadoEsperado, estadoObtido)
+	}
+}
+
+func TestAtivaPessoa02(t *testing.T) {
+	cpf := testPessoa01.Cpf
+
+	p, err := AtivaPessoa02(db2, cpf)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if p == nil {
+		// feito RETURN para evitar PANIC por ponteiro vazio nas próximas verificações
+		t.Errorf("Ativação retornou um ponteiro vazio[%v]", p)
+		return
+	}
+
+	estadoObtido := p.Estado
+	estadoEsperado := true
+	if estadoObtido != estadoEsperado {
+		t.Errorf("Ativação de pessoa com CPF '%s' retornou um 'estado' diferente do esperado. Esperado: '%t', obtido: '%t'", cpf, estadoEsperado, estadoObtido)
+	}
+}
+
+func TestSetAdministrador02(t *testing.T) {
+	cpf := testPessoa01.Cpf
+	administrador := true
+	comum := false
+
+	p, err := SetAdministrador02(db2, cpf, administrador)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if p == nil {
+		// feito RETURN para evitar PANIC por ponteiro vazio nas próximas verificações
+		t.Errorf("Alterar administrador retornou um ponteiro vazio[%v]", p)
+		return
+	}
+
+	valorAdministrador := p.Administrador
+	if valorAdministrador != administrador {
+		t.Errorf("Alteração de usuário comum para administrador de pessoa com CPF '%s' retornou um valor para chave 'administrador' diferente do esperado. Esperado: '%t', obtido: '%t'", cpf, administrador, valorAdministrador)
+	}
+
+	p, err = SetAdministrador02(db2, cpf, comum)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if p == nil {
+		// feito RETURN para evitar PANIC por ponteiro vazio nas próximas verificações
+		t.Errorf("Alterar chave administrador retornou um ponteiro vazio[%v]", p)
+		return
+	}
+
+	valorAdministrador = p.Administrador
+	if valorAdministrador != comum {
+		t.Errorf("Alteração de administrador para usuário comum de pessoa com CPF '%s' retornou um valor para chave 'administrador' diferente do esperado. Esperado: '%t', obtido: '%t'", cpf, comum, valorAdministrador)
+	}
+}
+
 func TestRemovePessoa02(t *testing.T) {
 	err := RemovePessoa02(db2, testPessoaAdmin01.Cpf)
 	if err != nil {

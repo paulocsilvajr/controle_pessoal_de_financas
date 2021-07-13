@@ -4,7 +4,7 @@ BASE=$(dirname $0)
 PASTA=$BASE/bin/API_CPF
 ARQUIVO=$PASTA/API_CPF
 
-sudo apt install musl musl-dev musl-tools tree && echo -e "Instalado musl\n"
+apt install musl musl-dev musl-tools tree && echo -e "Instalado musl\n"
 
 export GOOS=linux
 export GOARCH=amd64

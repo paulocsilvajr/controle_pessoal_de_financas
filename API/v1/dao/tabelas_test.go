@@ -520,9 +520,11 @@ func getTLancamento1(p *pessoa.TPessoa) *lancamento.TLancamento {
 }
 
 func verificaErroConstraintExists(err error) error {
-	erroConstraintExists := strings.Contains(err.Error(), "already exists")
-	if !erroConstraintExists {
-		return err
+	if err != nil {
+		erroConstraintExists := strings.Contains(err.Error(), "already exists")
+		if !erroConstraintExists {
+			return err
+		}
 	}
 	return nil
 }

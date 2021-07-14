@@ -39,7 +39,7 @@ FROM
 	return carregaPessoas(db, query)
 }
 
-func CarregaPessoas02(db *gorm.DB) (pessoas *pessoa.Pessoas, err error) {
+func CarregaPessoas02(db *gorm.DB) (pessoa.Pessoas, error) {
 	var tpessoas pessoa.TPessoas
 	resultado := db.Find(&tpessoas)
 

@@ -337,18 +337,22 @@ func ConverteTDetalheLancamentoParaDetalheLancamento(dl *detalhe_lancamento.TDet
 }
 
 // ConverteTPessoasParaPessoas recebe um resultado do tipo *gorm.DB e um slice de TPessoas e retorna um slice de Pessoas e um erro != nil se ocorrer algum problema
-func ConverteTPessoasParaPessoas(resultado *gorm.DB, tpessoas *pessoa.TPessoas) (pessoas *pessoa.Pessoas, err error) {
-	err = resultado.Error
-	encontrouRegistros := resultado.RowsAffected > 0
+func ConverteTPessoasParaPessoas(resultado *gorm.DB, tpessoas *pessoa.TPessoas) (pessoa.Pessoas, error) {
+	err := resultado.Error
+	if err != nil {
+		return nil, err
+	}
 
+	pessoas := pessoa.Pessoas{}
+	encontrouRegistros := resultado.RowsAffected > 0
 	if encontrouRegistros {
 		for _, tp := range *tpessoas {
 			p := ConverteTPessoaParaPessoa(tp)
-			*pessoas = append(*pessoas, p)
+			pessoas = append(pessoas, p)
 		}
 	}
 
-	return pessoas, err
+	return pessoas, nil
 }
 
 // VerificaQuantidadeLinhasAfetadas retorna um erro != nil se a quantidade esperada(quantiadeEsperada int64) for diferente da quantidade realmente afetada obtida a partir do parâmetro tx(*gorm.DB)

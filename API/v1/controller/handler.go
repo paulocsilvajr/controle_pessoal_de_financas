@@ -27,7 +27,8 @@ var (
 The gunpowder treason and plot;
 I know of no reason why the gunpowder treason
 Should ever be forgot.`)
-	db = dao.GetDB()
+	db   = dao.GetDB()
+	db02 = dao.GetDB02()
 )
 
 // GetMySigningKey é um método para retornar a chave usada para assinar o token da API
@@ -115,8 +116,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status = http.StatusNotFound // 404
-	verif := usuarioEncontrado.Estado == false
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário inativo"))
+	verif := !usuarioEncontrado.Estado
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("usuário inativo"))
 	if err != nil {
 		return
 	}
@@ -126,7 +127,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	usuarioBD := usuarioEncontrado.Usuario
 	verif = !(senhaHash == senhaInformadaHash && usuarioBD == usuarioInformado.Usuario)
 	status = http.StatusNotAcceptable // 406
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário ou Senha inválida"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("usuário ou Senha inválida"))
 	if err != nil {
 		return
 	}

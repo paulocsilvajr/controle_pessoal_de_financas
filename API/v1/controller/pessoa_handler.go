@@ -35,13 +35,15 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 
 	var listaPessoas pessoa.IPessoas
 	if admin {
-		listaPessoas, err = dao.CarregaPessoas(db)
+		// listaPessoas, err = dao.CarregaPessoas(db)
+		listaPessoas, err = dao.CarregaPessoas02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
 		}
 	} else {
-		listaPessoas, err = dao.CarregaPessoasSimples(db)
+		// listaPessoas, err = dao.CarregaPessoasSimples(db)
+		listaPessoas, err = dao.CarregaPessoasSimples02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
@@ -54,7 +56,7 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = DefineHeaderRetorno(w, SetHeaderJSON, p.GetEmail() != emailToken, status, errors.New("Email de token não confere com email de pessoa"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, p.GetEmail() != emailToken, status, errors.New("email de token não confere com email de pessoa"))
 	if err != nil {
 		return
 	}
@@ -91,7 +93,7 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := usuarioToken != usuarioRota
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário de token diferente do solicitado na rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("usuário de token diferente do solicitado na rota"))
 	if err != nil {
 		return
 	}
@@ -135,7 +137,7 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := usuarioToken != usuarioAdmin
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário de token diferente do informado na rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("usuário de token diferente do informado na rota"))
 	if err != nil {
 		return
 	}
@@ -147,7 +149,7 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif = !(admin && usuarioDB.Administrador)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem usar essa rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem usar essa rota"))
 	if err != nil {
 		return
 	}
@@ -196,7 +198,7 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := !(admin && usuarioDB.Administrador)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem usar essa rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem usar essa rota"))
 	if err != nil {
 		return
 	}
@@ -277,13 +279,13 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := !(admin && usuarioDB.Administrador)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem usar essa rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem usar essa rota"))
 	if err != nil {
 		return
 	}
 
 	verif = usuarioToken == usuarioRemocao
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, fmt.Errorf("O usuário %s não pode remover a si mesmo", usuarioToken))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, fmt.Errorf("o usuário %s não pode remover a si mesmo", usuarioToken))
 	if err != nil {
 		return
 	}
@@ -335,7 +337,7 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := !(admin && usuarioDB.Administrador || usuarioToken == usuarioAlteracao)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores ou o próprio usuário pode alterar seus dados"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores ou o próprio usuário pode alterar seus dados"))
 	if err != nil {
 		return
 	}
@@ -419,7 +421,7 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := !(admin && usuarioDB.Administrador && usuarioToken != usuarioAlteracao)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem alterar o estado de pessoas que sejam diferentes do próprio administrador"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem alterar o estado de pessoas que sejam diferentes do próprio administrador"))
 	if err != nil {
 		return
 	}
@@ -502,7 +504,7 @@ func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := !(admin && usuarioDB.Administrador && usuarioToken != usuarioAlteracao)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem redefinir como administrador pessoas que sejam diferentes do próprio administrador"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem redefinir como administrador pessoas que sejam diferentes do próprio administrador"))
 	if err != nil {
 		return
 	}

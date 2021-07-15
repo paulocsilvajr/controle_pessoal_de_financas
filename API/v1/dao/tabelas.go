@@ -236,6 +236,16 @@ func ConverteTPessoaParaPessoa(p *pessoa.TPessoa) *pessoa.Pessoa {
 	}
 }
 
+// ConverteTPessoaParaPessoaSimples recebe um ponteiro do tipo da struct TPessoa como parâmetro e retorna um ponteiro do tipo PessoaSimples
+func ConverteTPessoaParaPessoaSimples(p *pessoa.TPessoa) *pessoa.PessoaSimples {
+	return &pessoa.PessoaSimples{
+		Usuario:         p.Usuario,
+		Email:           p.Email,
+		DataCriacao:     p.DataCriacao,
+		DataModificacao: p.DataModificacao,
+	}
+}
+
 // ConverteTipoContaParaTTipoConta recebe uma variável do tipo da struct TipoConta como parâmetro e retorna uma variável do tipo TTipoConta
 func ConverteTipoContaParaTTipoConta(tc *tipo_conta.TipoConta) *tipo_conta.TTipoConta {
 	return &tipo_conta.TTipoConta{
@@ -353,6 +363,25 @@ func ConverteTPessoasParaPessoas(resultado *gorm.DB, tpessoas *pessoa.TPessoas) 
 	}
 
 	return pessoas, nil
+}
+
+// ConverteTPessoasParaPessoasSimples recebe um resultado do tipo *gorm.DB e um slice de TPessoas e retorna um slice de PessoasSimples e um erro != nil se ocorrer algum problema
+func ConverteTPessoasParaPessoasSimples(resultado *gorm.DB, tpessoas *pessoa.TPessoas) (pessoa.PessoasSimples, error) {
+	err := resultado.Error
+	if err != nil {
+		return nil, err
+	}
+
+	pessoasSimples := pessoa.PessoasSimples{}
+	encontrouRegistros := resultado.RowsAffected > 0
+	if encontrouRegistros {
+		for _, tp := range *tpessoas {
+			p := ConverteTPessoaParaPessoaSimples(tp)
+			pessoasSimples = append(pessoasSimples, p)
+		}
+	}
+
+	return pessoasSimples, nil
 }
 
 // VerificaQuantidadeLinhasAfetadas retorna um erro != nil se a quantidade esperada(quantiadeEsperada int64) for diferente da quantidade realmente afetada obtida a partir do parâmetro tx(*gorm.DB)

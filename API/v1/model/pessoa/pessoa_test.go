@@ -2,9 +2,10 @@
 package pessoa
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/erro"
 	"testing"
 	"time"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/erro"
 )
 
 func TestMakePessoa(t *testing.T) {
@@ -188,8 +189,8 @@ func TestAlteraEstadoPessoa(t *testing.T) {
 }
 
 func TestProcuraPessoaPorUsuario(t *testing.T) {
-	p1, err := GetPessoaTest()
-	p2, err := NewPessoa("12378945610", "Usuário Teste 02", "teste02", "147852", "teste02@email.com")
+	p1, _ := GetPessoaTest()
+	p2, _ := NewPessoa("12378945610", "Usuário Teste 02", "teste02", "147852", "teste02@email.com")
 
 	pessoas := Pessoas{p1, p2}
 

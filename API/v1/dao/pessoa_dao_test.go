@@ -248,6 +248,28 @@ func TestCarregaPessoas02(t *testing.T) {
 	}
 }
 
+func TestCarregaPessoasSimples02(t *testing.T) {
+	pessoasSimples, err := CarregaPessoasSimples02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantPessoas := len(pessoasSimples)
+	quantEsperada := 2
+	if quantPessoas != quantEsperada {
+		t.Errorf("consulta de Pessoas Simples retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantPessoas)
+	}
+
+	usuario1 := testPessoa01.Usuario
+	usuario2 := testPessoaAdmin01.Usuario
+	for _, p := range pessoasSimples {
+		if p.Usuario == usuario1 || p.Usuario == usuario2 {
+			continue
+		}
+		t.Errorf("registro de pessoa(Usuário) encontrado diferente do esperado. Esperado: '%s' ou '%s', obtido: '%s'", usuario1, usuario2, p.Usuario)
+	}
+}
+
 func TestRemovePessoa02(t *testing.T) {
 	err := RemovePessoa02(db2, testPessoaAdmin01.Cpf)
 	if err != nil {

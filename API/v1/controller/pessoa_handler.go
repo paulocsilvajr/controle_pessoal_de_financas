@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,6 +14,7 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 // PessoaIndex é um handler/controller que responde a rota '[GET] /pessoas' e retorna StatusOK(200) e uma listagem de pessoas de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
@@ -35,14 +35,12 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 
 	var listaPessoas pessoa.IPessoas
 	if admin {
-		// listaPessoas, err = dao.CarregaPessoas(db)
 		listaPessoas, err = dao.CarregaPessoas02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
 		}
 	} else {
-		// listaPessoas, err = dao.CarregaPessoasSimples(db)
 		listaPessoas, err = dao.CarregaPessoasSimples02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
@@ -98,7 +96,7 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario(db, usuarioRota)
+	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioRota)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -142,7 +140,7 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioAdmin)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioAdmin)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -155,7 +153,7 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status = http.StatusNotFound // 404
-	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario(db, usuario)
+	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario02(db02, usuario)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -191,7 +189,7 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -229,12 +227,12 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	adicionaPessoa := dao.AdicionaPessoa
+	adicionaPessoa := dao.AdicionaPessoa02
 	if pessoaFromJSON.Administrador {
-		adicionaPessoa = dao.AdicionaPessoaAdmin
+		adicionaPessoa = dao.AdicionaPessoaAdmin02
 	}
 
-	p, err := adicionaPessoa(db, novaPessoa)
+	p, err := adicionaPessoa(db02, novaPessoa)
 	status = http.StatusInternalServerError // 500
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -272,7 +270,7 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -291,7 +289,7 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status = http.StatusNotFound // 404
-	err = dao.RemovePessoaPorUsuario(db, usuarioRemocao)
+	err = dao.RemovePessoaPorUsuario02(db02, usuarioRemocao)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -330,7 +328,7 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -358,7 +356,7 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioParaAlterar, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	usuarioParaAlterar, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioAlteracao)
 	status = http.StatusInternalServerError // 500
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -372,8 +370,8 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, err := dao.AlteraPessoaPorUsuario(
-		db,
+	p, err := dao.AlteraPessoaPorUsuario02(
+		db02,
 		usuarioAlteracao,
 		&pessoaFromJSON)
 	status = http.StatusNotModified // 304
@@ -414,7 +412,7 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -442,20 +440,20 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioAlteracao)
 	status = http.StatusNotFound // 404
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	var alteraEstado func(*sql.DB, string) (*pessoa.Pessoa, error)
+	var alteraEstado func(*gorm.DB, string) (*pessoa.Pessoa, error)
 	if estadoPessoa.Estado {
-		alteraEstado = dao.AtivaPessoa
+		alteraEstado = dao.AtivaPessoa02
 	} else {
-		alteraEstado = dao.InativaPessoa
+		alteraEstado = dao.InativaPessoa02
 	}
-	p, err := alteraEstado(db, usuarioDBAlteracao.Cpf)
+	p, err := alteraEstado(db02, usuarioDBAlteracao.Cpf)
 	status = http.StatusNotModified // 304
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -497,7 +495,7 @@ func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -525,14 +523,14 @@ func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioAlteracao)
 	status = http.StatusNotFound // 404
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	p, err := dao.SetAdministrador(db, usuarioDBAlteracao.Cpf, adminPessoa.Administrador)
+	p, err := dao.SetAdministrador02(db02, usuarioDBAlteracao.Cpf, adminPessoa.Administrador)
 	status = http.StatusNotModified // 304
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {

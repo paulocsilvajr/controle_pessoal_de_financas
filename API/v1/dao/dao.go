@@ -40,12 +40,6 @@ func CreateDB() error {
 
 func CriarTabelas() error {
 	err := criarTabelas()
-	if err != nil {
-		jaExiste := "already exists"
-		if strings.Contains(err.Error(), jaExiste) {
-			return nil
-		}
-	}
 	return err
 }
 
@@ -54,30 +48,38 @@ func criarTabelas() error {
 
 	err := CriarTabelaPessoa(db2)
 	if err != nil {
-		return err
+		return verificaErroChaveJaExiste(err)
 	}
 
 	err = CriarTabelaTipoConta(db2)
 	if err != nil {
-		return err
+		return verificaErroChaveJaExiste(err)
 	}
 
 	err = CriarTabelaConta(db2)
 	if err != nil {
-		return err
+		return verificaErroChaveJaExiste(err)
 	}
 
 	err = CriarTabelaLancamento(db2)
 	if err != nil {
-		return err
+		return verificaErroChaveJaExiste(err)
 	}
 
 	err = CriarTabelaDetalheLancamento(db2)
 	if err != nil {
-		return err
+		return verificaErroChaveJaExiste(err)
 	}
 
 	return nil
+}
+
+func verificaErroChaveJaExiste(err error) error {
+	jaExiste := "already exists"
+	if strings.Contains(err.Error(), jaExiste) {
+		return nil
+	}
+	return err
 }
 
 func CreateDBParaTestes() error {

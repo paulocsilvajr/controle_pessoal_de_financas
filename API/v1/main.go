@@ -48,14 +48,14 @@ func main() {
 }
 
 func criarUsuarioAdminInicial() {
-	db := dao.GetDB()
+	db := dao.GetDB02()
 
 	admin := pessoa.New("00000000000", "Administrador", "admin", "admin", "meuemail@email.com")
 
-	_, err := dao.ProcuraPessoaPorUsuario(db, admin.Usuario)
-	novaPessoa := new(pessoa.Pessoa)
+	_, err := dao.ProcuraPessoaPorUsuario02(db, admin.Usuario)
+	var novaPessoa *pessoa.Pessoa
 	if err != nil {
-		novaPessoa, err = dao.AdicionaPessoaAdmin(db, admin)
+		novaPessoa, err = dao.AdicionaPessoaAdmin02(db, admin)
 		if err != nil {
 			log.Fatal(err)
 		} else {
@@ -64,7 +64,7 @@ func criarUsuarioAdminInicial() {
 	} else {
 		confirmacao := inputString("Usuário admin já existe, deseja resetar para a senha padrão?[s/N]: ")
 		if strings.ToLower(confirmacao) == "s" {
-			novaPessoa, err = dao.AlteraPessoaPorUsuario(db, admin.Usuario, admin)
+			novaPessoa, err = dao.AlteraPessoaPorUsuario02(db, admin.Usuario, admin)
 			if err != nil {
 				log.Fatal(err)
 			} else {
@@ -73,7 +73,7 @@ func criarUsuarioAdminInicial() {
 		}
 	}
 
-	err = db.Close()
+	err = dao.CloseDB(db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,7 +93,7 @@ func verificaParametrosInicializacao() {
 				panic(err)
 			}
 
-			// criarUsuarioAdminInicial()
+			criarUsuarioAdminInicial()
 
 			fmt.Println("\nCriado banco de dados, tabelas e usuário Admin.\nReexecute a API sem parâmetros para reconhecer o banco de dados e iniciar o seu uso")
 			os.Exit(0)

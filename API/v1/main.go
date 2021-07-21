@@ -95,7 +95,7 @@ func verificaParametrosInicializacao() {
 
 			criarUsuarioAdminInicial()
 
-			fmt.Println("\nCriado banco de dados, tabelas e usuário Admin.\nReexecute a API sem parâmetros para reconhecer o banco de dados e iniciar o seu uso")
+			fmt.Println("\nCriado banco de dados, tabelas e usuário Admin, se essas estruturas não existirem.\nReexecute a API sem parâmetros para reconhecer o banco de dados e iniciar o seu uso")
 			os.Exit(0)
 		case "--rotes", "-r":
 			imprimeRotas()

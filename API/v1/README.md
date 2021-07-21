@@ -1,5 +1,5 @@
 # Controle Pessoal de Finanças(CPF)
-## API desenvolvida no Ubuntu 18.04 em Golang 1.12
+## API desenvolvida no Ubuntu 18.04 em Golang 1.16
 
 Este repositório contém a API de um software desenvolvido em go para disponibilizar rotas para as operações de inclusão, alteração, exclusão e consulta de lançamentos contábeis em um sistema de controle de finanças. Toda a comunicação com a API é feita com um token gerado ao fazer login e mantido por tempo pré definido em arquivo de configuração. A API faz a comunicação e interpretação dos dados das aplicações WEB e Mobile com o banco de dados usando requisições GET/POST/PUT/DELETE usando o formato JSON para representar as informações compartilhadas. A rota padrão para testar se a API está funcionando é: **https://localhost:8085/API**
 
@@ -25,7 +25,9 @@ Para executar os scripts(*.sh) deve-se conceder privilégio de execução a cada
 
 O banco de dados utilizado é o **PostgreSQL 11**. Atualmente nos testes é usado o **Docker** para criar o container do Postgres e PgAdmin. Pode-se replicar esse ambiente utilizando o repositório [docker-code](https://bitbucket.org/paulocsilvajr/docker-code/src/master/) com os scripts da pasta **yml/postgreSQL_pgadmin4**. Senhas e usuários em arquivo .YML de repositório apresentado. Em branch **DESENVOLVIMENTO** na pasta DOC/sql/, pode-se encontrar backups.sql do banco de dados, use a versão com data mais atual para restaurar o banco **controle_pessoal_financas**.
 
-Execute o script **install_dependencies.sh** antes da primeira execução do código para instalar as dependências da API em GO.
+Foi adicionado parâmetros ao executável gerado ao compilar a API. Ao usar o parâmetro "-i" e tendo conexão com o banco de dados, será criado automaticamente o banco de dados, juntamente com suas tabelas, e também o usuário padrão "admin". Pode-se obter ajuda com o parâmetro "-h" ou "--help" e listar as rotas cadastradas como parâmetro "-r".
+
+Execute o script **install_dependencies.sh** antes da primeira execução do código para instalar as dependências da API em GO. No diretório raiz do projeto, foi adicionado os arquivo "go.mod" e "go.sum" com a listagem dos pacotes usados no projeto, execute **go list -m all** para listá-las. Pode-se obtê-los localmente com o comando **go mod download** na pasta "API/v1/".
 
 ### Compilando com DOCKER
 

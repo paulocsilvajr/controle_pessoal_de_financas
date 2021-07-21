@@ -132,7 +132,7 @@ func getDB02(config config.Configuracoes) *gorm.DB {
 		DSN:                  connStr,
 		PreferSimpleProtocol: true,
 	}), &gorm.Config{
-		Logger: loggerGORM.Default.LogMode(loggerGORM.Error),
+		Logger: loggerGORM.Default.LogMode(loggerGORM.Silent), // loggerGORM.Error para somente exibir informações de ERRO ref a instruções SQL enviadas ao banco
 	})
 
 	if err != nil {

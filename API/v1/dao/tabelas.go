@@ -384,6 +384,25 @@ func ConverteTPessoasParaPessoasSimples(resultado *gorm.DB, tpessoas *pessoa.TPe
 	return pessoasSimples, nil
 }
 
+// ConverteTTiposContaParaTiposConta recebe um resultado do tipo *gorm.DB e um slice de TTiposConta e retorna um slice de TiposConta e um erro != nil se ocorrer algum problema
+func ConverteTTiposContaParaTiposConta(resultado *gorm.DB, tTiposConta *tipo_conta.TTiposConta) (tipo_conta.TiposConta, error) {
+	err := resultado.Error
+	if err != nil {
+		return nil, err
+	}
+
+	tiposConta := tipo_conta.TiposConta{}
+	encontrouRegistros := resultado.RowsAffected > 0
+	if encontrouRegistros {
+		for _, ttc := range *tTiposConta {
+			tc := ConverteTTipoContaParaTipoConta(ttc)
+			tiposConta = append(tiposConta, tc)
+		}
+	}
+
+	return tiposConta, nil
+}
+
 // VerificaQuantidadeLinhasAfetadas retorna um erro != nil se a quantidade esperada(quantiadeEsperada int64) for diferente da quantidade realmente afetada obtida a partir do parâmetro tx(*gorm.DB)
 func VerificaQuantidadeRegistrosAfetados(tx *gorm.DB, quantidadeEsperada int64) error {
 	quantidadeAfetada := tx.RowsAffected

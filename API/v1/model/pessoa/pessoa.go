@@ -64,6 +64,7 @@ const (
 // Pessoas representa um conjunto/lista(slice) de pessoas(*Pessoa)
 type Pessoas []*Pessoa
 
+// Pessoas representa um conjunto/lista(slice) de TPessoas de acordo com o GORM(*TPessoa)
 type TPessoas []*TPessoa
 
 // IPessoa é uma interface que exibe o método GetMail para representar uma pessoa genérica(Pessoa e PessoaSimples)

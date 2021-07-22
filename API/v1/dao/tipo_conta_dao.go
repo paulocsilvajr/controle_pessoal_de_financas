@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
+	"gorm.io/gorm"
 )
 
 var (
@@ -29,6 +30,14 @@ FROM
 	query := getTemplateQuery("CarregaTiposConta", tipoContaDB, sql)
 
 	return carregaTiposConta(db, query)
+}
+
+// CarregaTiposConta02 retorna uma listagem de todos os tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaTiposConta02(db *gorm.DB) (tipo_conta.TiposConta, error) {
+	var tTiposConta tipo_conta.TTiposConta
+	resultado := db.Find(&tTiposConta)
+
+	return ConverteTTiposContaParaTiposConta(resultado, &tTiposConta)
 }
 
 // CarregaTiposContaAtiva retorna uma listagem de tipos de conta ativos(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório

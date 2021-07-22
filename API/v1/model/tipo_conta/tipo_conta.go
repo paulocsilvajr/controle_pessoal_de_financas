@@ -63,6 +63,9 @@ type ITiposConta interface {
 // TiposConta representa um conjunto/lista(slice) de Tipos de Contas(*TipoConta)
 type TiposConta []*TipoConta
 
+// TTiposConta representa um conjunto/lista(slice) de Tipos de Contas de acordo com o GORM(*TTipoConta)
+type TTiposConta []*TTipoConta
+
 // New retorna uma novo Tipo de Conta(*TipoConta) através dos parâmetros informados(nome, descDebito e descCredito). Função equivalente a criação de um TipoConta via literal &TipoConta{Nome: ..., ...}. Data de criação e modificação são definidos como o horário atual e o estado é definido como ativo
 func New(nome, descDebito, descCredito string) *TipoConta {
 	return &TipoConta{

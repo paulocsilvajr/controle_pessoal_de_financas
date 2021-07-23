@@ -98,6 +98,23 @@ VALUES($1, $2, $3, $4, $5, $6)
 	return adicionaTipoConta(db, tc, query)
 }
 
+// AdicionaTipoConta02 adiciona um tipo conta ao BD e retorna o tipo conta incluída(*TipoConta) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um tipo conta(*TipoConta)
+func AdicionaTipoConta02(db *gorm.DB, novoTipoConta *tipo_conta.TipoConta) (*tipo_conta.TipoConta, error) {
+	tc, err := tipo_conta.NewTipoConta(novoTipoConta.Nome, novoTipoConta.DescricaoDebito, novoTipoConta.DescricaoCredito)
+	if err != nil {
+		return nil, err
+	}
+
+	tTipoConta := ConverteTipoContaParaTTipoConta(tc)
+	err = db.Create(&tTipoConta).Error
+	if err != nil {
+		return nil, err
+	}
+	tipoConta := ConverteTTipoContaParaTipoConta(tTipoConta)
+
+	return tipoConta, nil
+}
+
 // ProcuraTipoConta localiza um tipo conta no BD e retorna o tipo conta procurado(*TipoConta). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um NOME do tipo conta desejado
 func ProcuraTipoConta(db *sql.DB, nome string) (tc *tipo_conta.TipoConta, err error) {
 	sql := `

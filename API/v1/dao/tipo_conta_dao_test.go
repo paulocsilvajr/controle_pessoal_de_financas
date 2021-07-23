@@ -1,5 +1,49 @@
 package dao
 
+import (
+	"testing"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
+)
+
+var (
+	testTipoConta01, testTipoConta02, testTipoConta03, testTipoConta04 *tipo_conta.TipoConta
+)
+
+func TestAdicionaTipoConta02(t *testing.T) {
+	testTipoConta01 = ConverteTTipoContaParaTipoConta(getTTipoConta1())
+	testTipoConta01.Nome = "banco teste 01"
+
+	testTipoConta02 = ConverteTTipoContaParaTipoConta(getTTipoConta1())
+	testTipoConta02.Nome = "banco teste 02"
+
+	testTipoConta03 = ConverteTTipoContaParaTipoConta(getTTipoConta1())
+	testTipoConta03.Nome = "banco teste 03"
+
+	testTipoConta04 = tipo_conta.New("EVA01", "", "")
+
+	tc1, err := AdicionaTipoConta02(db2, testTipoConta01)
+	if err := verificaErroChaveDuplicada(err); err != nil {
+		t.Error(err, tc1)
+	}
+
+	tc2, err := AdicionaTipoConta02(db2, testTipoConta02)
+	if err := verificaErroChaveDuplicada(err); err != nil {
+		t.Error(err, tc2)
+	}
+
+	tc3, err := AdicionaTipoConta02(db2, testTipoConta03)
+	if err := verificaErroChaveDuplicada(err); err != nil {
+		t.Error(err, tc3)
+	}
+
+	tc4, err := AdicionaTipoConta02(db2, testTipoConta04)
+	erroDescricao := "Descrição do débito com tamanho inválido[0]"
+	if err.Error() != erroDescricao {
+		t.Error(err, tc4)
+	}
+}
+
 // TESTES ANTIGOS
 // import (
 // 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
@@ -7,7 +51,7 @@ package dao
 // )
 
 // func TestAdicionaTipoConta(t *testing.T) {
-// 	tc1 := tipo_conta.GetTipoContaTest()
+// tc1 := tipo_conta.GetTipoContaTest()
 
 // 	tc2 := tipo_conta.GetTipoContaTest()
 // 	tc2.Nome = "banco teste 02"

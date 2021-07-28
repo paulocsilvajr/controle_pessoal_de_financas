@@ -20,6 +20,32 @@ var (
 		"estado":           "estado"}
 )
 
+// CarregaTiposConta02 retorna uma listagem de todos os tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaTiposConta02(db *gorm.DB) (tipo_conta.TiposConta, error) {
+	var tTiposConta tipo_conta.TTiposConta
+	resultado := db.Find(&tTiposConta)
+
+	return ConverteTTiposContaParaTiposConta(resultado, &tTiposConta)
+}
+
+// CarregaTiposContaAtiva02 retorna uma listagem de tipos de conta ativos(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaTiposContaAtiva02(db *gorm.DB) (tiposContas tipo_conta.TiposConta, err error) {
+	return carregaTiposContaEstado02(db, true)
+}
+
+// CarregaTiposContaInativa02 retorna uma listagem de tipos de conta(tipo_conta.TiposConta) no estado inativo e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaTiposContaInativa02(db *gorm.DB) (tiposContas tipo_conta.TiposConta, err error) {
+	return carregaTiposContaEstado02(db, false)
+}
+
+func carregaTiposContaEstado02(db *gorm.DB, estado bool) (tiposContas tipo_conta.TiposConta, err error) {
+	var tTiposConta tipo_conta.TTiposConta
+	sql := fmt.Sprintf("%s = ?", tipoContaDB["estado"])
+	resultado := db.Where(sql, estado).Find(&tTiposConta)
+
+	return ConverteTTiposContaParaTiposConta(resultado, &tTiposConta)
+}
+
 // CarregaTiposConta retorna uma listagem de todos os tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaTiposConta(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `
@@ -61,24 +87,6 @@ WHERE
 	query := getTemplateQuery("CarregaTiposContaInativa", tipoContaDB, sql)
 
 	return carregaTiposConta(db, query)
-}
-
-// CarregaTiposConta02 retorna uma listagem de todos os tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
-func CarregaTiposConta02(db *gorm.DB) (tipo_conta.TiposConta, error) {
-	var tTiposConta tipo_conta.TTiposConta
-	resultado := db.Find(&tTiposConta)
-
-	return ConverteTTiposContaParaTiposConta(resultado, &tTiposConta)
-}
-
-// CarregaTiposContaAtiva02 retorna uma listagem de tipos de conta ativos(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
-func CarregaTiposContaAtiva02(db *gorm.DB) (tiposContas tipo_conta.TiposConta, err error) {
-	return carregaTiposContaAtiva02(db, true)
-}
-
-// CarregaTiposContaInativa02 retorna uma listagem de tipos de conta(tipo_conta.TiposConta) no estado inativo e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
-func CarregaTiposContaInativa02(db *gorm.DB) (tiposContas tipo_conta.TiposConta, err error) {
-	return carregaTiposContaAtiva02(db, false)
 }
 
 // AdicionaTipoConta adiciona um tipo conta ao BD e retorna o tipo conta incluída(*TipoConta) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um tipo conta(*TipoConta)
@@ -327,12 +335,4 @@ func converteEmTiposConta(registros []interface{}) (tiposConta tipo_conta.TiposC
 	}
 
 	return
-}
-
-func carregaTiposContaAtiva02(db *gorm.DB, estado bool) (tiposContas tipo_conta.TiposConta, err error) {
-	var tTiposConta tipo_conta.TTiposConta
-	sql := fmt.Sprintf("%s = ?", tipoContaDB["estado"])
-	resultado := db.Where(sql, estado).Find(&tTiposConta)
-
-	return ConverteTTiposContaParaTiposConta(resultado, &tTiposConta)
 }

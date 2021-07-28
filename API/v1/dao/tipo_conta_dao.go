@@ -46,6 +46,58 @@ func carregaTiposContaEstado02(db *gorm.DB, estado bool) (tiposContas tipo_conta
 	return ConverteTTiposContaParaTiposConta(resultado, &tTiposConta)
 }
 
+// AdicionaTipoConta02 adiciona um tipo conta ao BD e retorna o tipo conta incluída(*TipoConta) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um tipo conta(*TipoConta)
+func AdicionaTipoConta02(db *gorm.DB, novoTipoConta *tipo_conta.TipoConta) (*tipo_conta.TipoConta, error) {
+	tc, err := tipo_conta.NewTipoConta(novoTipoConta.Nome, novoTipoConta.DescricaoDebito, novoTipoConta.DescricaoCredito)
+	if err != nil {
+		return nil, err
+	}
+
+	tTipoConta := ConverteTipoContaParaTTipoConta(tc)
+	err = db.Create(&tTipoConta).Error
+	if err != nil {
+		return nil, err
+	}
+	tipoConta := ConverteTTipoContaParaTipoConta(tTipoConta)
+
+	return tipoConta, nil
+}
+
+// ProcuraTipoConta02 localiza um tipo conta no BD e retorna o tipo conta procurado(*TipoConta). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um NOME do tipo conta desejado
+func ProcuraTipoConta02(db *gorm.DB, nome string) (*tipo_conta.TipoConta, error) {
+	ttc := new(tipo_conta.TTipoConta)
+
+	sql := getTemplateSQL(
+		"ProcuraTipoConta02",
+		"{{.nome}} = ?",
+		tipoContaDB,
+	)
+	tx := db.Where(sql, nome).First(&ttc)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTTipoContaParaTipoConta(ttc), nil
+}
+
+// RemoveTipoConta02 remove um tipo conta do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma string contendo o NOME do tipo conta desejado
+func RemoveTipoConta02(db *gorm.DB, nome string) error {
+	tc := &tipo_conta.TTipoConta{Nome: nome}
+
+	tx := db.Delete(tc)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de TipoConta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", nome, esperado, linhaAfetadas)
+	}
+
+	return nil
+}
+
 // CarregaTiposConta retorna uma listagem de todos os tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaTiposConta(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `
@@ -104,23 +156,6 @@ VALUES($1, $2, $3, $4, $5, $6)
 	query := getTemplateQuery("AdicionaTipoConta", tipoContaDB, sql)
 
 	return adicionaTipoConta(db, tc, query)
-}
-
-// AdicionaTipoConta02 adiciona um tipo conta ao BD e retorna o tipo conta incluída(*TipoConta) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um tipo conta(*TipoConta)
-func AdicionaTipoConta02(db *gorm.DB, novoTipoConta *tipo_conta.TipoConta) (*tipo_conta.TipoConta, error) {
-	tc, err := tipo_conta.NewTipoConta(novoTipoConta.Nome, novoTipoConta.DescricaoDebito, novoTipoConta.DescricaoCredito)
-	if err != nil {
-		return nil, err
-	}
-
-	tTipoConta := ConverteTipoContaParaTTipoConta(tc)
-	err = db.Create(&tTipoConta).Error
-	if err != nil {
-		return nil, err
-	}
-	tipoConta := ConverteTTipoContaParaTipoConta(tTipoConta)
-
-	return tipoConta, nil
 }
 
 // ProcuraTipoConta localiza um tipo conta no BD e retorna o tipo conta procurado(*TipoConta). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um NOME do tipo conta desejado

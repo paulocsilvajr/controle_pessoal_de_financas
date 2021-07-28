@@ -98,6 +98,56 @@ func RemoveTipoConta02(db *gorm.DB, nome string) error {
 	return nil
 }
 
+// AtivaTipoConta02 ativa um tipo conta no BD e retorna o tipo conta(*TipoConta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um NOME do TipoConta desejado
+func AtivaTipoConta02(db *gorm.DB, nome string) (*tipo_conta.TipoConta, error) {
+	tipoContaBanco, err := ProcuraTipoConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	tipoContaBanco.Ativa()
+
+	ttc := ConverteTipoContaParaTTipoConta(tipoContaBanco)
+	tx := db.Save(&ttc)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("ativação de tipo conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTTipoContaParaTipoConta(ttc), nil
+}
+
+// InativaTipoConta02 inativa um tipo conta no BD e retorna o tipo conta(*TipoConta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um NOME do TipoConta desejado
+func InativaTipoConta02(db *gorm.DB, nome string) (*tipo_conta.TipoConta, error) {
+	tipoContaBanco, err := ProcuraTipoConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	tipoContaBanco.Inativa()
+
+	ttc := ConverteTipoContaParaTTipoConta(tipoContaBanco)
+	tx := db.Save(&ttc)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("desativação de tipo conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTTipoContaParaTipoConta(ttc), nil
+}
+
 // CarregaTiposConta retorna uma listagem de todos os tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaTiposConta(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `

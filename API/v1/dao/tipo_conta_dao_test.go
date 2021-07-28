@@ -78,6 +78,44 @@ func TestProcuraTipoConta02(t *testing.T) {
 	}
 }
 
+func TestInativaTipoConta02(t *testing.T) {
+	nome01 := testTipoConta01.Nome
+	tc, err := InativaTipoConta02(db2, nome01)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if tc != nil {
+		estadoObtido := tc.Estado
+		estafoEsperado := false
+
+		if estadoObtido != estafoEsperado {
+			t.Errorf("Inativação de tipo conta com nome '%s' retornou um estado diferente do esperado. Esperado: '%t', obtido: '%t'", nome01, estafoEsperado, estadoObtido)
+		}
+	} else {
+		t.Errorf("Inativação retornou um ponteiro vazio[%v]", tc)
+	}
+}
+
+func TestAtivaTipoConta02(t *testing.T) {
+	nome01 := testTipoConta01.Nome
+	tc, err := AtivaTipoConta02(db2, nome01)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if tc != nil {
+		estadoObtido := tc.Estado
+		estafoEsperado := true
+
+		if estadoObtido != estafoEsperado {
+			t.Errorf("Ativação de tipo conta com nome '%s' retornou um estado diferente do esperado. Esperado: '%t', obtido: '%t'", nome01, estafoEsperado, estadoObtido)
+		}
+	} else {
+		t.Errorf("Ativação retornou um ponteiro vazio[%v]", tc)
+	}
+}
+
 func TestRemoveTipoConta02(t *testing.T) {
 	tiposConta := tipo_conta.TiposConta{
 		testTipoConta01,

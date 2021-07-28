@@ -97,6 +97,19 @@ func TestInativaTipoConta02(t *testing.T) {
 	}
 }
 
+func TestCarregaTiposContaInativa02(t *testing.T) {
+	tiposConta, err := CarregaTiposContaInativa02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantTiposConta := len(tiposConta)
+	quantEsperada := 1
+	if quantTiposConta != quantEsperada {
+		t.Errorf("consulta de tipos conta retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantTiposConta)
+	}
+}
+
 func TestAtivaTipoConta02(t *testing.T) {
 	nome01 := testTipoConta01.Nome
 	tc, err := AtivaTipoConta02(db2, nome01)
@@ -109,10 +122,23 @@ func TestAtivaTipoConta02(t *testing.T) {
 		estafoEsperado := true
 
 		if estadoObtido != estafoEsperado {
-			t.Errorf("Ativação de tipo conta com nome '%s' retornou um estado diferente do esperado. Esperado: '%t', obtido: '%t'", nome01, estafoEsperado, estadoObtido)
+			t.Errorf("Ativação de tipo conta(inativa) com nome '%s' retornou um estado diferente do esperado. Esperado: '%t', obtido: '%t'", nome01, estafoEsperado, estadoObtido)
 		}
 	} else {
 		t.Errorf("Ativação retornou um ponteiro vazio[%v]", tc)
+	}
+}
+
+func TestCarregaTiposContaAtiva02(t *testing.T) {
+	tiposConta, err := CarregaTiposContaAtiva02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantTiposConta := len(tiposConta)
+	quantEsperada := 3
+	if quantTiposConta != quantEsperada {
+		t.Errorf("consulta de tipos conta(ativa) retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantTiposConta)
 	}
 }
 
@@ -139,6 +165,29 @@ func TestAlteraTipoConta02(t *testing.T) {
 		if descricaoCredito != novaDescricaoCredito {
 			t.Errorf("Alteração de tipo conta com nome '%s' retornou um descrição de crédito diferente do esperado. Esperado: '%s', obtido: '%s'", nome, novaDescricaoCredito, descricaoCredito)
 		}
+	}
+}
+
+func TestCarregaTiposConta02(t *testing.T) {
+	tiposConta, err := CarregaTiposConta02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantTiposConta := len(tiposConta)
+	quantEsperada := 3
+	if quantTiposConta != quantEsperada {
+		t.Errorf("consulta de tipos conta retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantTiposConta)
+	}
+
+	nome01 := testTipoConta01.Nome
+	nome02 := testTipoConta02.Nome
+	nome03 := testTipoConta03.Nome
+	for _, p := range tiposConta {
+		if p.Nome == nome01 || p.Nome == nome02 || p.Nome == nome03 {
+			continue
+		}
+		t.Errorf("registro de tipo conta(nome) encontrado diferente do esperado. Esperado: '%s' ou '%s' ou '%s', obtido: '%s'", nome01, nome02, nome03, p.Nome)
 	}
 }
 

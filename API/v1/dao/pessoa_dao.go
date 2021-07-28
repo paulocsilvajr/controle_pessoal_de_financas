@@ -164,6 +164,31 @@ func AlteraPessoaPorUsuario02(db *gorm.DB, usuario string, pessoaAlteracao *pess
 	return ConverteTPessoaParaPessoa(tp), nil
 }
 
+// AtivaPessoa02 ativa uma pessoa no BD e retorna a pessoa(*Pessoa) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um CPF(string) da pessoa desejada
+func AtivaPessoa02(db *gorm.DB, cpf string) (*pessoa.Pessoa, error) {
+	pessoaBanco, err := ProcuraPessoa02(db, cpf)
+	if err != nil {
+		return nil, err
+	}
+
+	pessoaBanco.Ativa()
+
+	tp := ConvertePessoaParaTPessoa(pessoaBanco)
+	tx := db.Save(&tp)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("ativação de pessoa com CPF '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", cpf, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
 // InativaPessoa02 inativa uma pessoa no BD e retorna a pessoa(*Pessoa) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um CPF(string) da pessoa desejada
 func InativaPessoa02(db *gorm.DB, cpf string) (*pessoa.Pessoa, error) {
 	pessoaBanco, err := ProcuraPessoa02(db, cpf)
@@ -380,31 +405,6 @@ WHERE {{.cpf}} = $3
 	query := getTemplateQuery("AtivaPessoa", pessoaDB, sql)
 
 	return estadoPessoa(db, pessoaBanco, query, cpf)
-}
-
-// AtivaPessoa02 ativa uma pessoa no BD e retorna a pessoa(*Pessoa) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um CPF(string) da pessoa desejada
-func AtivaPessoa02(db *gorm.DB, cpf string) (*pessoa.Pessoa, error) {
-	pessoaBanco, err := ProcuraPessoa02(db, cpf)
-	if err != nil {
-		return nil, err
-	}
-
-	pessoaBanco.Ativa()
-
-	tp := ConvertePessoaParaTPessoa(pessoaBanco)
-	tx := db.Save(&tp)
-
-	linhaAfetadas := tx.RowsAffected
-	var esperado int64 = 1
-	if linhaAfetadas != esperado {
-		return nil, fmt.Errorf("ativação de pessoa com CPF '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", cpf, esperado, linhaAfetadas)
-	}
-
-	if err := tx.Error; err != nil {
-		return nil, err
-	}
-
-	return ConverteTPessoaParaPessoa(tp), nil
 }
 
 // InativaPessoa inativa uma pessoa no BD e retorna a pessoa(*Pessoa) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD como parâmetro obrigatório e um CPF da pessoa desejada

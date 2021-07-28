@@ -148,6 +148,34 @@ func InativaTipoConta02(db *gorm.DB, nome string) (*tipo_conta.TipoConta, error)
 	return ConverteTTipoContaParaTipoConta(ttc), nil
 }
 
+// AlteraTipoConta02 altera um tipo conta com o nome(string) informado a partir dos dados do *TipoConta informado no parâmetro tipoContaAlteracao. O campo Estado não é alterado, enquanto que o campo Nome sim. Use a função específica para essa tarefa(estado). Retorna um *TipoConta alterado no BD(*gorm.DB) e um error. error != nil caso ocorra um problema.
+func AlteraTipoConta02(db *gorm.DB, nome string, tipoContaAlteracao *tipo_conta.TipoConta) (*tipo_conta.TipoConta, error) {
+	tipoContaBanco, err := ProcuraTipoConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tipoContaBanco.Altera(tipoContaAlteracao.Nome, tipoContaAlteracao.DescricaoDebito, tipoContaAlteracao.DescricaoCredito)
+	if err != nil {
+		return nil, err
+	}
+
+	ttc := ConverteTipoContaParaTTipoConta(tipoContaBanco)
+	tx := db.Save(&ttc)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("alteração de tipo conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTTipoContaParaTipoConta(ttc), nil
+}
+
 // CarregaTiposConta retorna uma listagem de todos os tipos de conta(tipo_conta.TiposConta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaTiposConta(db *sql.DB) (tiposContas tipo_conta.TiposConta, err error) {
 	sql := `

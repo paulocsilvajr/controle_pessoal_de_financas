@@ -116,6 +116,32 @@ func TestAtivaTipoConta02(t *testing.T) {
 	}
 }
 
+func TestAlteraTipoConta02(t *testing.T) {
+	nome := testTipoConta01.Nome
+	novaDescricaoDebito := "débito alterado"
+	novaDescricaoCredito := "crédito alterado"
+
+	testTipoConta01.DescricaoDebito = novaDescricaoDebito
+	testTipoConta01.DescricaoCredito = novaDescricaoCredito
+
+	tc, err := AlteraTipoConta02(db2, nome, testTipoConta01)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if tc != nil {
+		descricaoDebito := tc.DescricaoDebito
+		if descricaoDebito != novaDescricaoDebito {
+			t.Errorf("Alteração de tipo conta com nome '%s' retornou um descrição de débito diferente do esperado. Esperado: '%s', obtido: '%s'", nome, novaDescricaoDebito, descricaoDebito)
+		}
+
+		descricaoCredito := tc.DescricaoCredito
+		if descricaoCredito != novaDescricaoCredito {
+			t.Errorf("Alteração de tipo conta com nome '%s' retornou um descrição de crédito diferente do esperado. Esperado: '%s', obtido: '%s'", nome, novaDescricaoCredito, descricaoCredito)
+		}
+	}
+}
+
 func TestRemoveTipoConta02(t *testing.T) {
 	tiposConta := tipo_conta.TiposConta{
 		testTipoConta01,

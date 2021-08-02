@@ -3,8 +3,10 @@ package dao
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
+	"gorm.io/gorm"
 )
 
 var (
@@ -25,6 +27,40 @@ var (
 
 func GetPrimaryKeyConta() string {
 	return contaDB["nome"]
+}
+
+// AdicionaConta02 adiciona uma conta ao BD e retorna a conta incluída(*Conta) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma conta(*Conta)
+func AdicionaConta02(db *gorm.DB, novaConta *conta.Conta) (*conta.Conta, error) {
+	c, err := conta.NewConta(novaConta.Nome, novaConta.NomeTipoConta, novaConta.Codigo, novaConta.ContaPai, novaConta.Comentario)
+	if err != nil {
+		return nil, err
+	}
+
+	tc := ConverteContaParaTConta(c)
+	err = db.Create(&tc).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
+// RemoveConta02 remove uma conta do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma string contendo o NOME da conta desejado
+func RemoveConta02(db *gorm.DB, nome string) error {
+	c := &conta.TConta{Nome: nome}
+
+	tx := db.Delete(c)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", nome, esperado, linhaAfetadas)
+	}
+
+	return nil
 }
 
 // CarregaContas retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório

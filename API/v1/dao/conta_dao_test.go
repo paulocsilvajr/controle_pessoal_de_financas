@@ -1,5 +1,93 @@
 package dao
 
+import (
+	"testing"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
+)
+
+var (
+	testTipoContaB01         *tipo_conta.TipoConta
+	testConta01, testConta02 *conta.Conta
+)
+
+func TestAdicionaConta02(t *testing.T) {
+	ttc01 := getTTipoConta1()
+	testTipoContaB01 = ConverteTTipoContaParaTipoConta(ttc01)
+	testTipoContaB01, err := AdicionaTipoConta02(
+		db2,
+		testTipoContaB01,
+	)
+	if err != nil {
+		t.Error("Erro em inclusão de tipo conta em TestAdicionaConta02", testTipoContaB01, err)
+	}
+
+	tc01 := getTConta1(ttc01)
+	testConta01 = ConverteTContaParaConta(tc01)
+	testConta01, err = AdicionaConta02(
+		db2,
+		testConta01,
+	)
+	if err != nil {
+		t.Error("Erro em inclusão de conta em TestAdicionaConta02", testConta01, err)
+	}
+
+	tc02 := getTConta2(ttc01, tc01)
+	testConta02 = ConverteTContaParaConta(tc02)
+	testConta02, err = AdicionaConta02(
+		db2,
+		testConta02,
+	)
+	if err != nil {
+		t.Error("Erro em inclusão de conta em TestAdicionaConta02", testConta02, err)
+	}
+
+	nomeEsperado := ttc01.Nome
+	nomeObtido := testTipoContaB01.Nome
+	if nomeEsperado != nomeObtido {
+		t.Errorf("Nome de tipo de conta inserida em BD diferente do esperado. Esperado: '%s', obtido: '%s'", nomeEsperado, nomeObtido)
+	}
+
+	nomeEsperado = tc01.Nome
+	nomeObtido = testConta01.Nome
+	if nomeEsperado != nomeObtido {
+		t.Errorf("Nome de conta inserida em BD diferente do esperado. Esperado: '%s', obtido: '%s'", nomeEsperado, nomeObtido)
+	}
+
+	nomeEsperado = tc02.Nome
+	nomeObtido = testConta02.Nome
+	if nomeEsperado != nomeObtido {
+		t.Errorf("Nome de conta inserida em BD diferente do esperado. Esperado: '%s', obtido: '%s'", nomeEsperado, nomeObtido)
+	}
+}
+
+func TestRemoveConta02(t *testing.T) {
+	err := RemoveConta02(
+		db2,
+		testConta02.Nome,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = RemoveConta02(
+		db2,
+		testConta01.Nome,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = RemoveTipoConta02(
+		db2,
+		testTipoContaB01.Nome,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // TESTES ANTIGOS
 // import (
 // 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"

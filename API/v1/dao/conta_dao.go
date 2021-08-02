@@ -63,6 +63,51 @@ func RemoveConta02(db *gorm.DB, nome string) error {
 	return nil
 }
 
+// ProcuraConta02 localiza uma conta no BD e retorna a conta procurada(*Conta). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e o NOME da conta desejada
+func ProcuraConta02(db *gorm.DB, nome string) (*conta.Conta, error) {
+	tc := new(conta.TConta)
+
+	sql := getTemplateSQL(
+		"ProcuraConta02",
+		"{{.nome}} = ?",
+		contaDB,
+	)
+	tx := db.Where(sql, nome).First(&tc)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
+// AlteraConta02 altera uma conta com o nome(string) informado a partir dos dados da *Conta informada no parâmetro contaAlteracao. O campo Estado não é alterado, enquanto que o campo Nome sim. Use a função específica para essa tarefa(estado). Retorna uma *Conta alterada no BD(*gorm.DB) e um error. error != nil caso ocorra um problema.
+func AlteraConta02(db *gorm.DB, nome string, contaAlteracao *conta.Conta) (*conta.Conta, error) {
+	contaBanco, err := ProcuraConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	err = contaBanco.Altera(contaAlteracao.Nome, contaAlteracao.NomeTipoConta, contaAlteracao.Codigo, contaAlteracao.ContaPai, contaAlteracao.Comentario)
+	if err != nil {
+		return nil, err
+	}
+
+	tc := ConverteContaParaTConta(contaBanco)
+	tx := db.Save(&tc)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("alteração de conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
 // CarregaContas retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaContas(db *sql.DB) (contas conta.Contas, err error) {
 	sql := `

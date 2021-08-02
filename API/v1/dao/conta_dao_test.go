@@ -62,6 +62,43 @@ func TestAdicionaConta02(t *testing.T) {
 	}
 }
 
+func TestProcuraConta02(t *testing.T) {
+	nomeProcurado := testConta02.Nome
+	c, err := ProcuraConta02(db2, nomeProcurado)
+	if err != nil {
+		t.Error(err)
+	}
+
+	nomeEncontrado := c.Nome
+	if nomeEncontrado != nomeProcurado {
+		t.Errorf("Nome procurado diferente de nome encontrado. Esperado: '%s', encontrado: '%s'", nomeProcurado, nomeEncontrado)
+	}
+}
+
+func TestAlteraConta02(t *testing.T) {
+	nome := testConta01.Nome
+	novoCodigo := "C0D1G0 N0V0"
+	novoComentario := "Comentário NOVO"
+
+	testConta01.Codigo = novoCodigo
+	testConta01.Comentario = novoComentario
+
+	c, err := AlteraConta02(db2, nome, testConta01)
+	if err != nil {
+		t.Error(err)
+	}
+
+	codigo := c.Codigo
+	if codigo != novoCodigo {
+		t.Errorf("Alteração de conta com nome %s retornou um 'codigo' diferente do esperado. Esperado: '%s', retorno: '%s'", nome, novoCodigo, codigo)
+	}
+
+	comentario := c.Comentario
+	if comentario != novoComentario {
+		t.Errorf("Alteração de conta com nome %s retornou um 'comentario' diferente do esperado. Esperado: '%s', retorno: '%s'", nome, novoComentario, comentario)
+	}
+}
+
 func TestRemoveConta02(t *testing.T) {
 	err := RemoveConta02(
 		db2,

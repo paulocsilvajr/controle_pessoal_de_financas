@@ -54,6 +54,9 @@ func (d dados) Len() int {
 
 // LancamentoIndex é um handler/controller que responde a rota '[GET] /lancamentos' e retorna StatusOK(200) e uma listagem de lancamentos de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500). Quando solicitado como usuário comum, retorna somente lancamentos ativos ref a esse usuário(cpf), enquanto que como administrador, retorna todos os registros de lancamentos ref ao usuário
 func LancamentoIndex(w http.ResponseWriter, r *http.Request) {
+	db := dao.GetDB()
+	defer db.Close()
+
 	var status = http.StatusInternalServerError // 500
 
 	token, err := helper.GetToken(r, GetMySigningKey())
@@ -103,6 +106,9 @@ func LancamentoIndex(w http.ResponseWriter, r *http.Request) {
 
 // LancamentoShow é um handler/controller que responde a rota '[GET] /lancamentos/{lancamento}' e retorna StatusOK(200) e os dados do lancamento(ID) solicitado caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func LancamentoShow(w http.ResponseWriter, r *http.Request) {
+	db := dao.GetDB()
+	defer db.Close()
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -167,6 +173,9 @@ func LancamentoShow(w http.ResponseWriter, r *http.Request) {
 
 // LancamentoCreate é um handler/controller que responde a rota '[POST] /lancamentos' e retorna StatusCreated(201) e os dados de um lancamento e seus detalhes lancamento criados através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"cpf_pessoa":"?",  "nome_conta_origem":"?", "data":"?", "numero":"?", "descricao":"?", "nome_conta_destino":"?", "debito":?, "credito":?}
 func LancamentoCreate(w http.ResponseWriter, r *http.Request) {
+	db := dao.GetDB()
+	defer db.Close()
+
 	var status = http.StatusInternalServerError // 500
 	var lancamentoFromJSON LancamentoPersJSON
 	var novoLancamento *lancamento.Lancamento
@@ -249,6 +258,9 @@ func LancamentoCreate(w http.ResponseWriter, r *http.Request) {
 
 // LancamentoRemove é um handler/controller que responde a rota '[DELETE] /lancamentos/{lancamento}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que a conta informada esteja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func LancamentoRemove(w http.ResponseWriter, r *http.Request) {
+	db := dao.GetDB()
+	defer db.Close()
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -304,6 +316,9 @@ func LancamentoRemove(w http.ResponseWriter, r *http.Request) {
 
 // LancamentoAlter é um handler/controller que responde a rota '[PUT] /lancamentos/{lancamento}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados do lancamento alterado caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o lancamento informado na rota existir. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"cpf_pessoa":"?", "nome_conta_origem":"?", "data":"?", "numero":"?", "descricao":"?", "nome_conta_destino":"?", "debito":?, "credito":?}, ou StatusNotModified(304) caso ocorra algum erro na alteração do BD.
 func LancamentoAlter(w http.ResponseWriter, r *http.Request) {
+	db := dao.GetDB()
+	defer db.Close()
+
 	var status = http.StatusInternalServerError // 500
 	var lancamentoFromJSON LancamentoPersJSON
 	var lancamentoAlteracao *lancamento.Lancamento
@@ -411,6 +426,9 @@ func LancamentoAlter(w http.ResponseWriter, r *http.Request) {
 
 // LancamentoEstado é um handler/controller que responde a rota '[PUT] /lancamentos/{lancamento}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados do lancamento alterado caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o lancamento informado na rota existir. Somente usuários ADMINISTRADORES podem ATIVAR contas, USUÁRIO COMUNS podem somente INATIVAR. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o lancamento informado na rota não existir
 func LancamentoEstado(w http.ResponseWriter, r *http.Request) {
+	db := dao.GetDB()
+	defer db.Close()
+
 	var status = http.StatusInternalServerError // 500
 	var estadoLancamento estado
 
@@ -502,6 +520,9 @@ func LancamentoEstado(w http.ResponseWriter, r *http.Request) {
 
 // LancamentoPorConta é um handler/controller que responde a rota '[GET] /lancamentos_conta/{conta}' e retorna StatusOK(200) e uma listagem de lancamentos de acordo a conta informada e com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500). Quando solicitado como usuário comum, retorna somente lancamentos ativos ref a esse usuário(cpf), enquanto que como administrador, retorna todos os registros de lancamentos ref ao usuário
 func LancamentoPorConta(w http.ResponseWriter, r *http.Request) {
+	db := dao.GetDB()
+	defer db.Close()
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)

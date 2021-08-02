@@ -19,6 +19,9 @@ import (
 
 // PessoaIndex é um handler/controller que responde a rota '[GET] /pessoas' e retorna StatusOK(200) e uma listagem de pessoas de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	token, err := helper.GetToken(r, GetMySigningKey())
@@ -73,6 +76,9 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 
 // PessoaShow é um handler/controller que responde a rota '[GET] /pessoas/{usuario}' e retorna StatusOK(200) e os dados da pessoa(usuário) solicitada caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB e igual ao usuário da rota. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaShow(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -116,6 +122,9 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 
 // PessoaShowAdmin é um handler/controller que responde a rota '[GET] /pessoas/{usuarioAdmin}/{usuario}' e retorna StatusOK(200) e os dados da pessoa(usuário) solicitada caso o TOKEN informado for válido e o usuário administrador associado ao token for cadastrado na API/DB e igual ao usuário admin da rota. Caso não for encontrado o usuário informado no BD, retorna StatusNotFound(404). Para os outros erros, retorna StatusInternalServerError(500)
 func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -173,6 +182,9 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 
 // PessoaCreate é um handler/controller que responde a rota '[POST] /pessoas' e retorna StatusCreated(201) e os dados da pessoa criada através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"[, "administrador": ?]}
 func PessoaCreate(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError
 	var pessoaFromJSON pessoa.Pessoa
 	var novaPessoa *pessoa.Pessoa
@@ -253,6 +265,9 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 
 // PessoaRemove é um handler/controller que responde a rota '[DELETE] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que o usuário informado na rota seja diferente ao do token e seja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusNotFound(404) caso não encontre o registro para remoção
 func PessoaRemove(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -310,6 +325,9 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 
 // PessoaAlter é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar qualquer usuário. Um usuário comum somente pode alterar a si mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"} ou StatusNotModified(304) caso ocorra algum erro na alteração do BD
 func PessoaAlter(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 	var pessoaFromJSON pessoa.Pessoa
 
@@ -394,6 +412,9 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 
 // PessoaEstado é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar o estado de usuários, mas não pode alterar o próprio estado. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
 func PessoaEstado(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 	var estadoPessoa estado
 
@@ -474,6 +495,9 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 
 // PessoaAdmin é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/admin' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem redefinir usuários como administrador, mas não pode alterar a sí mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"adminstrador": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
 func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 	type administrador struct {
 		Administrador bool `json:"administrador"`

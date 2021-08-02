@@ -49,6 +49,7 @@ func main() {
 
 func criarUsuarioAdminInicial() {
 	db := dao.GetDB02()
+	defer dao.CloseDB(db)
 
 	admin := pessoa.New("00000000000", "Administrador", "admin", "admin", "meuemail@email.com")
 

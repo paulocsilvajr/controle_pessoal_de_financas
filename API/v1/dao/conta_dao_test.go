@@ -90,25 +90,33 @@ func TestAlteraConta02(t *testing.T) {
 
 	codigo := c.Codigo
 	if codigo != novoCodigo {
-		t.Errorf("Alteração de conta com nome %s retornou um 'codigo' diferente do esperado. Esperado: '%s', retorno: '%s'", nome, novoCodigo, codigo)
+		t.Errorf("Alteração de conta com nome %s retornou um 'codigo' diferente do esperado. Esperado: '%s', obtido: '%s'", nome, novoCodigo, codigo)
 	}
 
 	comentario := c.Comentario
 	if comentario != novoComentario {
-		t.Errorf("Alteração de conta com nome %s retornou um 'comentario' diferente do esperado. Esperado: '%s', retorno: '%s'", nome, novoComentario, comentario)
+		t.Errorf("Alteração de conta com nome %s retornou um 'comentario' diferente do esperado. Esperado: '%s', obtido: '%s'", nome, novoComentario, comentario)
 	}
 
-	novoNome := "novo nome de conta"
+	novoNome := "N0V0 N0m3 d3 c0nt4"
+	novoComentario2 := "C0M3N3NT4R10..."
 	testConta01.Nome = novoNome
-	c, err = AlteraConta02(db2, nome, testConta01)
+	testConta01.Comentario = novoComentario2
+	c2, err := AlteraConta02(db2, nome, testConta01)
 	if err != nil {
 		t.Error(err)
 	}
 
-	nomeAlterado := c.Nome
+	nomeAlterado := c2.Nome
 	if novoNome != nomeAlterado {
-		t.Errorf("Alteração de conta com nome %s retornou um 'nome' diferente do esperado. Esperado: '%s', retorno: '%s'", nome, novoNome, nomeAlterado)
+		t.Errorf("Alteração de conta com nome %s retornou um 'nome' diferente do esperado. Esperado: '%s', obtido: '%s'", nome, novoNome, nomeAlterado)
 	}
+
+	comentario = c2.Comentario
+	if comentario != novoComentario2 {
+		t.Errorf("Alteração de conta com nome %s retornou um 'comentario' diferente do esperado. Esperado: '%s', obtido: '%s'", nome, novoComentario2, comentario)
+	}
+	// t.Error(c2)
 }
 
 func TestInativaConta02(t *testing.T) {

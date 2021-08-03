@@ -99,6 +99,36 @@ func TestAlteraConta02(t *testing.T) {
 	}
 }
 
+func TestInativaConta02(t *testing.T) {
+	nome := testConta01.Nome
+
+	c, err := InativaConta02(db2, nome)
+	if err != nil {
+		t.Error(err)
+	}
+
+	estadoObtido := c.Estado
+	estadoEsperado := false
+	if estadoObtido != estadoEsperado {
+		t.Errorf("Inativação de conta com nome '%s' retornou um 'estado' diferente do esperado. Esperado: '%t', obtido: '%t'", nome, estadoEsperado, estadoObtido)
+	}
+}
+
+func TestAtivaConta02(t *testing.T) {
+	nome := testConta01.Nome
+
+	c, err := AtivaConta02(db2, nome)
+	if err != nil {
+		t.Error(err)
+	}
+
+	estadoObtido := c.Estado
+	estadoEsperado := true
+	if estadoObtido != estadoEsperado {
+		t.Errorf("Ativação de conta com nome '%s' retornou um 'estado' diferente do esperado. Esperado: '%t', obtido: '%t'", nome, estadoEsperado, estadoObtido)
+	}
+}
+
 func TestRemoveConta02(t *testing.T) {
 	err := RemoveConta02(
 		db2,

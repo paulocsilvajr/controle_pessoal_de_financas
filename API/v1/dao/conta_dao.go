@@ -108,6 +108,56 @@ func AlteraConta02(db *gorm.DB, nome string, contaAlteracao *conta.Conta) (*cont
 	return ConverteTContaParaConta(tc), nil
 }
 
+// AtivaConta02 ativa uma conta no BD e retorna a conta(*Conta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um NOME(string) da Conta desejada
+func AtivaConta02(db *gorm.DB, nome string) (*conta.Conta, error) {
+	contaBanco, err := ProcuraConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	contaBanco.Ativa()
+
+	tc := ConverteContaParaTConta(contaBanco)
+	tx := db.Save(&tc)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("ativação de conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
+// InativaConta02 inativa uma conta no BD e retorna a conta(*Conta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um NOME(string) da Conta desejada
+func InativaConta02(db *gorm.DB, nome string) (*conta.Conta, error) {
+	contaBanco, err := ProcuraConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	contaBanco.Inativa()
+
+	tc := ConverteContaParaTConta(contaBanco)
+	tx := db.Save(&tc)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("inativação de conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
 // CarregaContas retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaContas(db *sql.DB) (contas conta.Contas, err error) {
 	sql := `

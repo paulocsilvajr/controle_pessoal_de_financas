@@ -93,7 +93,19 @@ func AlteraConta02(db *gorm.DB, nome string, contaAlteracao *conta.Conta) (*cont
 	}
 
 	tc := ConverteContaParaTConta(contaBanco)
-	tx := db.Save(&tc)
+	var tx *gorm.DB
+	if nome != tc.Nome {
+		sql := getTemplateSQL(
+			"AlteraConta02",
+			"{{.nome}}",
+			contaDB,
+		)
+		novoNome := tc.Nome
+		tc.Nome = nome
+		tx = db.Model(&tc).Update(sql, novoNome)
+	} else {
+		tx = db.Save(&tc)
+	}
 
 	linhaAfetadas := tx.RowsAffected
 	var esperado int64 = 1

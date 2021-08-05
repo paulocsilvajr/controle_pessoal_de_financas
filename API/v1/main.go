@@ -24,7 +24,9 @@ func main() {
 	host := configuracoes["host"]
 	protocolo := configuracoes["protocolo"]
 
-	verificaParametrosInicializacao()
+	if exitCode := verificaParametrosInicializacao(); exitCode >= 0 {
+		os.Exit(exitCode)
+	}
 
 	router := route.NewRouter()
 
@@ -80,7 +82,7 @@ func criarUsuarioAdminInicial() {
 	}
 }
 
-func verificaParametrosInicializacao() {
+func verificaParametrosInicializacao() int {
 	args := os.Args
 
 	if len(args) >= 2 {
@@ -97,10 +99,10 @@ func verificaParametrosInicializacao() {
 			criarUsuarioAdminInicial()
 
 			fmt.Println("\nCriado banco de dados, tabelas e usuário Admin, se essas estruturas não existirem.\nReexecute a API sem parâmetros para reconhecer o banco de dados e iniciar o seu uso")
-			os.Exit(0)
+			return 0
 		case "--rotes", "-r":
 			imprimeRotas()
-			os.Exit(0)
+			return 0
 		case "--help", "-h":
 			fmt.Printf(`Uso: %s [ -h | --help | -i | --init ]
 Inicia a API do "Controle Pessoa de Finanças"
@@ -109,9 +111,13 @@ Argumentos:
   -r, --routes        exibe as métodos/rotas cadastradas na API
   -h, --help         exibe essa ajuda
 `, args[0])
-			os.Exit(1)
+			return 1
+		default:
+			fmt.Println("Argumento informado inválido. Use '-h' e '--help' para obter ajuda")
+			return 1
 		}
 	}
+	return -1
 }
 
 func imprimeRotas() {

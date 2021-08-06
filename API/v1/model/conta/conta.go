@@ -71,6 +71,9 @@ type IContas interface {
 // Contas representa um conjunto/lista(slice) de Contas(*Conta)
 type Contas []*Conta
 
+// TContas representa um lista(slice) de TContas(*TConta) baseado no GORM
+type TContas []*TConta
+
 // converteParaConta converte uma interface IConta em um tipo Conta, se possível. Caso contrário, retorna nil para conta e um erro
 func converteParaConta(cb IConta) (*Conta, error) {
 	c, ok := cb.(*Conta)

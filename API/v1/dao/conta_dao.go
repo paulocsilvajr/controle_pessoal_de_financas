@@ -170,6 +170,40 @@ func InativaConta02(db *gorm.DB, nome string) (*conta.Conta, error) {
 	return ConverteTContaParaConta(tc), nil
 }
 
+// CarregaContas02 retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaContas02(db *gorm.DB) (conta.Contas, error) {
+	var tContas conta.TContas
+	resultado := db.Find(&tContas)
+
+	return ConverteTContasParaContas(resultado, &tContas)
+}
+
+// CarregaContasAtiva02 retorna uma listagem de contas ativas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaContasAtiva02(db *gorm.DB) (conta.Contas, error) {
+	var tContas conta.TContas
+	sql := getTemplateSQL(
+		"CarregaContasAtiva02",
+		"{{.estado}} = true",
+		contaDB,
+	)
+	resultado := db.Where(sql).Find(&tContas)
+
+	return ConverteTContasParaContas(resultado, &tContas)
+}
+
+// CarregaContasInativa02 retorna uma listagem de contas inativas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaContasInativa02(db *gorm.DB) (conta.Contas, error) {
+	var tContas conta.TContas
+	sql := getTemplateSQL(
+		"CarregaContasAtiva02",
+		"{{.estado}} = false",
+		contaDB,
+	)
+	resultado := db.Where(sql).Find(&tContas)
+
+	return ConverteTContasParaContas(resultado, &tContas)
+}
+
 // CarregaContas retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaContas(db *sql.DB) (contas conta.Contas, err error) {
 	sql := `

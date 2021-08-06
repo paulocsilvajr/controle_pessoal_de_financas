@@ -134,6 +134,19 @@ func TestInativaConta02(t *testing.T) {
 	}
 }
 
+func TestCarregaContasInativa02(t *testing.T) {
+	contas, err := CarregaContasInativa02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantObtida := len(contas)
+	quantEsperada := 1
+	if quantObtida != quantEsperada {
+		t.Errorf("consulta de Contas Inativas retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantObtida)
+	}
+}
+
 func TestAtivaConta02(t *testing.T) {
 	nome := testConta01.Nome
 
@@ -146,6 +159,41 @@ func TestAtivaConta02(t *testing.T) {
 	estadoEsperado := true
 	if estadoObtido != estadoEsperado {
 		t.Errorf("Ativação de conta com nome '%s' retornou um 'estado' diferente do esperado. Esperado: '%t', obtido: '%t'", nome, estadoEsperado, estadoObtido)
+	}
+}
+
+func TestCarregaContas02(t *testing.T) {
+	contas, err := CarregaContas02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantObtida := len(contas)
+	quantEsperada := 2
+	if quantObtida != quantEsperada {
+		t.Errorf("consulta de Contas retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantObtida)
+	}
+
+	nome1 := testConta01.Nome
+	nome2 := testConta02.Nome
+	for _, c := range contas {
+		if c.Nome == nome1 || c.Nome == nome2 {
+			continue
+		}
+		t.Errorf("registro de conta(nome) encontrado diferente do esperado. Esperado: '%s' ou '%s', obtido: '%s'", nome1, nome2, c.Nome)
+	}
+}
+
+func TestCarregaContasAtiva02(t *testing.T) {
+	contas, err := CarregaContasAtiva02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantObtida := len(contas)
+	quantEsperada := 2
+	if quantObtida != quantEsperada {
+		t.Errorf("consulta de Contas ativas retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantObtida)
 	}
 }
 

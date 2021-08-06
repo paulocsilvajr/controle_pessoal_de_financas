@@ -298,6 +298,25 @@ func ConverteTContaParaConta(c *conta.TConta) *conta.Conta {
 	}
 }
 
+// ConverteTPessoasParaPessoas recebe um resultado do tipo *gorm.DB e um slice de TPessoas e retorna um slice de Pessoas e um erro != nil se ocorrer algum problema
+func ConverteTContasParaContas(resultado *gorm.DB, tContas *conta.TContas) (conta.Contas, error) {
+	err := resultado.Error
+	if err != nil {
+		return nil, err
+	}
+
+	contas := conta.Contas{}
+	encontrouRegistros := resultado.RowsAffected > 0
+	if encontrouRegistros {
+		for _, tc := range *tContas {
+			c := ConverteTContaParaConta(tc)
+			contas = append(contas, c)
+		}
+	}
+
+	return contas, nil
+}
+
 // ConverteLancamentoParaTLancamento recebe um ponteiro do tipo da struct Lancamento como parâmetro e retorna um ponteiro do tipo TLancamento
 func ConverteLancamentoParaTLancamento(l *lancamento.Lancamento) *lancamento.TLancamento {
 	return &lancamento.TLancamento{

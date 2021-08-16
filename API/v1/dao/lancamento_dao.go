@@ -7,6 +7,7 @@ import (
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
+	"gorm.io/gorm"
 )
 
 var (
@@ -27,6 +28,53 @@ var (
 		"fkPessoa":               pessoaDB["cpf"],
 	}
 )
+
+// AdicionaLancamento02 adiciona um lancamento ao BD e retorna o lancamento incluída(*Lancamento) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*sql.DB) como parâmetro obrigatório e um lancamento(*Lancamento)
+func AdicionaLancamento02(db *gorm.DB, novoLancamento *lancamento.Lancamento) (*lancamento.Lancamento, error) {
+	l, err := lancamento.NewLancamento(novoLancamento.ID, novoLancamento.CpfPessoa, novoLancamento.Data, novoLancamento.Numero, novoLancamento.Descricao)
+	if err != nil {
+		return nil, err
+	}
+
+	tlancamento := ConverteLancamentoParaTLancamento(l)
+	err = db.Create(&tlancamento).Error
+	if err != nil {
+		return nil, err
+	}
+	lancamento := ConverteTLancamentoParaLancamento(tlancamento)
+
+	return lancamento, nil
+}
+
+// ProcuraLancamento02 localiza um lancamento no BD e retorna o lancamento procurado(*Lancamento). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e o ID do lancamento desejado
+func ProcuraLancamento02(db *gorm.DB, id int) (*lancamento.Lancamento, error) {
+	tl := new(lancamento.TLancamento)
+
+	tx := db.First(&tl, id)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTLancamentoParaLancamento(tl), nil
+}
+
+// RemoveLancamento02 remove um lancamento do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm) como parâmetro obrigatório e um int contendo o ID do lancamento desejado
+func RemoveLancamento02(db *gorm.DB, id int) error {
+	l := &lancamento.TLancamento{ID: id}
+
+	tx := db.Delete(l)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de lancamento com ID %d retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", id, esperado, linhaAfetadas)
+	}
+
+	return nil
+}
 
 // CarregaLancamentos retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaLancamentos(db *sql.DB) (lancamentos lancamento.Lancamentos, err error) {

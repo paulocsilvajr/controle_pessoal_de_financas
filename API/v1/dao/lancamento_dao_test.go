@@ -1,5 +1,52 @@
 package dao
 
+import (
+	"testing"
+
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
+)
+
+var (
+	testLancamento01  *lancamento.Lancamento
+	testPessoaAdmin02 *pessoa.Pessoa
+)
+
+func TestAdicionaLancamento02(t *testing.T) {
+	var err error
+
+	p := getPessoaAdmin2()
+	testPessoaAdmin02, err = AdicionaPessoa02(db2, p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	l := getLancamento2(testPessoaAdmin02)
+	testLancamento01, err = AdicionaLancamento02(db2, l)
+	if err != nil {
+		t.Error(err)
+	}
+
+	cpfEsperado := l.CpfPessoa
+	cpfObtido := testLancamento01.CpfPessoa
+	id := testLancamento01.ID
+	if cpfEsperado != cpfObtido {
+		t.Errorf("CPF de pessoa em lancamento %d diferente do esperado. Esperado: '%s', obtido: '%s'", id, cpfEsperado, cpfObtido)
+	}
+}
+
+func TestRemoveLancamento02(t *testing.T) {
+	err := RemoveLancamento02(db2, testLancamento01.ID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = RemovePessoa02(db2, testPessoaAdmin02.Cpf)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // TESTES ANTIGOS
 // import (
 // 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"

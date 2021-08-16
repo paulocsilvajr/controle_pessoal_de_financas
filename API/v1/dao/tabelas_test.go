@@ -486,6 +486,14 @@ func getTPessoaAdmin1() *pessoa.TPessoa {
 	return ConvertePessoaParaTPessoa(p)
 }
 
+func getPessoaAdmin2() *pessoa.Pessoa {
+	p, err := pessoa.NewPessoaAdmin("99999999999", "Administrador 99", "admin99", "999999", "admin09@email.com")
+	if err != nil {
+		return nil
+	}
+	return p
+}
+
 func getTTipoConta1() *tipo_conta.TTipoConta {
 	tc, err := tipo_conta.NewTipoConta("banco", "saque", "depósito")
 	if err != nil {
@@ -517,6 +525,14 @@ func getTLancamento1(p *pessoa.TPessoa) *lancamento.TLancamento {
 		return nil
 	}
 	return ConverteLancamentoParaTLancamento(l)
+}
+
+func getLancamento2(p *pessoa.Pessoa) *lancamento.Lancamento {
+	l, err := lancamento.NewLancamento02(p.Cpf, time.Now(), "909090", "Lançamento teste 909090")
+	if err != nil {
+		return nil
+	}
+	return l
 }
 
 func verificaErroConstraintExists(err error) error {

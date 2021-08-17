@@ -73,6 +73,9 @@ type ILancamentos interface {
 // Lancamentos representa um conjunto/lista(slice) de Lancamentos(*Lancamento)
 type Lancamentos []*Lancamento
 
+// TLancamentos representa um conjunto/lista(slice) de TLancamentos(*TLancamento)
+type TLancamentos []*TLancamento
+
 // converterParaLancamento converte um intergface ILancamento em um tipo Lancamento, se possível. Caso contrário retorna nil para lancamento e um erro
 func converterParaLancamento(lb ILancamento) (*Lancamento, error) {
 	l, ok := lb.(*Lancamento)

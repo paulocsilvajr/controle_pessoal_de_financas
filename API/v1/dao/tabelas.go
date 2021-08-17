@@ -404,7 +404,7 @@ func ConverteTPessoasParaPessoasSimples(resultado *gorm.DB, tpessoas *pessoa.TPe
 }
 
 // ConverteTTiposContaParaTiposConta recebe um resultado do tipo *gorm.DB e um slice de TTiposConta e retorna um slice de TiposConta e um erro != nil se ocorrer algum problema
-func ConverteTTiposContaParaTiposConta(resultado *gorm.DB, tTiposConta *tipo_conta.TTiposConta) (tipo_conta.TiposConta, error) {
+func ConverteTTiposContaParaTiposConta(resultado *gorm.DB, ttiposConta *tipo_conta.TTiposConta) (tipo_conta.TiposConta, error) {
 	err := resultado.Error
 	if err != nil {
 		return nil, err
@@ -413,13 +413,32 @@ func ConverteTTiposContaParaTiposConta(resultado *gorm.DB, tTiposConta *tipo_con
 	tiposConta := tipo_conta.TiposConta{}
 	encontrouRegistros := resultado.RowsAffected > 0
 	if encontrouRegistros {
-		for _, ttc := range *tTiposConta {
+		for _, ttc := range *ttiposConta {
 			tc := ConverteTTipoContaParaTipoConta(ttc)
 			tiposConta = append(tiposConta, tc)
 		}
 	}
 
 	return tiposConta, nil
+}
+
+// ConverteTLancamentosParaLancamentos recebe um resultado do tipo *gorm.DB e um slice de TLancamentos e retorna um slice de Lancamentos e um erro != nil se ocorrer algum problema
+func ConverteTLancamentosParaLancamentos(resultado *gorm.DB, tlancamentos *lancamento.TLancamentos) (lancamento.Lancamentos, error) {
+	err := resultado.Error
+	if err != nil {
+		return nil, err
+	}
+
+	lancamentos := lancamento.Lancamentos{}
+	encontrouRegistros := resultado.RowsAffected > 0
+	if encontrouRegistros {
+		for _, tp := range *tlancamentos {
+			l := ConverteTLancamentoParaLancamento(tp)
+			lancamentos = append(lancamentos, l)
+		}
+	}
+
+	return lancamentos, nil
 }
 
 // VerificaQuantidadeLinhasAfetadas retorna um erro != nil se a quantidade esperada(quantiadeEsperada int64) for diferente da quantidade realmente afetada obtida a partir do parâmetro tx(*gorm.DB)

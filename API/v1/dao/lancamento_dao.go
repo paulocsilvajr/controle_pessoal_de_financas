@@ -76,6 +76,42 @@ func RemoveLancamento02(db *gorm.DB, id int) error {
 	return nil
 }
 
+// CarregaLancamentos02 retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
+func CarregaLancamentos02(db *gorm.DB) (lancamento.Lancamentos, error) {
+	var tlanc lancamento.TLancamentos
+	resultado := db.Find(&tlanc)
+
+	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
+}
+
+// AlteraLancamento02 altera um lancamento com o id(int) informado a partir dos dados do *Lancamento informada no parâmetro lancamentoAlteracao. O campo Estado não é alterado. Use a função específica para essa tarefa(estado). Retorna um *Lancamento alterado no BD e um error. error != nil caso ocorra um problema.
+func AlteraLancamento02(db *gorm.DB, transacao *gorm.DB, id int, lancamentoAlteracao *lancamento.Lancamento) (*lancamento.Lancamento, error) {
+	lancamentoBanco, err := ProcuraLancamento02(db, id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = lancamentoBanco.Altera(lancamentoAlteracao.CpfPessoa, lancamentoAlteracao.Data, lancamentoAlteracao.Numero, lancamentoAlteracao.Descricao)
+	if err != nil {
+		return nil, err
+	}
+
+	tl := ConverteLancamentoParaTLancamento(lancamentoBanco)
+	tx := db.Save(&tl)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("alteração de lancamento com ID %d retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", id, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTLancamentoParaLancamento(tl), nil
+}
+
 // CarregaLancamentos retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaLancamentos(db *sql.DB) (lancamentos lancamento.Lancamentos, err error) {
 	sql := `

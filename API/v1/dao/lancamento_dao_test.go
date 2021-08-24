@@ -2,6 +2,7 @@ package dao
 
 import (
 	"testing"
+	"time"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/lancamento"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
@@ -57,6 +58,39 @@ func TestCarregaLancamentos02(t *testing.T) {
 		if l.ID != id {
 			t.Errorf("registro de lancamento(ID) encontrado diferente do esperado. Esperado: %d, obtido: %d", id, l.ID)
 		}
+	}
+}
+
+func TestAlteraLancamento02(t *testing.T) {
+	id := testLancamento01.ID
+	novoNumero := "Ln1234"
+	novaData := time.Now()
+	novaDescricao := "NOVA descrição Lanc Ln1234"
+
+	testLancamento01.Numero = novoNumero
+	testLancamento01.Data = novaData
+	testLancamento01.Descricao = novaDescricao
+
+	transacao := db2.Begin()
+	l, err := AlteraLancamento02(db2, transacao, id, testLancamento01)
+	transacao.Commit()
+	if err != nil {
+		t.Error(err)
+	}
+
+	numero := l.Numero
+	if numero != novoNumero {
+		t.Errorf("alteração de lancamento com ID %d retornou um 'Número' diferente do esperado. Esperado: '%s', obtido: '%s'", id, novoNumero, numero)
+	}
+
+	data := l.Data
+	if data.Unix() != novaData.Unix() {
+		t.Errorf("alteração de lancamento com ID %d retornou uma 'Data' diferente do esperado. Esperado: '%s', obtido: '%s'", id, novaData, data)
+	}
+
+	descricao := l.Descricao
+	if descricao != novaDescricao {
+		t.Errorf("alteração de lancamento com ID %d retornou uma 'Descrição' diferente do esperado. Esperado: '%s', obtido: '%s'", id, novaDescricao, novoNumero)
 	}
 }
 

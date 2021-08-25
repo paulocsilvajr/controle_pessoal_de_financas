@@ -190,6 +190,54 @@ func CarregaLancamentosInativo02(db *gorm.DB) (lancamento.Lancamentos, error) {
 	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
 }
 
+// CarregaLancamentosAtivoPorCPF02 retorna uma listagem de todos os lancamentos ativos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma string contendo o CPF(11 caracteres)
+func CarregaLancamentosAtivoPorCPF02(db *gorm.DB, cpf string) (lancamento.Lancamentos, error) {
+	var tlanc lancamento.TLancamentos
+	var estado bool = true
+
+	sql := getTemplateSQL("CarregaLancamentosAtivoPorCPF02",
+		"{{.cpfPessoa}} = ? AND {{.estado}} = ?",
+		lancamentoDB,
+	)
+	resultado := db.Where(sql, cpf, estado).Find(&tlanc)
+
+	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
+}
+
+// CarregaLancamentosInativoPorCPF02 retorna uma listagem de todos os lancamentos ativos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma string contendo o CPF(11 caracteres)
+func CarregaLancamentosInativoPorCPF02(db *gorm.DB, cpf string) (lancamento.Lancamentos, error) {
+	var tlanc lancamento.TLancamentos
+	var estado bool = false
+
+	sql := getTemplateSQL("CarregaLancamentosAtivoPorCPF02",
+		"{{.cpfPessoa}} = ? AND {{.estado}} = ?",
+		lancamentoDB,
+	)
+	resultado := db.Where(sql, cpf, estado).Find(&tlanc)
+
+	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
+}
+
+// CarregaLancamentosPorCpfEConta02 retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
+func CarregaLancamentosPorCpfEConta02(db *sql.DB, cpf, conta string) (lancamento.Lancamentos, error) {
+
+	return nil, nil
+	// 	sql := `
+	// SELECT
+	// 	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
+	// FROM
+	// 	{{.tabela}}
+	// INNER JOIN
+	// 	{{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}
+	// WHERE
+	// 	{{.cpfPessoa}} = $1 AND {{.nomeConta}} = $2
+	// `
+
+	// 	query := getTemplateQuery("CarregaLancamentosPorCpfEConta", lancamentoDB, sql)
+
+	// 	return carregaLancamentos(db, query, cpf, conta)
+}
+
 // CarregaLancamentos retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaLancamentos(db *sql.DB) (lancamentos lancamento.Lancamentos, err error) {
 	sql := `

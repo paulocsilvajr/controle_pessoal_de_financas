@@ -130,6 +130,27 @@ func TestCarregaLancamentosInativo02(t *testing.T) {
 	}
 }
 
+func TestCarregaLancamentosInativoPorCPF02(t *testing.T) {
+	cpf := testLancamento01.CpfPessoa
+	lancamentos, err := CarregaLancamentosInativoPorCPF02(db2, cpf)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantEsperada := 1
+	quantObtida := lancamentos.Len()
+	if quantEsperada != quantObtida {
+		t.Errorf("consulta de lançamentos inativos por CPF '%s' retornou uma quantidade de registros incorreta. Esperado: %d, obtido: %d", cpf, quantEsperada, quantObtida)
+	}
+
+	for _, lanc := range lancamentos {
+		cpfObtido := lanc.CpfPessoa
+		if lanc.CpfPessoa != cpf {
+			t.Errorf("consulta de lançamentos inativos por CPF '%s' retornou um cpf diferente do esperado. Esperado '%[1]s', obtido: '%s'", cpf, cpfObtido)
+		}
+	}
+}
+
 func TestAtivaLancamento02(t *testing.T) {
 	id := testLancamento01.ID
 	l, err := AtivaLancamento02(db2, id)
@@ -163,6 +184,27 @@ func TestCarregaLancamentosAtivo02(t *testing.T) {
 	quantEsperada := 1
 	if quantEsperada != quantObtida {
 		t.Errorf("consulta de lançamentos ativos retornou uma quantidade de registros incorreta. Esperado: %d, obtido: %d", quantEsperada, quantObtida)
+	}
+}
+
+func TestCarregaLancamentosAtivoPorCPF02(t *testing.T) {
+	cpf := testLancamento01.CpfPessoa
+	lancamentos, err := CarregaLancamentosAtivoPorCPF02(db2, cpf)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantEsperada := 1
+	quantObtida := lancamentos.Len()
+	if quantEsperada != quantObtida {
+		t.Errorf("consulta de lançamentos ativos por CPF '%s' retornou uma quantidade de registros incorreta. Esperado: %d, obtido: %d", cpf, quantEsperada, quantObtida)
+	}
+
+	for _, lanc := range lancamentos {
+		cpfObtido := lanc.CpfPessoa
+		if lanc.CpfPessoa != cpf {
+			t.Errorf("consulta de lançamentos ativos por CPF '%s' retornou um cpf diferente do esperado. Esperado '%[1]s', obtido: '%s'", cpf, cpfObtido)
+		}
 	}
 }
 

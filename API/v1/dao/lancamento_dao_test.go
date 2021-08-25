@@ -94,6 +94,78 @@ func TestAlteraLancamento02(t *testing.T) {
 	}
 }
 
+func TestInativaLancamento02(t *testing.T) {
+	id := testLancamento01.ID
+	l, err := InativaLancamento02(db2, id)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if l != nil {
+		idObtido := l.ID
+		if idObtido != id {
+			t.Errorf("inativação de lançamento retornou um lançamento com ID diferente do esperado. Esperado: %d, obtido: %d", id, idObtido)
+		}
+
+		estadoObtido := l.Estado
+		estadoEsperado := false
+		if estadoObtido != estadoEsperado {
+			t.Errorf("inativação de lançamento retornou um lançamento com estado diferente do esperado. Esperado: %t, obtido: %t", estadoEsperado, estadoObtido)
+		}
+	} else {
+		t.Errorf("func InativaLancamento02(db2, %d) retornou um lançamento nulo(nil)", id)
+	}
+}
+
+func TestCarregaLancamentosInativo02(t *testing.T) {
+	lancamentos, err := CarregaLancamentosInativo02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantObtida := len(lancamentos)
+	quantEsperada := 1
+	if quantEsperada != quantObtida {
+		t.Errorf("consulta de lançamentos inativos retornou uma quantidade de registros incorreta. Esperado: %d, obtido: %d", quantEsperada, quantObtida)
+	}
+}
+
+func TestAtivaLancamento02(t *testing.T) {
+	id := testLancamento01.ID
+	l, err := AtivaLancamento02(db2, id)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if l != nil {
+		idObtido := l.ID
+		if idObtido != id {
+			t.Errorf("ativação de lançamento retornou um lançamento com ID diferente do esperado. Esperado: %d, obtido: %d", id, idObtido)
+		}
+
+		estadoObtido := l.Estado
+		estadoEsperado := true
+		if estadoObtido != estadoEsperado {
+			t.Errorf("ativação de lançamento retornou um lançamento com estado diferente do esperado. Esperado: %t, obtido: %t", estadoEsperado, estadoObtido)
+		}
+	} else {
+		t.Errorf("func AtivaLancamento02(db2, %d) retornou um lançamento nulo(nil)", id)
+	}
+}
+
+func TestCarregaLancamentosAtivo02(t *testing.T) {
+	lancamentos, err := CarregaLancamentosAtivo02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantObtida := len(lancamentos)
+	quantEsperada := 1
+	if quantEsperada != quantObtida {
+		t.Errorf("consulta de lançamentos ativos retornou uma quantidade de registros incorreta. Esperado: %d, obtido: %d", quantEsperada, quantObtida)
+	}
+}
+
 func TestRemoveLancamento02(t *testing.T) {
 	err := RemoveLancamento02(db2, testLancamento01.ID)
 	if err != nil {

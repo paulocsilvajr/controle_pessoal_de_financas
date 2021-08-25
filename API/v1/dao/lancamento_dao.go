@@ -112,6 +112,84 @@ func AlteraLancamento02(db *gorm.DB, transacao *gorm.DB, id int, lancamentoAlter
 	return ConverteTLancamentoParaLancamento(tl), nil
 }
 
+// AtivaLancamento02 ativa um lancamento no BD e retorna o lancamento(*Lancamento) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um ID(int) do Lancamento desejado
+func AtivaLancamento02(db *gorm.DB, id int) (*lancamento.Lancamento, error) {
+	lancamentoBanco, err := ProcuraLancamento02(db, id)
+	if err != nil {
+		return nil, err
+	}
+
+	lancamentoBanco.Ativa()
+
+	tl := ConverteLancamentoParaTLancamento(lancamentoBanco)
+	tx := db.Save(&tl)
+
+	linhasAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhasAfetadas != esperado {
+		return nil, fmt.Errorf("ativação de lancamento com ID %d retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", id, esperado, linhasAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTLancamentoParaLancamento(tl), nil
+}
+
+// InativaLancamento02 inativa um lancamento no BD e retorna o lancamento(*Lancamento) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um ID(int) do Lancamento desejado
+func InativaLancamento02(db *gorm.DB, id int) (*lancamento.Lancamento, error) {
+	lancamentoBanco, err := ProcuraLancamento02(db, id)
+	if err != nil {
+		return nil, err
+	}
+
+	lancamentoBanco.Inativa()
+
+	tl := ConverteLancamentoParaTLancamento(lancamentoBanco)
+	tx := db.Save(&tl)
+
+	linhasAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhasAfetadas != esperado {
+		return nil, fmt.Errorf("inativação de lancamento com ID %d retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", id, esperado, linhasAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTLancamentoParaLancamento(tl), nil
+}
+
+// CarregaLancamentosAtivo02 retorna uma listagem de lancamentos ativos(lancamento.Lancamento) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaLancamentosAtivo02(db *gorm.DB) (lancamento.Lancamentos, error) {
+	var tlanc lancamento.TLancamentos
+	var estado bool = true
+
+	sql := getTemplateSQL("CarregaLancamentosAtivo02",
+		"{{.estado}} = ?",
+		lancamentoDB,
+	)
+	resultado := db.Where(sql, estado).Find(&tlanc)
+
+	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
+}
+
+// CarregaLancamentosInativo02 retorna uma listagem de lancamentos inativos(lancamento.Lancamento) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaLancamentosInativo02(db *gorm.DB) (lancamento.Lancamentos, error) {
+	var tlanc lancamento.TLancamentos
+	var estado bool = false
+
+	sql := getTemplateSQL("CarregaLancamentosInativo02",
+		"{{.estado}} = ?",
+		lancamentoDB,
+	)
+	resultado := db.Where(sql, estado).Find(&tlanc)
+
+	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
+}
+
 // CarregaLancamentos retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaLancamentos(db *sql.DB) (lancamentos lancamento.Lancamentos, err error) {
 	sql := `

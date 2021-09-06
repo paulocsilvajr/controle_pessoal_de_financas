@@ -153,7 +153,7 @@ func TestNewDetalheLancamento(t *testing.T) {
 
 	credito, debito = 0, 0
 	dl, err = NewDetalheLancamento(lancamento.ID, conta.Nome, debito, credito)
-	if err.Error() != "Campos débito e crédito não podem ter simultaneamente valor zero(0)" {
+	if err.Error() != "campos débito e crédito não podem ter simultaneamente valor zero(0)" {
 		t.Error("Erro em função detalhe_lancamento.NewLancamento, não retornou o erro esperado", dl, err)
 	}
 
@@ -316,7 +316,7 @@ func TestAlteraCampos(t *testing.T) {
 	campos["debito"] = "100,00"
 	campos["credito"] = "10.00"
 	err = dl.AlteraCampos(campos)
-	if err.Error() != "Erro ao converter string para float64" {
+	if err.Error() != "erro ao converter string para float64" {
 		t.Error(err, dl)
 	}
 
@@ -324,7 +324,7 @@ func TestAlteraCampos(t *testing.T) {
 	campos["debito"] = "100.00"
 	campos["credito"] = "10,00"
 	err = dl.AlteraCampos(campos)
-	if err.Error() != "Erro ao converter string para float64" {
+	if err.Error() != "erro ao converter string para float64" {
 		t.Error(err, dl)
 	}
 
@@ -431,7 +431,7 @@ func TestProcuraDetalheLancamento(t *testing.T) {
 	}
 
 	dls, err := detalheLancamentos.ProcuraDetalheLancamentosPorNomeConta("")
-	if err.Error() != "Não foi encontrado nenhum DetalheLancamento com o NomeConta[] informado" {
+	if err.Error() != "não foi encontrado nenhum DetalheLancamento com o NomeConta[] informado" {
 		t.Error(err, dls)
 	}
 
@@ -450,7 +450,7 @@ func TestProcuraDetalheLancamento(t *testing.T) {
 	}
 
 	dls, err = detalheLancamentos.ProcuraDetalheLancamentosPorIDLancamento(0)
-	if err.Error() != "Não foi encontrado nenhum DetalheLancamento com o IDLancamento[0] informado" {
+	if err.Error() != "não foi encontrado nenhum DetalheLancamento com o IDLancamento[0] informado" {
 		t.Error(err, dls)
 	}
 }

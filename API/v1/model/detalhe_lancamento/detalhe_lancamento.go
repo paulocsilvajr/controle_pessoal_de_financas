@@ -253,7 +253,7 @@ func verifica(nomeConta string, debito, credito float64) (err error) {
 		return
 	} else if err = helper.VerificaValor("Credito", credito); err != nil {
 		return
-	} else if (debito + credito) == 0 {
+	} else if (debito + credito) == 0.0 {
 		return errors.New("campos débito e crédito não podem ter simultaneamente valor zero(0)")
 	}
 

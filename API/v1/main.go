@@ -100,7 +100,7 @@ func verificaParametrosInicializacao() int {
 
 			fmt.Println("\nCriado banco de dados, tabelas e usuário Admin, se essas estruturas não existirem.\nReexecute a API sem parâmetros para reconhecer o banco de dados e iniciar o seu uso")
 			return 0
-		case "--rotes", "-r":
+		case "--routes", "-r":
 			imprimeRotas()
 			return 0
 		case "--help", "-h":

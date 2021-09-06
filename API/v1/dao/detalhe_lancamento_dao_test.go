@@ -78,6 +78,60 @@ func TestAdicionaDetalheLancamento02(t *testing.T) {
 	}
 }
 
+func TestCarregaDetalheLancamento02(t *testing.T) {
+	detLancamentos, err := CarregaDetalheLancamentos02(db2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantDetLancamentos := len(detLancamentos)
+	quantEsperada := 1
+	if quantDetLancamentos != quantEsperada {
+		t.Errorf("consulta de Detalhe Lancamentos retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantDetLancamentos)
+	}
+
+	idLancamento := testDetalheLancamentoB01.IDLancamento
+	nomeConta := testDetalheLancamentoB01.NomeConta
+	for _, dl := range detLancamentos {
+		if dl.IDLancamento != idLancamento {
+			t.Errorf("registro de detalhe lancamento(IDLancamento) encontrado diferente do esperado. Esperado: %d, obtido: %d", idLancamento, dl.IDLancamento)
+		}
+
+		if dl.NomeConta != nomeConta {
+			t.Errorf("registro de detalhe lançamento(NomeConta) encontrado diferente do esperado. Esperado: '%s', obtido: '%s'", nomeConta, dl.NomeConta)
+		}
+	}
+
+}
+
+func TestCarregaDetalheLancamentosPorIDLancamento02(t *testing.T) {
+	idLanc := testLancamentoB01.ID
+	detLancamentos, err := CarregaDetalheLancamentosPorIDLancamento02(db2, idLanc)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantDetLancamentos := len(detLancamentos)
+	quantEsperada := 1
+	if quantDetLancamentos != quantEsperada {
+		t.Errorf("consulta de Detalhe Lançamentos por id lançamento retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantDetLancamentos)
+	}
+}
+
+func TestCarregaDetalheLancamentosPorNomeConta02(t *testing.T) {
+	nomeConta := testContaB01.Nome
+	detLancamentos, err := CarregaDetalheLancamentosPorNomeConta02(db2, nomeConta)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantDetLancamentos := len(detLancamentos)
+	quantEsperada := 1
+	if quantDetLancamentos != quantEsperada {
+		t.Errorf("consulta de Detalhe Lançamentos por nome de conta retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantDetLancamentos)
+	}
+}
+
 func TestRemoveDetalheLancamento02(t *testing.T) {
 	var err error
 	err = RemoveDetalheLancamento02(db2,

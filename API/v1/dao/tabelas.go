@@ -441,6 +441,25 @@ func ConverteTLancamentosParaLancamentos(resultado *gorm.DB, tlancamentos *lanca
 	return lancamentos, nil
 }
 
+// ConverteTDetalheLancamentosParaDetalheLancamentos recebe um resultado do tipo *gorm.DB e um slice de TDetalheLancamentos e retorna um slice de DetalheLancamentos e um erro != nil se ocorrer algum problema
+func ConverteTDetalheLancamentosParaDetalheLancamentos(resultado *gorm.DB, tDetLancamentos *detalhe_lancamento.TDetalheLancamentos) (detalhe_lancamento.DetalheLancamentos, error) {
+	err := resultado.Error
+	if err != nil {
+		return nil, err
+	}
+
+	detLancamentos := detalhe_lancamento.DetalheLancamentos{}
+	encontrouRegistros := resultado.RowsAffected > 0
+	if encontrouRegistros {
+		for _, tdl := range *tDetLancamentos {
+			dl := ConverteTDetalheLancamentoParaDetalheLancamento(tdl)
+			detLancamentos = append(detLancamentos, dl)
+		}
+	}
+
+	return detLancamentos, nil
+}
+
 // VerificaQuantidadeLinhasAfetadas retorna um erro != nil se a quantidade esperada(quantiadeEsperada int64) for diferente da quantidade realmente afetada obtida a partir do parâmetro tx(*gorm.DB)
 func VerificaQuantidadeRegistrosAfetados(tx *gorm.DB, quantidadeEsperada int64) error {
 	quantidadeAfetada := tx.RowsAffected

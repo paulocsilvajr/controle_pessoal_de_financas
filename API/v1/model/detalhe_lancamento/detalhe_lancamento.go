@@ -59,13 +59,16 @@ type IDetalheLancamentos interface {
 // DetalheLancamentos representa um conjunto/lista(slice) de DetalheLancamentos(*DetalheLancamento)
 type DetalheLancamentos []*DetalheLancamento
 
+// TDetalheLancamentos representa um slice de TDetalheLancamentos(*TDetalheLancamento)
+type TDetalheLancamentos []*TDetalheLancamento
+
 // converteParaDetalheLancamento converte uma interface IDetalheLancamento em um tipo DetalheLancamento, se possível. Caso contrário, retornal nil para DetalheLancamento e um erro
 func converteParaDetalheLancamento(dlb IDetalheLancamento) (*DetalheLancamento, error) {
 	dl, ok := dlb.(*DetalheLancamento)
 	if ok {
 		return dl, nil
 	}
-	return nil, errors.New("Erro ao converter para DetalheLancamento")
+	return nil, errors.New("erro ao converter para DetalheLancamento")
 }
 
 // New retorna um novo Detalhe Lançamento(*DetalheLancamento) através dos parâmetros informados(idLancamento, nomeConta, debito, credito). Função equivalente a criação de um DetalheLancamento via literal &DetalheLancamento{IDLancamento: ..., ...}
@@ -161,7 +164,7 @@ func (dl *DetalheLancamento) AlteraCampos(campos map[string]string) (err error) 
 		case "debito", "credito":
 			decimal, err := strconv.ParseFloat(valor, 64)
 			if err != nil {
-				return errors.New("Erro ao converter string para float64")
+				return errors.New("erro ao converter string para float64")
 			}
 
 			err = helper.VerificaValor(chave, decimal)
@@ -200,7 +203,7 @@ func (dls DetalheLancamentos) ProcuraDetalheLancamentosPorNomeConta(nomeConta st
 	}
 
 	if len(dlse) == 0 {
-		err = fmt.Errorf("Não foi encontrado nenhum DetalheLancamento com o NomeConta[%s] informado", nomeConta)
+		err = fmt.Errorf("não foi encontrado nenhum DetalheLancamento com o NomeConta[%s] informado", nomeConta)
 	}
 
 	return
@@ -215,7 +218,7 @@ func (dls DetalheLancamentos) ProcuraDetalheLancamentosPorIDLancamento(idLancame
 	}
 
 	if len(dlse) == 0 {
-		err = fmt.Errorf("Não foi encontrado nenhum DetalheLancamento com o IDLancamento[%d] informado", idLancamento)
+		err = fmt.Errorf("não foi encontrado nenhum DetalheLancamento com o IDLancamento[%d] informado", idLancamento)
 	}
 
 	return
@@ -251,7 +254,7 @@ func verifica(nomeConta string, debito, credito float64) (err error) {
 	} else if err = helper.VerificaValor("Credito", credito); err != nil {
 		return
 	} else if (debito + credito) == 0 {
-		return errors.New("Campos débito e crédito não podem ter simultaneamente valor zero(0)")
+		return errors.New("campos débito e crédito não podem ter simultaneamente valor zero(0)")
 	}
 
 	return

@@ -60,6 +60,38 @@ func RemoveDetalheLancamento02(db *gorm.DB, idLancamento int, nomeConta string) 
 	return nil
 }
 
+// CarregaDetalheLancamentos02 retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaDetalheLancamentos02(db *gorm.DB) (detalhe_lancamento.DetalheLancamentos, error) {
+	var tDetLanc detalhe_lancamento.TDetalheLancamentos
+	resultado := db.Find(&tDetLanc)
+
+	return ConverteTDetalheLancamentosParaDetalheLancamentos(resultado, &tDetLanc)
+}
+
+// CarregaDetalheLancamentosPorIDLancamento02 retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) ref ao id de lancamento informado e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) e um idLancamento(int) como parâmetro obrigatório
+func CarregaDetalheLancamentosPorIDLancamento02(db *gorm.DB, idLancamento int) (detalhe_lancamento.DetalheLancamentos, error) {
+	var tDetLanc detalhe_lancamento.TDetalheLancamentos
+	sql := getTemplateSQL("CarregaDetalheLancamentosPorIDLancamento02",
+		"{{.idLancamento}} = ?",
+		detalheLancamentoDB,
+	)
+	resultado := db.Where(sql, idLancamento).Find(&tDetLanc)
+
+	return ConverteTDetalheLancamentosParaDetalheLancamentos(resultado, &tDetLanc)
+}
+
+// CarregaDetalheLancamentosPorNomeConta02 retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) ref ao nome de conta informado e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) e um nomeConta(string) como parâmetro obrigatório
+func CarregaDetalheLancamentosPorNomeConta02(db *gorm.DB, nomeConta string) (detalhe_lancamento.DetalheLancamentos, error) {
+	var tDetLanc detalhe_lancamento.TDetalheLancamentos
+	sql := getTemplateSQL("CarregaDetalheLancamentosPorNomeConta02",
+		"{{.nomeConta}} = ?",
+		detalheLancamentoDB,
+	)
+	resultado := db.Where(sql, nomeConta).Find(&tDetLanc)
+
+	return ConverteTDetalheLancamentosParaDetalheLancamentos(resultado, &tDetLanc)
+}
+
 // CarregaDetalheLancamentos retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaDetalheLancamentos(db *sql.DB) (detalheLancamentos detalhe_lancamento.DetalheLancamentos, err error) {
 	sql := `

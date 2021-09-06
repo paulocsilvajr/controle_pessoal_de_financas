@@ -307,7 +307,7 @@ func CarregaLancamentosInativosPorCPFeConta02(db *gorm.DB, cpf, conta string) (l
 		"{{.cpfPessoa}} = ? AND {{.nomeConta}} = ? AND {{.estado}} = ?",
 		lancamentoDB,
 	)
-	estado := true
+	estado := false
 	resultado := db.Joins(innerJoin).Select(campos).Where(where, cpf, conta, estado).Find(&tlanc)
 
 	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)

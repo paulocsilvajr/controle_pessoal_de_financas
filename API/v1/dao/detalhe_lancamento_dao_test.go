@@ -178,6 +178,51 @@ func TestAlteraDetalheLancamento02(t *testing.T) {
 	}
 }
 
+func TestCarregaLancamentosPorCPFeConta02(t *testing.T) {
+	cpf := testPessoaAdminB02.Cpf
+	nomeConta := testContaB01.Nome
+	l, err := CarregaLancamentosPorCPFeConta02(db2, cpf, nomeConta)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantEsperada := 1
+	quantObtida := l.Len()
+	if quantObtida != quantEsperada {
+		t.Errorf("consulta de lançamentos por CPF '%s' e conta '%s' retornou uma quantidade de registros incorreta. Esperado: %d, obtido: %d", cpf, nomeConta, quantEsperada, quantObtida)
+	}
+}
+
+func TestCarregaLancamentosInativosPorCPFeConta02(t *testing.T) {
+	cpf := testPessoaAdminB02.Cpf
+	nomeConta := testContaB01.Nome
+	l, err := CarregaLancamentosInativosPorCPFeConta02(db2, cpf, nomeConta)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantEsperada := 0
+	quantObtida := l.Len()
+	if quantObtida != quantEsperada {
+		t.Errorf("consulta de lançamentos por CPF '%s' e conta '%s' retornou uma quantidade de registros incorreta. Esperado: %d, obtido: %d", cpf, nomeConta, quantEsperada, quantObtida)
+	}
+}
+
+func TestCarregaLancamentosAtivosPorCPFeConta02(t *testing.T) {
+	cpf := testPessoaAdminB02.Cpf
+	nomeConta := testContaB01.Nome
+	l, err := CarregaLancamentosAtivosPorCPFeConta02(db2, cpf, nomeConta)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantEsperada := 1
+	quantObtida := l.Len()
+	if quantObtida != quantEsperada {
+		t.Errorf("consulta de lançamentos por CPF '%s' e conta '%s' retornou uma quantidade de registros incorreta. Esperado: %d, obtido: %d", cpf, nomeConta, quantEsperada, quantObtida)
+	}
+}
+
 func TestRemoveDetalheLancamento02(t *testing.T) {
 	var err error
 	err = RemoveDetalheLancamento02(db2,

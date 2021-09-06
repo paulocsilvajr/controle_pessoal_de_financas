@@ -86,11 +86,6 @@ func TestCarregaLancamentosPorCPF02(t *testing.T) {
 	}
 }
 
-func TestCarregaLancamentosPorCPFeConta02(t *testing.T) {
-	// CarregaLancamentosPorCPFeConta02(db2, "11122233344", "conta inexistente")
-	t.Error("Função CarregaLancamentosPorCPFeConta02 NÃO foi TESTADA")
-}
-
 func TestAlteraLancamento02(t *testing.T) {
 	id := testLancamento01.ID
 	novoNumero := "Ln1234"
@@ -181,11 +176,6 @@ func TestCarregaLancamentosInativoPorCPF02(t *testing.T) {
 	}
 }
 
-func TestCarregaLancamentosInativosPorCPFeConta02(t *testing.T) {
-	// CarregaLancamentosInativosPorCPFeConta02(db2, "11122233344", "conta inexistente")
-	t.Error("Função CarregaLancamentosInativosPorCPFeConta02 NÃO foi TESTADA")
-}
-
 func TestAtivaLancamento02(t *testing.T) {
 	id := testLancamento01.ID
 	l, err := AtivaLancamento02(db2, id)
@@ -241,11 +231,6 @@ func TestCarregaLancamentosAtivoPorCPF02(t *testing.T) {
 			t.Errorf("consulta de lançamentos ativos por CPF '%s' retornou um cpf diferente do esperado. Esperado '%[1]s', obtido: '%s'", cpf, cpfObtido)
 		}
 	}
-}
-
-func TestCarregaLancamentosAtivosPorCPFeConta02(t *testing.T) {
-	// CarregaLancamentosAtivosPorCPFeConta02(db2, "11122233344", "conta inexistente")
-	t.Error("Função CarregaLancamentosAtivosPorCPFeConta02 NÃO foi TESTADA")
 }
 
 func TestRemoveLancamento02(t *testing.T) {

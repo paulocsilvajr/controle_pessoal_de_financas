@@ -200,18 +200,6 @@ func CarregaLancamentosPorCPF02(db *gorm.DB, cpf string) (lancamento.Lancamentos
 	resultado := db.Where(sql, cpf).Find(&tlanc)
 
 	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
-	// 	sql := `
-	// SELECT
-	// 	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
-	// FROM
-	// 	{{.tabela}}
-	// WHERE
-	// 	{{.cpfPessoa}} = $1
-	// `
-
-	// 	query := getTemplateQuery("CarregaLancamentosPorCpf", lancamentoDB, sql)
-
-	// 	return carregaLancamentos(db, query, cpf)
 }
 
 // CarregaLancamentosAtivoPorCPF02 retorna uma listagem de todos os lancamentos ativos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma string contendo o CPF(11 caracteres)
@@ -244,59 +232,85 @@ func CarregaLancamentosInativoPorCPF02(db *gorm.DB, cpf string) (lancamento.Lanc
 
 // CarregaLancamentosPorCPFeConta02 retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
 func CarregaLancamentosPorCPFeConta02(db *gorm.DB, cpf, conta string) (lancamento.Lancamentos, error) {
-	return nil, nil
-	// 	sql := `
-	// SELECT
-	// 	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
-	// FROM
-	// 	{{.tabela}}
-	// INNER JOIN
-	// 	{{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}
-	// WHERE
-	// 	{{.cpfPessoa}} = $1 AND {{.nomeConta}} = $2
-	// `
+	var tlanc lancamento.TLancamentos
 
-	// 	query := getTemplateQuery("CarregaLancamentosPorCpfEConta", lancamentoDB, sql)
+	campos := []string{
+		lancamentoDB["id"],
+		lancamentoDB["cpfPessoa"],
+		lancamentoDB["data"],
+		lancamentoDB["numero"],
+		lancamentoDB["descricao"],
+		lancamentoDB["dataCriacao"],
+		lancamentoDB["dataModificacao"],
+		lancamentoDB["estado"],
+	}
+	innerJoin := getTemplateSQL("CarregaLancamentosPorCPFeContasJoin",
+		"INNER JOIN {{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}",
+		lancamentoDB,
+	)
+	where := getTemplateSQL("CarregaLancamentosPorCPFeContasWhere",
+		"{{.cpfPessoa}} = ? AND {{.nomeConta}} = ?",
+		lancamentoDB,
+	)
+	resultado := db.Debug().Joins(innerJoin).Select(campos).Where(where, cpf, conta).Find(&tlanc)
 
-	// 	return carregaLancamentos(db, query, cpf, conta)
+	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
 }
 
-// CarregaLancamentosAtivoPorCPFeConta02 retorna uma listagem de todos os lancamentos ativos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
-func CarregaLancamentosAtivoPorCPFeConta02(db *gorm.DB, cpf, conta string) (lancamentos lancamento.Lancamentos, err error) {
-	return nil, nil
-	// 	sql := `
-	// SELECT
-	// 	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
-	// FROM
-	// 	{{.tabela}}
-	// INNER JOIN
-	// 	{{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}
-	// WHERE
-	// 	{{.cpfPessoa}} = $1 AND {{.nomeConta}} = $2 AND {{.estado}} = true
-	// `
+// CarregaLancamentosAtivosPorCPFeConta02 retorna uma listagem de todos os lancamentos ativos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
+func CarregaLancamentosAtivosPorCPFeConta02(db *gorm.DB, cpf, conta string) (lancamentos lancamento.Lancamentos, err error) {
+	var tlanc lancamento.TLancamentos
 
-	// 	query := getTemplateQuery("CarregaLancamentosAtivoPorCpfEConta", lancamentoDB, sql)
+	campos := []string{
+		lancamentoDB["id"],
+		lancamentoDB["cpfPessoa"],
+		lancamentoDB["data"],
+		lancamentoDB["numero"],
+		lancamentoDB["descricao"],
+		lancamentoDB["dataCriacao"],
+		lancamentoDB["dataModificacao"],
+		lancamentoDB["estado"],
+	}
+	innerJoin := getTemplateSQL("CarregaLancamentosPorCPFeContasJoin",
+		"INNER JOIN {{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}",
+		lancamentoDB,
+	)
+	where := getTemplateSQL("CarregaLancamentosPorCPFeContasWhere",
+		"{{.cpfPessoa}} = ? AND {{.nomeConta}} = ? AND {{.estado}} = ?",
+		lancamentoDB,
+	)
+	estado := true
+	resultado := db.Debug().Joins(innerJoin).Select(campos).Where(where, cpf, conta, estado).Find(&tlanc)
 
-	// 	return carregaLancamentos(db, query, cpf, conta)
+	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
 }
 
-// CarregaLancamentosInativoPorCPFeConta02 retorna uma listagem de todos os lancamentos inativos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
-func CarregaLancamentosInativoPorCPFeConta02(db *gorm.DB, cpf, conta string) (lancamentos lancamento.Lancamentos, err error) {
-	return nil, nil
-	// 	sql := `
-	// SELECT
-	// 	{{.id}}, {{.cpfPessoa}}, {{.data}}, {{.numero}}, {{.descricao}}, {{.dataCriacao}}, {{.dataModificacao}}, {{.estado}}
-	// FROM
-	// 	{{.tabela}}
-	// INNER JOIN
-	// 	{{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}
-	// WHERE
-	// 	{{.cpfPessoa}} = $1 AND {{.nomeConta}} = $2 AND {{.estado}} = false
-	// `
+// CarregaLancamentosInativosPorCPFeConta02 retorna uma listagem de todos os lancamentos inativos(lancamento.Lancamentos) de acordo com conta informada e erro = nil do BD caso a consulta ocorra corretamente a partir do CPF da pessoa informado. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório, uma string contendo o cpf(11 caracteres) e um nome de conta(string)
+func CarregaLancamentosInativosPorCPFeConta02(db *gorm.DB, cpf, conta string) (lancamentos lancamento.Lancamentos, err error) {
+	var tlanc lancamento.TLancamentos
 
-	// 	query := getTemplateQuery("CarregaLancamentosInativoPorCpfEConta", lancamentoDB, sql)
+	campos := []string{
+		lancamentoDB["id"],
+		lancamentoDB["cpfPessoa"],
+		lancamentoDB["data"],
+		lancamentoDB["numero"],
+		lancamentoDB["descricao"],
+		lancamentoDB["dataCriacao"],
+		lancamentoDB["dataModificacao"],
+		lancamentoDB["estado"],
+	}
+	innerJoin := getTemplateSQL("CarregaLancamentosPorCPFeContasJoin",
+		"INNER JOIN {{.tabelaComplementar01}} ON {{.id}} = {{.tabelaComplementar01}}.{{.idTabelaComplementar01}}",
+		lancamentoDB,
+	)
+	where := getTemplateSQL("CarregaLancamentosPorCPFeContasWhere",
+		"{{.cpfPessoa}} = ? AND {{.nomeConta}} = ? AND {{.estado}} = ?",
+		lancamentoDB,
+	)
+	estado := true
+	resultado := db.Debug().Joins(innerJoin).Select(campos).Where(where, cpf, conta, estado).Find(&tlanc)
 
-	// 	return carregaLancamentos(db, query, cpf, conta)
+	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
 }
 
 // CarregaLancamentos retorna uma listagem de todos os lancamentos(lancamento.Lancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório

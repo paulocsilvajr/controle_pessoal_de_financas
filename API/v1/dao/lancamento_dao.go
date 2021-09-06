@@ -36,12 +36,12 @@ func AdicionaLancamento02(db *gorm.DB, novoLancamento *lancamento.Lancamento) (*
 		return nil, err
 	}
 
-	tlancamento := ConverteLancamentoParaTLancamento(l)
-	err = db.Create(&tlancamento).Error
+	tLancamento := ConverteLancamentoParaTLancamento(l)
+	err = db.Create(&tLancamento).Error
 	if err != nil {
 		return nil, err
 	}
-	lancamento := ConverteTLancamentoParaLancamento(tlancamento)
+	lancamento := ConverteTLancamentoParaLancamento(tLancamento)
 
 	return lancamento, nil
 }
@@ -70,7 +70,7 @@ func RemoveLancamento02(db *gorm.DB, id int) error {
 	linhaAfetadas := tx.RowsAffected
 	var esperado int64 = 1
 	if linhaAfetadas != esperado {
-		return fmt.Errorf("remoção de lancamento com ID %d retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", id, esperado, linhaAfetadas)
+		return fmt.Errorf("remoção de lançamento com ID %d retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", id, esperado, linhaAfetadas)
 	}
 
 	return nil

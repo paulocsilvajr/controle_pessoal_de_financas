@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/detalhe_lancamento"
+	"gorm.io/gorm"
 )
 
 var (
@@ -21,6 +22,43 @@ var (
 		"fkLancamento":     lancamentoDB["id"],
 	}
 )
+
+// AdicionaDetalheLancamento02 adiciona um detalhe lancamento ao BD e retorna o detalhe lancamento incluída(*DetalheLancamento) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um detalhe lancamento(*DetalheLancamento)
+func AdicionaDetalheLancamento02(db *gorm.DB, novoDetalheLancamento *detalhe_lancamento.DetalheLancamento) (*detalhe_lancamento.DetalheLancamento, error) {
+	dl, err := detalhe_lancamento.NewDetalheLancamento(novoDetalheLancamento.IDLancamento, novoDetalheLancamento.NomeConta, novoDetalheLancamento.Debito, novoDetalheLancamento.Credito)
+	if err != nil {
+		return nil, err
+	}
+
+	tDetLancamento := ConverteDetalheLancamentoParaTDetalheLancamento(dl)
+	err = db.Create(&tDetLancamento).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return ConverteTDetalheLancamentoParaDetalheLancamento(tDetLancamento), nil
+}
+
+// RemoveDetalheLancamento02 remove um detalhe lancamento do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um int contendo o IDLancamento e um string contendo o NomeConta desejado
+func RemoveDetalheLancamento02(db *gorm.DB, idLancamento int, nomeConta string) (err error) {
+	dl := &detalhe_lancamento.TDetalheLancamento{
+		IDLancamento: idLancamento,
+		NomeConta:    nomeConta,
+	}
+
+	tx := db.Delete(dl)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de detalhe lançamento com ID %d e nome conta '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", idLancamento, nomeConta, esperado, linhaAfetadas)
+	}
+
+	return nil
+}
 
 // CarregaDetalheLancamentos retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaDetalheLancamentos(db *sql.DB) (detalheLancamentos detalhe_lancamento.DetalheLancamentos, err error) {

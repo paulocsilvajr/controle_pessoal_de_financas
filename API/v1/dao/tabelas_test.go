@@ -503,12 +503,29 @@ func getTTipoConta1() *tipo_conta.TTipoConta {
 	return ConverteTipoContaParaTTipoConta(tc)
 }
 
+func getTipoConta1() *tipo_conta.TipoConta {
+	tc, err := tipo_conta.NewTipoConta("banco", "saque", "depósito")
+	if err != nil {
+		return nil
+	}
+
+	return tc
+}
+
 func getTConta1(tc *tipo_conta.TTipoConta) *conta.TConta {
 	c, err := conta.NewConta("Juros", tc.Nome, "001", "", "teste de conta 001 em banco")
 	if err != nil {
 		return nil
 	}
 	return ConverteContaParaTConta(c)
+}
+
+func getConta1(tc *tipo_conta.TipoConta) *conta.Conta {
+	c, err := conta.NewConta("Juros", tc.Nome, "001", "", "teste de conta 001 em banco")
+	if err != nil {
+		return nil
+	}
+	return c
 }
 
 func getTConta2(tc *tipo_conta.TTipoConta, cp *conta.TConta) *conta.TConta {
@@ -533,6 +550,14 @@ func getLancamento2(p *pessoa.Pessoa) *lancamento.Lancamento {
 		return nil
 	}
 	return l
+}
+
+func getDetalheLancamento(l *lancamento.Lancamento, c *conta.Conta) *detalhe_lancamento.DetalheLancamento {
+	dl, err := detalhe_lancamento.NewDetalheLancamento(l.ID, c.Nome, 0.0, 123.0)
+	if err != nil {
+		return nil
+	}
+	return dl
 }
 
 func verificaErroConstraintExists(err error) error {

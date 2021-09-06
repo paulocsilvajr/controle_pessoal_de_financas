@@ -85,8 +85,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 // Login é um handler/controller que responde a rota '[POST] /login/{usuario}' e retorna StatusOK(200) e o token em string(com dados: usuário, email, tipo e validade codificados) caso o usuário e senha informados via JSON(body) estiverem corretos. Não é necessário ter um token válido para consultar essa rota. Retorna StatusUnprocessableEntity(422) caso o JSON(body) for inválido, StatusNotAcceptable(406) caso o usuário/senha informado estiver incorreto ou não existir, StatusNotFound(404) caso o usuário estiver inativo
 func Login(w http.ResponseWriter, r *http.Request) {
-	db := dao.GetDB()
-	defer db.Close()
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
 
 	var status int
 	vars := mux.Vars(r)
@@ -109,7 +109,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, nomeUsuario)
+	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario02(db02, nomeUsuario)
 	status = http.StatusNotAcceptable // 406
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {

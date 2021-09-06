@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,14 +12,15 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
+	"gorm.io/gorm"
 
 	"github.com/gorilla/mux"
 )
 
 // TipoContaIndex é um handler/controller que responde a rota '[GET] /tipos_conta' e retorna StatusOK(200) e uma listagem de tipos de conta de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500). Quando solicitado como usuário comum, retorna somente tipos de conta ativos, enquanto que como administrador, retorna todos os registros de tipo de conta
 func TipoContaIndex(w http.ResponseWriter, r *http.Request) {
-	db := dao.GetDB()
-	defer db.Close()
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
 
 	var status = http.StatusInternalServerError // 500
 
@@ -36,7 +36,7 @@ func TipoContaIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	_, err = dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -44,13 +44,13 @@ func TipoContaIndex(w http.ResponseWriter, r *http.Request) {
 
 	var listaTiposConta tipo_conta.TiposConta
 	if admin {
-		listaTiposConta, err = dao.CarregaTiposConta(db)
+		listaTiposConta, err = dao.CarregaTiposConta02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
 		}
 	} else {
-		listaTiposConta, err = dao.CarregaTiposContaAtiva(db)
+		listaTiposConta, err = dao.CarregaTiposContaAtiva02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
@@ -71,8 +71,8 @@ func TipoContaIndex(w http.ResponseWriter, r *http.Request) {
 
 // TipoContaShow é um handler/controller que responde a rota '[GET] /tipos_conta/{tipoConta}' e retorna StatusOK(200) e os dados do tipo de conta(nome) solicitada caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func TipoContaShow(w http.ResponseWriter, r *http.Request) {
-	db := dao.GetDB()
-	defer db.Close()
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
 
 	var status = http.StatusInternalServerError // 500
 
@@ -91,13 +91,13 @@ func TipoContaShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	tipoContaEncontrada, err := dao.ProcuraTipoConta(db, tipoContaRota)
+	tipoContaEncontrada, err := dao.ProcuraTipoConta02(db02, tipoContaRota)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -125,8 +125,8 @@ func TipoContaShow(w http.ResponseWriter, r *http.Request) {
 
 // TipoContaCreate é um handler/controller que responde a rota '[POST] /tipos_conta' e retorna StatusCreated(201) e os dados do tipo de conta criada através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"nome":"?",  "descricao_debito":"?", "descricao_credito":"?"}
 func TipoContaCreate(w http.ResponseWriter, r *http.Request) {
-	db := dao.GetDB()
-	defer db.Close()
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
 
 	var status = http.StatusInternalServerError
 	var tipoContaFromJSON tipo_conta.TipoConta
@@ -144,7 +144,7 @@ func TipoContaCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	_, err = dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -175,7 +175,7 @@ func TipoContaCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t, err := dao.AdicionaTipoConta(db, novoTipoConta)
+	t, err := dao.AdicionaTipoConta02(db02, novoTipoConta)
 	status = http.StatusInternalServerError // 500
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -196,8 +196,8 @@ func TipoContaCreate(w http.ResponseWriter, r *http.Request) {
 
 // TipoContaRemove é um handler/controller que responde a rota '[DELETE] /tipos_conta/{tipoConta}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que o tipo de conta informado seja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func TipoContaRemove(w http.ResponseWriter, r *http.Request) {
-	db := dao.GetDB()
-	defer db.Close()
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
 
 	var status = http.StatusInternalServerError // 500
 
@@ -216,7 +216,7 @@ func TipoContaRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -228,7 +228,7 @@ func TipoContaRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dao.RemoveTipoConta(db, tipoContaRemocao)
+	err = dao.RemoveTipoConta02(db02, tipoContaRemocao)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -248,8 +248,8 @@ func TipoContaRemove(w http.ResponseWriter, r *http.Request) {
 
 // TipoContaAlter é um handler/controller que responde a rota '[PUT] /tipos_conta/{tipoConta}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados do tipo de conta alterado caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o tipo de conta informado na rota existir. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {["nome":"?",]  "descricao_debito":"?", "descricao_credito":"?"}, sendo campo nome opcional, ou StatusNotModified(304) caso ocorra algum erro na alteração do BD. Quando não for informado nome, esse campo não será alterado
 func TipoContaAlter(w http.ResponseWriter, r *http.Request) {
-	db := dao.GetDB()
-	defer db.Close()
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
 
 	var status = http.StatusInternalServerError // 500
 	var tipoContaFromJSON tipo_conta.TipoConta
@@ -269,7 +269,7 @@ func TipoContaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	_, err = dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -295,8 +295,8 @@ func TipoContaAlter(w http.ResponseWriter, r *http.Request) {
 		tipoContaFromJSON.Nome = tipoContaAlteracao
 	}
 
-	t, err := dao.AlteraTipoConta(
-		db,
+	t, err := dao.AlteraTipoConta02(
+		db02,
 		tipoContaAlteracao,
 		&tipoContaFromJSON)
 	status = http.StatusNotModified // 304
@@ -319,8 +319,8 @@ func TipoContaAlter(w http.ResponseWriter, r *http.Request) {
 
 // TipoContaEstado é um handler/controller que responde a rota '[PUT] /tipos_conta/{tipoConta}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados do tipo de conta alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o tipo de conta informado na rota existir. Somente usuários ADMINISTRADORES podem ATIVAR tipos de conta, USUÁRIO COMUNS podem somente INATIVAR. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o tipo de conta informado na rota não existir
 func TipoContaEstado(w http.ResponseWriter, r *http.Request) {
-	db := dao.GetDB()
-	defer db.Close()
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
 
 	var status = http.StatusInternalServerError // 500
 	var estadoTipoConta estado
@@ -340,7 +340,7 @@ func TipoContaEstado(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -373,20 +373,20 @@ func TipoContaEstado(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tipoContaDBAlteracao, err := dao.ProcuraTipoConta(db, tipoContaAlteracao)
+	tipoContaDBAlteracao, err := dao.ProcuraTipoConta02(db02, tipoContaAlteracao)
 	status = http.StatusNotFound // 404
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	var alteraEstado func(*sql.DB, string) (*tipo_conta.TipoConta, error)
+	var alteraEstado func(*gorm.DB, string) (*tipo_conta.TipoConta, error)
 	if estadoTipoConta.Estado {
-		alteraEstado = dao.AtivaTipoConta
+		alteraEstado = dao.AtivaTipoConta02
 	} else {
-		alteraEstado = dao.InativaTipoConta
+		alteraEstado = dao.InativaTipoConta02
 	}
-	t, err := alteraEstado(db, tipoContaDBAlteracao.Nome)
+	t, err := alteraEstado(db02, tipoContaDBAlteracao.Nome)
 	status = http.StatusNotModified // 304
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {

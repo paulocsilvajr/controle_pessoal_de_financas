@@ -61,6 +61,31 @@ func TestCarregaLancamentos02(t *testing.T) {
 	}
 }
 
+func TestCarregaLancamentosPorCPF02(t *testing.T) {
+	cpf := testLancamento01.CpfPessoa
+	lancamentos, err := CarregaLancamentosPorCPF02(db2, cpf)
+	if err != nil {
+		t.Error(err)
+	}
+
+	quantLancamentos := len(lancamentos)
+	quantEsperada := 1
+	if quantLancamentos != quantEsperada {
+		t.Errorf("consulta de Lancamentos retornou uma quantidade de registros diferente do esperado. Esperado: %d, obtido: %d", quantEsperada, quantLancamentos)
+	}
+
+	id := testLancamento01.ID
+	for _, l := range lancamentos {
+		if l.CpfPessoa != cpf {
+			t.Errorf("registro de lancamento(CpfPessoa) encontrado diferente do esperado. Esperado: '%s', obtido: '%s'", cpf, l.CpfPessoa)
+		}
+
+		if l.ID != id {
+			t.Errorf("registro de lancamento(ID) encontrado diferente do esperado. Esperado: %d, obtido: %d", id, l.ID)
+		}
+	}
+}
+
 func TestAlteraLancamento02(t *testing.T) {
 	id := testLancamento01.ID
 	novoNumero := "Ln1234"

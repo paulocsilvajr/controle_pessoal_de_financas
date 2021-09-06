@@ -92,6 +92,50 @@ func CarregaDetalheLancamentosPorNomeConta02(db *gorm.DB, nomeConta string) (det
 	return ConverteTDetalheLancamentosParaDetalheLancamentos(resultado, &tDetLanc)
 }
 
+// ProcuraDetalheLancamento02 localiza um detalhe lancamento no BD e retorna o detalhe lancamento procurado(*DetalheLancamento). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e o ID e NomeConta do detalhe lancamento desejado
+func ProcuraDetalheLancamento02(db *gorm.DB, idLancamento int, nomeConta string) (*detalhe_lancamento.DetalheLancamento, error) {
+	tdl := new(detalhe_lancamento.TDetalheLancamento)
+
+	sql := getTemplateSQL("ProcuraDetalheLancamento02",
+		"{{.idLancamento}} = ? AND {{.nomeConta}} = ?",
+		detalheLancamentoDB,
+	)
+	tx := db.Where(sql, idLancamento, nomeConta).First(&tdl)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTDetalheLancamentoParaDetalheLancamento(tdl), nil
+}
+
+// AlteraDetalheLancamento02 altera um detalhe lancamento com o IDLancamento(int) e NomeConta(string) informado a partir dos dados do *DetalheLancamento informado no parâmetro detalheLancamentoAlteracao. O IDLancamento não é alterado. Retorna um *DetalheLancamento alterado no BD e um error. error != nil caso ocorra um problema.
+func AlteraDetalheLancamento02(db *gorm.DB, transacao *gorm.DB, idLancamento int, nomeConta string, detalheLancamentoAlteracao *detalhe_lancamento.DetalheLancamento) (*detalhe_lancamento.DetalheLancamento, error) {
+	detalheLancamentoBanco, err := ProcuraDetalheLancamento02(db, idLancamento, nomeConta)
+	if err != nil {
+		return nil, err
+	}
+
+	err = detalheLancamentoBanco.Altera(detalheLancamentoAlteracao.NomeConta, detalheLancamentoAlteracao.Debito, detalheLancamentoAlteracao.Credito)
+	if err != nil {
+		return nil, err
+	}
+
+	tdl := ConverteDetalheLancamentoParaTDetalheLancamento(detalheLancamentoBanco)
+	tx := transacao.Save(&tdl)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("alteração de detalhe lançamento com ID %d e nome conta '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", idLancamento, nomeConta, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTDetalheLancamentoParaDetalheLancamento(tdl), nil
+}
+
 // CarregaDetalheLancamentos retorna uma listagem de todos os detalhe lancamentos(detalhe_lancamento.detalheLancamentos) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaDetalheLancamentos(db *sql.DB) (detalheLancamentos detalhe_lancamento.DetalheLancamentos, err error) {
 	sql := `

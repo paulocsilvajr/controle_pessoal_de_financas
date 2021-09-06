@@ -252,7 +252,7 @@ func CarregaLancamentosPorCPFeConta02(db *gorm.DB, cpf, conta string) (lancament
 		"{{.cpfPessoa}} = ? AND {{.nomeConta}} = ?",
 		lancamentoDB,
 	)
-	resultado := db.Debug().Joins(innerJoin).Select(campos).Where(where, cpf, conta).Find(&tlanc)
+	resultado := db.Joins(innerJoin).Select(campos).Where(where, cpf, conta).Find(&tlanc)
 
 	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
 }
@@ -280,7 +280,7 @@ func CarregaLancamentosAtivosPorCPFeConta02(db *gorm.DB, cpf, conta string) (lan
 		lancamentoDB,
 	)
 	estado := true
-	resultado := db.Debug().Joins(innerJoin).Select(campos).Where(where, cpf, conta, estado).Find(&tlanc)
+	resultado := db.Joins(innerJoin).Select(campos).Where(where, cpf, conta, estado).Find(&tlanc)
 
 	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
 }
@@ -308,7 +308,7 @@ func CarregaLancamentosInativosPorCPFeConta02(db *gorm.DB, cpf, conta string) (l
 		lancamentoDB,
 	)
 	estado := true
-	resultado := db.Debug().Joins(innerJoin).Select(campos).Where(where, cpf, conta, estado).Find(&tlanc)
+	resultado := db.Joins(innerJoin).Select(campos).Where(where, cpf, conta, estado).Find(&tlanc)
 
 	return ConverteTLancamentosParaLancamentos(resultado, &tlanc)
 }

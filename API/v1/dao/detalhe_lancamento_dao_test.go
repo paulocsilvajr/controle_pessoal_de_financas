@@ -132,6 +132,52 @@ func TestCarregaDetalheLancamentosPorNomeConta02(t *testing.T) {
 	}
 }
 
+func TestProcuraDetalheLancamento02(t *testing.T) {
+	idLancamento := testLancamentoB01.ID
+	nomeConta := testContaB01.Nome
+	dl, err := ProcuraDetalheLancamento02(db2, idLancamento, nomeConta)
+	if err != nil {
+		t.Error(err)
+	}
+
+	idLancamentoEncontrado := dl.IDLancamento
+	if idLancamentoEncontrado != idLancamento {
+		t.Errorf("ID lançamento procurado diferente do encontrado. Esperado: %d, obtido: %d", idLancamento, idLancamentoEncontrado)
+	}
+
+	nomeContaEncontrada := dl.NomeConta
+	if nomeContaEncontrada != nomeConta {
+		t.Errorf("Nome de conta procurado diferente do encontrado. Esperado: '%s', obtido: '%s'", nomeConta, nomeContaEncontrada)
+	}
+}
+
+func TestAlteraDetalheLancamento02(t *testing.T) {
+	idLancamento := testDetalheLancamentoB01.IDLancamento
+	nomeConta := testDetalheLancamentoB01.NomeConta
+	novoValorCredito := 0.0
+	novoValorDebito := 250.0
+
+	testDetalheLancamentoB01.Credito = novoValorCredito
+	testDetalheLancamentoB01.Debito = novoValorDebito
+
+	transacao := db2.Begin()
+	dl, err := AlteraDetalheLancamento02(db2, transacao, idLancamento, nomeConta, testDetalheLancamentoB01)
+	transacao.Commit()
+	if err != nil {
+		t.Error(err)
+	}
+
+	credito := dl.Credito
+	if credito != novoValorCredito {
+		t.Errorf("alteração de detalhe lançamento com ID %d e nome conta '%s' retornou um 'Crédito' diferente do esperado. Esperado: %f, obtido: %f", idLancamento, nomeConta, novoValorCredito, credito)
+	}
+
+	debito := dl.Debito
+	if debito != novoValorDebito {
+		t.Errorf("alteração de detalhe lançamento com ID %d e nome conta '%s' retornou um 'Débito' diferente do esperado. Esperado: %f, obtido: %f", idLancamento, nomeConta, novoValorDebito, debito)
+	}
+}
+
 func TestRemoveDetalheLancamento02(t *testing.T) {
 	var err error
 	err = RemoveDetalheLancamento02(db2,

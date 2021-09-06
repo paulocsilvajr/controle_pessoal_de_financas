@@ -120,7 +120,7 @@ func TestPessoaCreate(t *testing.T) {
 	// criar pessoa como administrador - 201
 	admin := "teste01"
 	tokenPessoaAdmin, _ := getToken(admin, "123456")
-	rota := fmt.Sprintf("/pessoas")
+	rota := "/pessoas"
 	res, body, err := post(rota, `{"cpf":"00000002000",  "nome_completo":"Teste 20", "usuario":"teste20", "senha":"20123456", "email":"teste20@email.com"}`, tokenPessoaAdmin)
 	if err != nil {
 		t.Error(err)
@@ -140,7 +140,7 @@ func TestPessoaCreate(t *testing.T) {
 	}
 
 	// criar pessoa2 como administrador - 201
-	rota = fmt.Sprintf("/pessoas")
+	rota = "/pessoas"
 	res, body, _ = post(rota, `{"cpf":"00000003000",  "nome_completo":"Teste 30", "usuario":"teste30", "senha":"30123456", "email":"teste30@email.com"}`, tokenPessoaAdmin)
 	status = res.StatusCode
 	if status != 201 {
@@ -148,7 +148,7 @@ func TestPessoaCreate(t *testing.T) {
 	}
 
 	// criar pessoa3 como administrador - 201
-	rota = fmt.Sprintf("/pessoas")
+	rota = "/pessoas"
 	res, body, _ = post(rota, `{"cpf":"00000004000",  "nome_completo":"Teste 40", "usuario":"teste40", "senha":"40123456", "email":"teste40@email.com"}`, tokenPessoaAdmin)
 	status = res.StatusCode
 	if status != 201 {
@@ -158,7 +158,7 @@ func TestPessoaCreate(t *testing.T) {
 	// criar pessoa como usuário comum - 500
 	admin = "paulo"
 	tokenPessoaAdmin, _ = getToken(admin, "123456")
-	rota = fmt.Sprintf("/pessoas")
+	rota = "/pessoas"
 	res, body, _ = post(rota, `{"cpf":"00000005000",  "nome_completo":"Teste 50", "usuario":"teste50", "senha":"50123456", "email":"teste50@email.com"}`, tokenPessoaAdmin)
 	status = res.StatusCode
 	if status != 500 {
@@ -168,7 +168,7 @@ func TestPessoaCreate(t *testing.T) {
 	// erro ao criar pessoa com json inválido - 422
 	admin = "teste01"
 	tokenPessoaAdmin, _ = getToken(admin, "123456")
-	rota = fmt.Sprintf("/pessoas")
+	rota = "/pessoas"
 	res, body, _ = post(rota, "", tokenPessoaAdmin)
 	status = res.StatusCode
 	if status != 422 {
@@ -303,7 +303,7 @@ func TestPessoaAdmin(t *testing.T) {
 	// Retira privilégio de administrador para a pessoa(teste20) com usuário administrador(teste01) - 200
 	usuario = "teste20"
 	rota = fmt.Sprintf("/pessoas/%s/admin", usuario)
-	res, body, err = put(rota, `{"adminstrador": false}`, tokenPessoaAdmin)
+	res, body, _ = put(rota, `{"adminstrador": false}`, tokenPessoaAdmin)
 	status = res.StatusCode
 	if status != 200 {
 		t.Error(res, string(body))
@@ -312,7 +312,7 @@ func TestPessoaAdmin(t *testing.T) {
 	// Retira privilégio de administrador para a pessoa(teste01) com o próprio usuário - 500
 	usuario = "teste01"
 	rota = fmt.Sprintf("/pessoas/%s/admin", usuario)
-	res, body, err = put(rota, `{"adminstrador": false}`, tokenPessoaAdmin)
+	res, body, _ = put(rota, `{"adminstrador": false}`, tokenPessoaAdmin)
 	status = res.StatusCode
 	if status != 500 {
 		t.Error(res, string(body))

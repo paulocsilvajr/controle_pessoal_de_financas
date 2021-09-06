@@ -11,15 +11,27 @@ import (
 
 // Pessoa é uma struct que representa uma pessoa. Possui notações para JSON para cada campo
 type Pessoa struct {
-	Cpf             string    `json:"cpf"`
-	NomeCompleto    string    `json:"nome_completo"`
-	Usuario         string    `json:"usuario"`
-	Senha           string    `json:"senha"`
-	Email           string    `json:"email"`
-	DataCriacao     time.Time `json:"data_criacao"`
-	DataModificacao time.Time `json:"data_modificacao"`
-	Estado          bool      `json:"estado"`
-	Administrador   bool      `json:"administrador"`
+	Cpf             string    `json:"cpf" gorm:"primaryKey;size:11;not null"`
+	NomeCompleto    string    `json:"nome_completo" gorm:"size:100"`
+	Usuario         string    `json:"usuario" gorm:"size:20;not null;unique"`
+	Senha           string    `json:"senha" gorm:"size:64;not null"`
+	Email           string    `json:"email" gorm:"size:45;not null;unique"`
+	DataCriacao     time.Time `json:"data_criacao" gorm:"not null;autoCreateTime"`
+	DataModificacao time.Time `json:"data_modificacao" gorm:"not null;autoUpdateTime"`
+	Estado          bool      `json:"estado" gorm:"not null;default:true"`
+	Administrador   bool      `json:"administrador" gorm:"not null;default:false"`
+}
+
+type TPessoa Pessoa
+
+// TableName define o nome da tabela ao efetuar o AutoMigrate do GORM
+func (TPessoa) TableName() string {
+	return "pessoa"
+}
+
+// GetNomeTabelaPessoa retorna o nome da tabela Pessoa
+func GetNomeTabelaPessoa() string {
+	return new(TPessoa).TableName()
 }
 
 // LenCpf: tamanho obrigatório do CPF;
@@ -52,6 +64,9 @@ const (
 // Pessoas representa um conjunto/lista(slice) de pessoas(*Pessoa)
 type Pessoas []*Pessoa
 
+// Pessoas representa um conjunto/lista(slice) de TPessoas de acordo com o GORM(*TPessoa)
+type TPessoas []*TPessoa
+
 // IPessoa é uma interface que exibe o método GetMail para representar uma pessoa genérica(Pessoa e PessoaSimples)
 type IPessoa interface {
 	GetEmail() string
@@ -63,6 +78,8 @@ type IPessoas interface {
 	ProcuraPessoaPorUsuario(string) (IPessoa, error)
 	Len() int
 }
+
+type FuncaoNewPessoa func(string, string, string, string, string) (*Pessoa, error)
 
 // New retorna uma nova Pessoa(*Pessoa) comum através dos parâmetros informados(cpf, nome, usuario, senha e email). Função equivalente a criação de pessoa via literal &Pessoa{Cpf: ..., NomeCompleto: ..., ...}. Data de criação e modificação são definidos como o horário atual e o estado é definido como ativo. OBS: senha NÃO é hasheada e parâmetros NÃO são validados
 func New(cpf, nome, usuario, senha, email string) *Pessoa {

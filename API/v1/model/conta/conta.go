@@ -1,6 +1,7 @@
 package conta
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -32,6 +33,26 @@ type Conta struct {
 	Estado          bool      `json:"estado"`
 }
 
+type TConta struct {
+	Nome            string         `gorm:"primaryKey;size:50;not null"`
+	NomeTipoConta   string         `gorm:"size:50;not null"`
+	Codigo          sql.NullString `gorm:"size:19;unique"`
+	ContaPai        sql.NullString `gorm:"size:50"`
+	Comentario      sql.NullString `gorm:"size:150"`
+	DataCriacao     time.Time      `gorm:"not null;autoCreateTime"`
+	DataModificacao time.Time      `gorm:"not null;autoUpdateTime"`
+	Estado          bool           `gorm:"not null;default:true"`
+}
+
+func (TConta) TableName() string {
+	return "conta"
+}
+
+// GetNomeTabelaConta retorna o nome da tabela Conta
+func GetNomeTabelaConta() string {
+	return new(TConta).TableName()
+}
+
 // MaxConta: tamanho máximo para os campos de texto(string) Nome, NomeTipoConta e ContaPai
 // MaxCodigo: tamanho máximo para o Código
 // MaxComentario: tamanho máximo para o Comentário
@@ -49,6 +70,9 @@ type IContas interface {
 
 // Contas representa um conjunto/lista(slice) de Contas(*Conta)
 type Contas []*Conta
+
+// TContas representa um lista(slice) de TContas(*TConta) baseado no GORM
+type TContas []*TConta
 
 // converteParaConta converte uma interface IConta em um tipo Conta, se possível. Caso contrário, retorna nil para conta e um erro
 func converteParaConta(cb IConta) (*Conta, error) {

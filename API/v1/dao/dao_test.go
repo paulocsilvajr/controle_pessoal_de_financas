@@ -2,14 +2,17 @@ package dao
 
 import "testing"
 
-var (
-	db = GetDB()
-)
+func TestCreateDB(t *testing.T) {
+	err := CreateDBParaTestes()
+	if err != nil {
+		t.Error(err)
+	}
+}
 
-func TestGetDB(t *testing.T) {
-	db := GetDB()
-	err := db.Ping()
+func TestGetDB02(t *testing.T) {
+	db := GetDB02ParaTestes()
 
+	err := PingDB(db)
 	if err != nil {
 		t.Error("Não foi possível estabelecer conexão com o Banco de Dados", db)
 	}

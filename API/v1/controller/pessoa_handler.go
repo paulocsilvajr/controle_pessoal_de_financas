@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,10 +14,14 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 // PessoaIndex é um handler/controller que responde a rota '[GET] /pessoas' e retorna StatusOK(200) e uma listagem de pessoas de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaIndex(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	token, err := helper.GetToken(r, GetMySigningKey())
@@ -35,13 +38,13 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 
 	var listaPessoas pessoa.IPessoas
 	if admin {
-		listaPessoas, err = dao.CarregaPessoas(db)
+		listaPessoas, err = dao.CarregaPessoas02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
 		}
 	} else {
-		listaPessoas, err = dao.CarregaPessoasSimples(db)
+		listaPessoas, err = dao.CarregaPessoasSimples02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
@@ -54,7 +57,7 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = DefineHeaderRetorno(w, SetHeaderJSON, p.GetEmail() != emailToken, status, errors.New("Email de token não confere com email de pessoa"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, p.GetEmail() != emailToken, status, errors.New("email de token não confere com email de pessoa"))
 	if err != nil {
 		return
 	}
@@ -73,6 +76,9 @@ func PessoaIndex(w http.ResponseWriter, r *http.Request) {
 
 // PessoaShow é um handler/controller que responde a rota '[GET] /pessoas/{usuario}' e retorna StatusOK(200) e os dados da pessoa(usuário) solicitada caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB e igual ao usuário da rota. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func PessoaShow(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -91,12 +97,12 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := usuarioToken != usuarioRota
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário de token diferente do solicitado na rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("usuário de token diferente do solicitado na rota"))
 	if err != nil {
 		return
 	}
 
-	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario(db, usuarioRota)
+	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioRota)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -116,6 +122,9 @@ func PessoaShow(w http.ResponseWriter, r *http.Request) {
 
 // PessoaShowAdmin é um handler/controller que responde a rota '[GET] /pessoas/{usuarioAdmin}/{usuario}' e retorna StatusOK(200) e os dados da pessoa(usuário) solicitada caso o TOKEN informado for válido e o usuário administrador associado ao token for cadastrado na API/DB e igual ao usuário admin da rota. Caso não for encontrado o usuário informado no BD, retorna StatusNotFound(404). Para os outros erros, retorna StatusInternalServerError(500)
 func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -135,25 +144,25 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	verif := usuarioToken != usuarioAdmin
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário de token diferente do informado na rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("usuário de token diferente do informado na rota"))
 	if err != nil {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioAdmin)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioAdmin)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
 	verif = !(admin && usuarioDB.Administrador)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem usar essa rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem usar essa rota"))
 	if err != nil {
 		return
 	}
 
 	status = http.StatusNotFound // 404
-	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario(db, usuario)
+	pessoaEncontrada, err := dao.ProcuraPessoaPorUsuario02(db02, usuario)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -173,6 +182,9 @@ func PessoaShowAdmin(w http.ResponseWriter, r *http.Request) {
 
 // PessoaCreate é um handler/controller que responde a rota '[POST] /pessoas' e retorna StatusCreated(201) e os dados da pessoa criada através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"[, "administrador": ?]}
 func PessoaCreate(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError
 	var pessoaFromJSON pessoa.Pessoa
 	var novaPessoa *pessoa.Pessoa
@@ -189,14 +201,14 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
 	verif := !(admin && usuarioDB.Administrador)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem usar essa rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem usar essa rota"))
 	if err != nil {
 		return
 	}
@@ -227,12 +239,12 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	adicionaPessoa := dao.AdicionaPessoa
+	adicionaPessoa := dao.AdicionaPessoa02
 	if pessoaFromJSON.Administrador {
-		adicionaPessoa = dao.AdicionaPessoaAdmin
+		adicionaPessoa = dao.AdicionaPessoaAdmin02
 	}
 
-	p, err := adicionaPessoa(db, novaPessoa)
+	p, err := adicionaPessoa(db02, novaPessoa)
 	status = http.StatusInternalServerError // 500
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -253,6 +265,9 @@ func PessoaCreate(w http.ResponseWriter, r *http.Request) {
 
 // PessoaRemove é um handler/controller que responde a rota '[DELETE] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que o usuário informado na rota seja diferente ao do token e seja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusNotFound(404) caso não encontre o registro para remoção
 func PessoaRemove(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -270,26 +285,26 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
 	verif := !(admin && usuarioDB.Administrador)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem usar essa rota"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem usar essa rota"))
 	if err != nil {
 		return
 	}
 
 	verif = usuarioToken == usuarioRemocao
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, fmt.Errorf("O usuário %s não pode remover a si mesmo", usuarioToken))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, fmt.Errorf("o usuário %s não pode remover a si mesmo", usuarioToken))
 	if err != nil {
 		return
 	}
 
 	status = http.StatusNotFound // 404
-	err = dao.RemovePessoaPorUsuario(db, usuarioRemocao)
+	err = dao.RemovePessoaPorUsuario02(db02, usuarioRemocao)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -310,6 +325,9 @@ func PessoaRemove(w http.ResponseWriter, r *http.Request) {
 
 // PessoaAlter é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar qualquer usuário. Um usuário comum somente pode alterar a si mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"cpf":"?",  "nome_completo":"?", "usuario":"?", "senha":"?", "email":"?"} ou StatusNotModified(304) caso ocorra algum erro na alteração do BD
 func PessoaAlter(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 	var pessoaFromJSON pessoa.Pessoa
 
@@ -328,14 +346,14 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
 	verif := !(admin && usuarioDB.Administrador || usuarioToken == usuarioAlteracao)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores ou o próprio usuário pode alterar seus dados"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores ou o próprio usuário pode alterar seus dados"))
 	if err != nil {
 		return
 	}
@@ -356,7 +374,7 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioParaAlterar, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	usuarioParaAlterar, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioAlteracao)
 	status = http.StatusInternalServerError // 500
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -370,8 +388,8 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, err := dao.AlteraPessoaPorUsuario(
-		db,
+	p, err := dao.AlteraPessoaPorUsuario02(
+		db02,
 		usuarioAlteracao,
 		&pessoaFromJSON)
 	status = http.StatusNotModified // 304
@@ -394,6 +412,9 @@ func PessoaAlter(w http.ResponseWriter, r *http.Request) {
 
 // PessoaEstado é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem alterar o estado de usuários, mas não pode alterar o próprio estado. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
 func PessoaEstado(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 	var estadoPessoa estado
 
@@ -412,14 +433,14 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
 	verif := !(admin && usuarioDB.Administrador && usuarioToken != usuarioAlteracao)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem alterar o estado de pessoas que sejam diferentes do próprio administrador"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem alterar o estado de pessoas que sejam diferentes do próprio administrador"))
 	if err != nil {
 		return
 	}
@@ -440,20 +461,20 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioAlteracao)
 	status = http.StatusNotFound // 404
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	var alteraEstado func(*sql.DB, string) (*pessoa.Pessoa, error)
+	var alteraEstado func(*gorm.DB, string) (*pessoa.Pessoa, error)
 	if estadoPessoa.Estado {
-		alteraEstado = dao.AtivaPessoa
+		alteraEstado = dao.AtivaPessoa02
 	} else {
-		alteraEstado = dao.InativaPessoa
+		alteraEstado = dao.InativaPessoa02
 	}
-	p, err := alteraEstado(db, usuarioDBAlteracao.Cpf)
+	p, err := alteraEstado(db02, usuarioDBAlteracao.Cpf)
 	status = http.StatusNotModified // 304
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -474,6 +495,9 @@ func PessoaEstado(w http.ResponseWriter, r *http.Request) {
 
 // PessoaAdmin é um handler/controller que responde a rota '[PUT] /pessoas/{usuario}/admin' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da pessoa alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e o usuário informado na rota existir. Somente usuários administradores podem redefinir usuários como administrador, mas não pode alterar a sí mesmo. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"adminstrador": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso o usuário informado na rota não existir
 func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 	type administrador struct {
 		Administrador bool `json:"administrador"`
@@ -495,14 +519,14 @@ func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
 	verif := !(admin && usuarioDB.Administrador && usuarioToken != usuarioAlteracao)
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Somente administradores podem redefinir como administrador pessoas que sejam diferentes do próprio administrador"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("somente administradores podem redefinir como administrador pessoas que sejam diferentes do próprio administrador"))
 	if err != nil {
 		return
 	}
@@ -523,14 +547,14 @@ func PessoaAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario(db, usuarioAlteracao)
+	usuarioDBAlteracao, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioAlteracao)
 	status = http.StatusNotFound // 404
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	p, err := dao.SetAdministrador(db, usuarioDBAlteracao.Cpf, adminPessoa.Administrador)
+	p, err := dao.SetAdministrador02(db02, usuarioDBAlteracao.Cpf, adminPessoa.Administrador)
 	status = http.StatusNotModified // 304
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {

@@ -282,6 +282,16 @@ func AbrirConfiguracoes() Configuracoes {
 	return configuracoes
 }
 
+// AbrirConfiguracoesParaTestes retorna um map com as configurações de teste, mas adiciona ao nome do Banco o sufixo "_teste", para ser usado exclusivamente nos testes Test...
+func AbrirConfiguracoesParaTestes() Configuracoes {
+	config := AbrirConfiguracoes()
+	sufixo := "_teste"
+
+	config["DBnome"] = fmt.Sprintf("%s%s", config["DBnome"], sufixo)
+
+	return config
+}
+
 func getArquivoLog() string {
 	dirBase, _ := helper.GetDiretorioAbs()
 	dirBaseLog := path.Join(dirBase, diretorioLog)
@@ -301,7 +311,7 @@ func criarConfigPadrao() error {
 	configuracoes["DB"] = "postgres"
 	configuracoes["DBhost"] = "localhost"
 	configuracoes["DBporta"] = "15432"
-	configuracoes["DBnome"] = "controle_pessoal_financas"
+	configuracoes["DBnome"] = "controle_pessoal_financas_2"
 	configuracoes["DBusuario"] = "postgres"
 	configuracoes["DBsenha"] = "Postgres2019!"
 

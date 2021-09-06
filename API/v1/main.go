@@ -24,7 +24,9 @@ func main() {
 	host := configuracoes["host"]
 	protocolo := configuracoes["protocolo"]
 
-	verificaParametrosInicializacao()
+	if exitCode := verificaParametrosInicializacao(); exitCode >= 0 {
+		os.Exit(exitCode)
+	}
 
 	router := route.NewRouter()
 
@@ -48,14 +50,15 @@ func main() {
 }
 
 func criarUsuarioAdminInicial() {
-	db := dao.GetDB()
+	db := dao.GetDB02()
+	defer dao.CloseDB(db)
 
 	admin := pessoa.New("00000000000", "Administrador", "admin", "admin", "meuemail@email.com")
 
-	_, err := dao.ProcuraPessoaPorUsuario(db, admin.Usuario)
-	novaPessoa := new(pessoa.Pessoa)
+	_, err := dao.ProcuraPessoaPorUsuario02(db, admin.Usuario)
+	var novaPessoa *pessoa.Pessoa
 	if err != nil {
-		novaPessoa, err = dao.AdicionaPessoaAdmin(db, admin)
+		novaPessoa, err = dao.AdicionaPessoaAdmin02(db, admin)
 		if err != nil {
 			log.Fatal(err)
 		} else {
@@ -64,7 +67,7 @@ func criarUsuarioAdminInicial() {
 	} else {
 		confirmacao := inputString("Usuário admin já existe, deseja resetar para a senha padrão?[s/N]: ")
 		if strings.ToLower(confirmacao) == "s" {
-			novaPessoa, err = dao.AlteraPessoaPorUsuario(db, admin.Usuario, admin)
+			novaPessoa, err = dao.AlteraPessoaPorUsuario02(db, admin.Usuario, admin)
 			if err != nil {
 				log.Fatal(err)
 			} else {
@@ -73,33 +76,48 @@ func criarUsuarioAdminInicial() {
 		}
 	}
 
-	err = db.Close()
+	err = dao.CloseDB(db)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func verificaParametrosInicializacao() {
+func verificaParametrosInicializacao() int {
 	args := os.Args
 
 	if len(args) >= 2 {
 		switch args[1] {
 		case "--init", "-i":
+			if err := dao.CreateDB(); err != nil {
+				panic(err)
+			}
+
+			if err := dao.CriarTabelas(); err != nil {
+				panic(err)
+			}
+
 			criarUsuarioAdminInicial()
-		case "--rotes", "-r":
+
+			fmt.Println("\nCriado banco de dados, tabelas e usuário Admin, se essas estruturas não existirem.\nReexecute a API sem parâmetros para reconhecer o banco de dados e iniciar o seu uso")
+			return 0
+		case "--routes", "-r":
 			imprimeRotas()
-			os.Exit(0)
+			return 0
 		case "--help", "-h":
 			fmt.Printf(`Uso: %s [ -h | --help | -i | --init ]
 Inicia a API do "Controle Pessoa de Finanças"
 Argumentos:
-  -i, --init         cria o usuário administrador inicial "admin" com senha "admin"
+  -i, --init         cria o banco de dados(de acordo com config.json), as tabelas e o usuário administrador inicial "admin" com senha "admin"
   -r, --routes        exibe as métodos/rotas cadastradas na API
   -h, --help         exibe essa ajuda
 `, args[0])
-			os.Exit(1)
+			return 1
+		default:
+			fmt.Println("Argumento informado inválido. Use '-h' e '--help' para obter ajuda")
+			return 1
 		}
 	}
+	return -1
 }
 
 func imprimeRotas() {
@@ -108,7 +126,7 @@ func imprimeRotas() {
 	t.AppendHeader(table.Row{"TIPO", "ROTA"})
 	for _, rota := range config.Rotas {
 		t.AppendRow([]interface{}{rota.Tipo, rota.Rota})
-		t.AppendSeparator()
+		// t.AppendSeparator()
 	}
 	t.Render()
 

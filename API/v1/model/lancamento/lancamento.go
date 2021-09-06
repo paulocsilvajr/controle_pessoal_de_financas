@@ -1,6 +1,7 @@
 package lancamento
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -34,6 +35,25 @@ type Lancamento struct {
 	Estado          bool
 }
 
+type TLancamento struct {
+	ID              int            `gorm:"primaryKey;autoIncrement:true;not null"`
+	CpfPessoa       string         `gorm:"size:11;not null"`
+	Data            time.Time      `gorm:"not null;autoUpdateTime"`
+	Numero          sql.NullString `gorm:"size:19"`
+	Descricao       string         `gorm:"size:100;not null"`
+	DataCriacao     time.Time      `gorm:"not null;autoCreateTime"`
+	DataModificacao time.Time      `gorm:"not null;autoUpdateTime"`
+	Estado          bool           `gorm:"not null;default:true"`
+}
+
+func (TLancamento) TableName() string {
+	return "lancamento"
+}
+
+func GetNomeTabelaLancamento() string {
+	return new(TLancamento).TableName()
+}
+
 // MaxCPFPessoa: tamanho máximo para o campo CpfPessoa, baseado em modelo em model.pessoa
 // MaxNumero: tamamho máximo para o campo Numero, baseado em modelo em model.conta
 // MaxDescricao: tamanho máximo para o campo Descricao
@@ -52,6 +72,9 @@ type ILancamentos interface {
 
 // Lancamentos representa um conjunto/lista(slice) de Lancamentos(*Lancamento)
 type Lancamentos []*Lancamento
+
+// TLancamentos representa um conjunto/lista(slice) de TLancamentos(*TLancamento)
+type TLancamentos []*TLancamento
 
 // converterParaLancamento converte um intergface ILancamento em um tipo Lancamento, se possível. Caso contrário retorna nil para lancamento e um erro
 func converterParaLancamento(lb ILancamento) (*Lancamento, error) {
@@ -75,7 +98,7 @@ func New(id int, cpfPessoa string, data time.Time, numero, descricao string) *La
 		Estado:          true}
 }
 
-// NewLancamento cria uma novo Lancamento semelhante a função New(), mas faz a validação dos campos informados nos parâmetros id, cpfPeddoa, data, numero e descricao
+// NewLancamento cria uma novo Lancamento semelhante a função New(), mas faz a validação dos campos informados nos parâmetros id, cpfPessoa, data, numero e descricao
 func NewLancamento(id int, cpfPessoa string, data time.Time, numero, descricao string) (lancamento *Lancamento, err error) {
 	lancamento = New(id, cpfPessoa, data, numero, descricao)
 
@@ -84,6 +107,11 @@ func NewLancamento(id int, cpfPessoa string, data time.Time, numero, descricao s
 	}
 
 	return
+}
+
+// NewLancamento cria uma novo Lancamento semelhante a função New(), mas faz a validação dos campos informados nos parâmetros cpfPessoa, data, numero e descricao. Inicializa o id como 0
+func NewLancamento02(cpfPessoa string, data time.Time, numero, descricao string) (lancamento *Lancamento, err error) {
+	return NewLancamento(0, cpfPessoa, data, numero, descricao)
 }
 
 // GetLancamentoTest retorna um Lancamento teste usado para os testes em geral

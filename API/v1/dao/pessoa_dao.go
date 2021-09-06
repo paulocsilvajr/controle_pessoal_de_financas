@@ -3,13 +3,15 @@ package dao
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
+	"gorm.io/gorm"
 )
 
 var (
 	pessoaDB = map[string]string{
-		"tabela":          "pessoa",
+		"tabela":          pessoa.GetNomeTabelaPessoa(),
 		"cpf":             "cpf",
 		"nomeCompleto":    "nome_completo",
 		"usuario":         "usuario",
@@ -20,6 +22,245 @@ var (
 		"estado":          "estado",
 		"administrador":   "administrador"}
 )
+
+// CarregaPessoas02 retorna uma listagem de pessoas(pessoa.Pessoas) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaPessoas02(db *gorm.DB) (pessoa.Pessoas, error) {
+	var tpessoas pessoa.TPessoas
+	resultado := db.Find(&tpessoas)
+
+	return ConverteTPessoasParaPessoas(resultado, &tpessoas)
+}
+
+// AdicionaPessoa02 adiciona uma pessoa comum ao BD e retorna a pessoa incluída(*Pessoa) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) e uma pessoa(*Pessoa) como parâmetros obrigatórios
+func AdicionaPessoa02(db *gorm.DB, novaPessoa *pessoa.Pessoa) (*pessoa.Pessoa, error) {
+	return adicionaPessoaBase02(db, novaPessoa, pessoa.NewPessoa)
+}
+
+// AdicionaPessoaAdmin02 adiciona uma pessoa administradora ao BD e retorna a pessoa incluída(*Pessoa) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) e uma pessoa(*Pessoa) como parâmetros obrigatórios
+func AdicionaPessoaAdmin02(db *gorm.DB, novaPessoa *pessoa.Pessoa) (*pessoa.Pessoa, error) {
+	return adicionaPessoaBase02(db, novaPessoa, pessoa.NewPessoaAdmin)
+}
+
+// RemovePessoa02 remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) e uma string contendo o CPF da pessoa desejada como parâmetros obrigatórios
+func RemovePessoa02(db *gorm.DB, cpf string) error {
+	p := &pessoa.TPessoa{Cpf: cpf}
+
+	tx := db.Delete(p)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de pessoa com CPF '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", cpf, esperado, linhaAfetadas)
+	}
+
+	return nil
+}
+
+// RemovePessoaPorUsuario02 remove uma pessoa do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) e uma string contendo o USUÁRIO da pessoa desejada como parâmetros obrigatórios
+func RemovePessoaPorUsuario02(db *gorm.DB, usuario string) error {
+	p := new(pessoa.TPessoa)
+
+	sql := fmt.Sprintf("%s = ?", pessoaDB["usuario"])
+
+	tx := db.Where(sql, usuario).Delete(p)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de pessoa por usuário '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", usuario, esperado, linhaAfetadas)
+	}
+
+	return nil
+}
+
+// ProcuraPessoa02 localiza uma pessoa no BD e retorna a pessoa procurada(*Pessoa). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um CPF(string) da pessoa desejada
+func ProcuraPessoa02(db *gorm.DB, cpf string) (*pessoa.Pessoa, error) {
+	tp := new(pessoa.TPessoa)
+
+	tx := db.First(&tp, cpf)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
+// ProcuraPessoaPorUsuario02 localiza uma pessoa no BD e retorna a pessoa procurada(*Pessoa). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma string contendo o USUÁRIO da pessoa desejada
+func ProcuraPessoaPorUsuario02(db *gorm.DB, usuario string) (*pessoa.Pessoa, error) {
+	tp := new(pessoa.TPessoa)
+
+	sql := getTemplateSQL(
+		"ProcuraPessoaPorUsuario02",
+		"{{.usuario}} = ?",
+		pessoaDB,
+	)
+	tx := db.Where(sql, usuario).First(&tp)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
+// AlteraPessoa02 altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa. Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
+func AlteraPessoa02(db *gorm.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (*pessoa.Pessoa, error) {
+	pessoaBanco, err := ProcuraPessoa02(db, cpf)
+	if err != nil {
+		return nil, err
+	}
+
+	err = pessoaBanco.Altera(pessoaAlteracao.Cpf, pessoaAlteracao.NomeCompleto, pessoaAlteracao.Usuario, pessoaAlteracao.Senha, pessoaAlteracao.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	tp := ConvertePessoaParaTPessoa(pessoaBanco)
+	tx := db.Save(&tp)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("alteração de pessoa com CPF '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", cpf, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
+// AlteraPessoaPorUsuario02 altera uma pessoa com o usuário(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa. Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
+func AlteraPessoaPorUsuario02(db *gorm.DB, usuario string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := ProcuraPessoaPorUsuario02(db, usuario)
+	if err != nil {
+		return nil, err
+	}
+
+	err = pessoaBanco.Altera(pessoaAlteracao.Cpf, pessoaAlteracao.NomeCompleto, pessoaAlteracao.Usuario, pessoaAlteracao.Senha, pessoaAlteracao.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	tp := ConvertePessoaParaTPessoa(pessoaBanco)
+	tx := db.Save(&tp)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("alteração de pessoa com usuário '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", usuario, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
+// AtivaPessoa02 ativa uma pessoa no BD e retorna a pessoa(*Pessoa) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um CPF(string) da pessoa desejada
+func AtivaPessoa02(db *gorm.DB, cpf string) (*pessoa.Pessoa, error) {
+	pessoaBanco, err := ProcuraPessoa02(db, cpf)
+	if err != nil {
+		return nil, err
+	}
+
+	pessoaBanco.Ativa()
+
+	tp := ConvertePessoaParaTPessoa(pessoaBanco)
+	tx := db.Save(&tp)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("ativação de pessoa com CPF '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", cpf, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
+// InativaPessoa02 inativa uma pessoa no BD e retorna a pessoa(*Pessoa) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um CPF(string) da pessoa desejada
+func InativaPessoa02(db *gorm.DB, cpf string) (*pessoa.Pessoa, error) {
+	pessoaBanco, err := ProcuraPessoa02(db, cpf)
+	if err != nil {
+		return nil, err
+	}
+
+	pessoaBanco.Inativa()
+
+	tp := ConvertePessoaParaTPessoa(pessoaBanco)
+	tx := db.Save(&tp)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("desativação de pessoa com CPF '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", cpf, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
+// SetAdministrador02 define com administrador de acordo com parâmetro boleado admin informado e retorna a pessoa com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório, um CPF(string) da pessoa desejada e o valor boleano(bool) no parâmetro admin
+func SetAdministrador02(db *gorm.DB, cpf string, admin bool) (*pessoa.Pessoa, error) {
+	pessoaBanco, err := ProcuraPessoa02(db, cpf)
+	if err != nil {
+		return nil, err
+	}
+
+	pessoaBanco.SetAdmin(admin)
+
+	tp := ConvertePessoaParaTPessoa(pessoaBanco)
+	tx := db.Save(&tp)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("definir pessoa com CPF '%s' como administrador retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", cpf, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTPessoaParaPessoa(tp), nil
+}
+
+// AlteraPessoa altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa. Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
+func AlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
+	pessoaBanco, err := ProcuraPessoa(db, cpf)
+	if err != nil {
+		return
+	}
+
+	err = pessoaBanco.Altera(pessoaAlteracao.Cpf, pessoaAlteracao.NomeCompleto, pessoaAlteracao.Usuario, pessoaAlteracao.Senha, pessoaAlteracao.Email)
+	if err != nil {
+		return
+	}
+
+	sql := `
+UPDATE {{.tabela}}
+SET {{.nomeCompleto}} = $1, {{.usuario}} = $2, {{.senha}} = $3, {{.email}} = $4, {{.dataModificacao}} = $5
+WHERE {{.cpf}} = $6
+`
+
+	query := getTemplateQuery("AlteraPessoa", pessoaDB, sql)
+
+	return alteraPessoa(db, pessoaBanco, query, cpf)
+}
 
 // CarregaPessoas retorna uma listagem de pessoas(pessoa.Pessoas) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaPessoas(db *sql.DB) (pessoas pessoa.Pessoas, err error) {
@@ -121,29 +362,6 @@ WHERE {{.usuario}} = $1
 	}
 
 	return
-}
-
-// AlteraPessoa altera uma pessoa com o cpf(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa. Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
-func AlteraPessoa(db *sql.DB, cpf string, pessoaAlteracao *pessoa.Pessoa) (p *pessoa.Pessoa, err error) {
-	pessoaBanco, err := ProcuraPessoa(db, cpf)
-	if err != nil {
-		return
-	}
-
-	err = pessoaBanco.Altera(pessoaAlteracao.Cpf, pessoaAlteracao.NomeCompleto, pessoaAlteracao.Usuario, pessoaAlteracao.Senha, pessoaAlteracao.Email)
-	if err != nil {
-		return
-	}
-
-	sql := `
-UPDATE {{.tabela}}
-SET {{.nomeCompleto}} = $1, {{.usuario}} = $2, {{.senha}} = $3, {{.email}} = $4, {{.dataModificacao}} = $5
-WHERE {{.cpf}} = $6
-`
-
-	query := getTemplateQuery("AlteraPessoa", pessoaDB, sql)
-
-	return alteraPessoa(db, pessoaBanco, query, cpf)
 }
 
 // AlteraPessoaPorUsuario altera uma pessoa com o usuário(string) informado a partir dos dados da *Pessoa informada no parâmetro pessoaAlteracao. Os campos Cpf(PK) e Estado não são alterados. Use a função específica para essa tarefa. Retorna uma *Pessoa alterada no BD e um error. error != nil caso ocorra um problema.
@@ -406,4 +624,20 @@ func scanPessoas02(rows *sql.Rows, pessoaAtual *pessoa.PessoaSimples) error {
 		&pessoaAtual.Email,
 		&pessoaAtual.DataCriacao,
 		&pessoaAtual.DataModificacao)
+}
+
+func adicionaPessoaBase02(db *gorm.DB, novaPessoa *pessoa.Pessoa, newPessoa pessoa.FuncaoNewPessoa) (p *pessoa.Pessoa, err error) {
+	p, err = newPessoa(novaPessoa.Cpf, novaPessoa.NomeCompleto, novaPessoa.Usuario, novaPessoa.Senha, novaPessoa.Email)
+	if err != nil {
+		return
+	}
+
+	tpessoa := ConvertePessoaParaTPessoa(p)
+	err = db.Create(&tpessoa).Error
+	if err != nil {
+		return
+	}
+	pessoa := ConverteTPessoaParaPessoa(tpessoa)
+
+	return pessoa, nil
 }

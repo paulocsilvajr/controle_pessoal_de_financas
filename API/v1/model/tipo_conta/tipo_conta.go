@@ -22,12 +22,23 @@ type ITipoConta interface {
 
 // TipoConta é uma struct que representa um tipo de conta. Possui notações JSON para cada campo e tem a composição da interface ITipoConta
 type TipoConta struct {
-	Nome             string    `json:"nome"`
-	DescricaoDebito  string    `json:"descricao_debito"`
-	DescricaoCredito string    `json:"descricao_credito"`
-	DataCriacao      time.Time `json:"data_criacao"`
-	DataModificacao  time.Time `json:"data_modificacao"`
-	Estado           bool      `json:"estado"`
+	Nome             string    `json:"nome" gorm:"primaryKey;size:50;not null"`
+	DescricaoDebito  string    `json:"descricao_debito" gorm:"size:20;not null"`
+	DescricaoCredito string    `json:"descricao_credito" gorm:"size:20;not null"`
+	DataCriacao      time.Time `json:"data_criacao" gorm:"not null;autoCreateTime"`
+	DataModificacao  time.Time `json:"data_modificacao" gorm:"not null;autoUpdateTime"`
+	Estado           bool      `json:"estado" gorm:"not null;default:true"`
+}
+
+type TTipoConta TipoConta
+
+func (TTipoConta) TableName() string {
+	return "tipo_conta"
+}
+
+// GetNomeTabelaTipoConta retorna o nome da tabela TipoConta
+func GetNomeTabelaTipoConta() string {
+	return new(TTipoConta).TableName()
 }
 
 // MaxNome: tamanho máximo para o nome do tipo de conta
@@ -51,6 +62,9 @@ type ITiposConta interface {
 
 // TiposConta representa um conjunto/lista(slice) de Tipos de Contas(*TipoConta)
 type TiposConta []*TipoConta
+
+// TTiposConta representa um conjunto/lista(slice) de Tipos de Contas de acordo com o GORM(*TTipoConta)
+type TTiposConta []*TTipoConta
 
 // New retorna uma novo Tipo de Conta(*TipoConta) através dos parâmetros informados(nome, descDebito e descCredito). Função equivalente a criação de um TipoConta via literal &TipoConta{Nome: ..., ...}. Data de criação e modificação são definidos como o horário atual e o estado é definido como ativo
 func New(nome, descDebito, descCredito string) *TipoConta {

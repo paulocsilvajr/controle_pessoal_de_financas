@@ -1,6 +1,6 @@
-FROM golang:1.12-buster
+FROM golang:1.16-buster
 
-WORKDIR /go/src
+WORKDIR /go/src/controle_pessoal_de_financas
 COPY install_dependencies.sh .
 
 RUN ./install_dependencies.sh

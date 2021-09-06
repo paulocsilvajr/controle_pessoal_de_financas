@@ -3,13 +3,15 @@ package dao
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
+	"gorm.io/gorm"
 )
 
 var (
 	contaDB = map[string]string{
-		"tabela":          "conta",
+		"tabela":          conta.GetNomeTabelaConta(),
 		"nome":            "nome",
 		"nomeTipoConta":   "nome_tipo_conta",
 		"codigo":          "codigo",
@@ -17,8 +19,190 @@ var (
 		"comentario":      "comentario",
 		"dataCriacao":     "data_criacao",
 		"dataModificacao": "data_modificacao",
-		"estado":          "estado"}
+		"estado":          "estado",
+		"tabelaTipoConta": tipoContaDB["tabela"],
+		"fkTipoConta":     tipoContaDB["nome"],
+	}
 )
+
+func GetPrimaryKeyConta() string {
+	return contaDB["nome"]
+}
+
+// AdicionaConta02 adiciona uma conta ao BD e retorna a conta incluída(*Conta) com os dados de acordo como ficou no BD. erro != nil caso ocorra um problema no processo de inclusão. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma conta(*Conta)
+func AdicionaConta02(db *gorm.DB, novaConta *conta.Conta) (*conta.Conta, error) {
+	c, err := conta.NewConta(novaConta.Nome, novaConta.NomeTipoConta, novaConta.Codigo, novaConta.ContaPai, novaConta.Comentario)
+	if err != nil {
+		return nil, err
+	}
+
+	tc := ConverteContaParaTConta(c)
+	err = db.Create(&tc).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
+// RemoveConta02 remove uma conta do BD e retorna erro != nil caso ocorra um problema no processo de remoção. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e uma string contendo o NOME da conta desejado
+func RemoveConta02(db *gorm.DB, nome string) error {
+	c := &conta.TConta{Nome: nome}
+
+	tx := db.Delete(c)
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return fmt.Errorf("remoção de conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", nome, esperado, linhaAfetadas)
+	}
+
+	return nil
+}
+
+// ProcuraConta02 localiza uma conta no BD e retorna a conta procurada(*Conta). erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e o NOME da conta desejada
+func ProcuraConta02(db *gorm.DB, nome string) (*conta.Conta, error) {
+	tc := new(conta.TConta)
+
+	sql := getTemplateSQL(
+		"ProcuraConta02",
+		"{{.nome}} = ?",
+		contaDB,
+	)
+	tx := db.Where(sql, nome).First(&tc)
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
+// AlteraConta02 altera uma conta com o nome(string) informado a partir dos dados da *Conta informada no parâmetro contaAlteracao. O campo Estado não é alterado, enquanto que o campo Nome sim. Use a função específica para essa tarefa(estado). Retorna uma *Conta alterada no BD(*gorm.DB) e um error. error != nil caso ocorra um problema.
+func AlteraConta02(db *gorm.DB, nome string, contaAlteracao *conta.Conta) (*conta.Conta, error) {
+	contaBanco, err := ProcuraConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	err = contaBanco.Altera(contaAlteracao.Nome, contaAlteracao.NomeTipoConta, contaAlteracao.Codigo, contaAlteracao.ContaPai, contaAlteracao.Comentario)
+	if err != nil {
+		return nil, err
+	}
+
+	tc := ConverteContaParaTConta(contaBanco)
+	var tx *gorm.DB
+	if nome != tc.Nome {
+		sql := getTemplateSQL(
+			"AlteraConta02",
+			"{{.nome}}",
+			contaDB,
+		)
+		novoNome := tc.Nome
+		tc.Nome = nome
+		tx = db.Model(&tc).Update(sql, novoNome)
+	} else {
+		tx = db.Save(&tc)
+	}
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("alteração de conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, obtido: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
+// AtivaConta02 ativa uma conta no BD e retorna a conta(*Conta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um NOME(string) da Conta desejada
+func AtivaConta02(db *gorm.DB, nome string) (*conta.Conta, error) {
+	contaBanco, err := ProcuraConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	contaBanco.Ativa()
+
+	tc := ConverteContaParaTConta(contaBanco)
+	tx := db.Save(&tc)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("ativação de conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
+// InativaConta02 inativa uma conta no BD e retorna a conta(*Conta) com os dados atualizados. erro != nil caso ocorra um problema no processo de procura. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório e um NOME(string) da Conta desejada
+func InativaConta02(db *gorm.DB, nome string) (*conta.Conta, error) {
+	contaBanco, err := ProcuraConta02(db, nome)
+	if err != nil {
+		return nil, err
+	}
+
+	contaBanco.Inativa()
+
+	tc := ConverteContaParaTConta(contaBanco)
+	tx := db.Save(&tc)
+
+	linhaAfetadas := tx.RowsAffected
+	var esperado int64 = 1
+	if linhaAfetadas != esperado {
+		return nil, fmt.Errorf("inativação de conta com nome '%s' retornou uma quantidade de registros afetados incorreto. Esperado: %d, retorno: %d", nome, esperado, linhaAfetadas)
+	}
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return ConverteTContaParaConta(tc), nil
+}
+
+// CarregaContas02 retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaContas02(db *gorm.DB) (conta.Contas, error) {
+	var tContas conta.TContas
+	resultado := db.Find(&tContas)
+
+	return ConverteTContasParaContas(resultado, &tContas)
+}
+
+// CarregaContasAtiva02 retorna uma listagem de contas ativas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaContasAtiva02(db *gorm.DB) (conta.Contas, error) {
+	var tContas conta.TContas
+	sql := getTemplateSQL(
+		"CarregaContasAtiva02",
+		"{{.estado}} = true",
+		contaDB,
+	)
+	resultado := db.Where(sql).Find(&tContas)
+
+	return ConverteTContasParaContas(resultado, &tContas)
+}
+
+// CarregaContasInativa02 retorna uma listagem de contas inativas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD(*gorm.DB) como parâmetro obrigatório
+func CarregaContasInativa02(db *gorm.DB) (conta.Contas, error) {
+	var tContas conta.TContas
+	sql := getTemplateSQL(
+		"CarregaContasAtiva02",
+		"{{.estado}} = false",
+		contaDB,
+	)
+	resultado := db.Where(sql).Find(&tContas)
+
+	return ConverteTContasParaContas(resultado, &tContas)
+}
 
 // CarregaContas retorna uma listagem de todos as contas(conta.Conta) e erro = nil do BD caso a consulta ocorra corretamente. erro != nil caso ocorra um problema. Deve ser informado uma conexão ao BD como parâmetro obrigatório
 func CarregaContas(db *sql.DB) (contas conta.Contas, err error) {

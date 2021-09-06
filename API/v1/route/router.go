@@ -7,7 +7,8 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
-	jwt "github.com/dgrijalva/jwt-go"
+	// jwt "github.com/dgrijalva/jwt-go" // repositório original
+	jwt "github.com/form3tech-oss/jwt-go" // fork
 	"github.com/gorilla/mux"
 )
 

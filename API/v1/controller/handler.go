@@ -17,7 +17,8 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/logger"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
 
-	"github.com/dgrijalva/jwt-go"
+	// "github.com/dgrijalva/jwt-go"  // repositório original
+	"github.com/form3tech-oss/jwt-go" // fork
 	"github.com/gorilla/mux"
 )
 
@@ -26,7 +27,6 @@ var (
 The gunpowder treason and plot;
 I know of no reason why the gunpowder treason
 Should ever be forgot.`)
-	db = dao.GetDB()
 )
 
 // GetMySigningKey é um método para retornar a chave usada para assinar o token da API
@@ -85,6 +85,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 // Login é um handler/controller que responde a rota '[POST] /login/{usuario}' e retorna StatusOK(200) e o token em string(com dados: usuário, email, tipo e validade codificados) caso o usuário e senha informados via JSON(body) estiverem corretos. Não é necessário ter um token válido para consultar essa rota. Retorna StatusUnprocessableEntity(422) caso o JSON(body) for inválido, StatusNotAcceptable(406) caso o usuário/senha informado estiver incorreto ou não existir, StatusNotFound(404) caso o usuário estiver inativo
 func Login(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status int
 	vars := mux.Vars(r)
 	nomeUsuario := vars["usuario"]
@@ -106,7 +109,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario(db, nomeUsuario)
+	usuarioEncontrado, err := dao.ProcuraPessoaPorUsuario02(db02, nomeUsuario)
 	status = http.StatusNotAcceptable // 406
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -114,8 +117,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status = http.StatusNotFound // 404
-	verif := usuarioEncontrado.Estado == false
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário inativo"))
+	verif := !usuarioEncontrado.Estado
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("usuário inativo"))
 	if err != nil {
 		return
 	}
@@ -125,7 +128,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	usuarioBD := usuarioEncontrado.Usuario
 	verif = !(senhaHash == senhaInformadaHash && usuarioBD == usuarioInformado.Usuario)
 	status = http.StatusNotAcceptable // 406
-	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("Usuário ou Senha inválida"))
+	err = DefineHeaderRetorno(w, SetHeaderJSON, verif, status, errors.New("usuário ou Senha inválida"))
 	if err != nil {
 		return
 	}

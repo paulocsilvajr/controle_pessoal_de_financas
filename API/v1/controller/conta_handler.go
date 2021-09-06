@@ -1,10 +1,6 @@
 package controller
 
 import (
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,11 +9,19 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/conta"
+	"gorm.io/gorm"
+
 	"github.com/gorilla/mux"
 )
 
 // ContaIndex é um handler/controller que responde a rota '[GET] /contas' e retorna StatusOK(200) e uma listagem de contas de acordo com o tipo de usuário(admin/comum) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500). Quando solicitado como usuário comum, retorna somente contas ativas, enquanto que como administrador, retorna todos os registros de contas
 func ContaIndex(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	token, err := helper.GetToken(r, GetMySigningKey())
@@ -32,7 +36,7 @@ func ContaIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	_, err = dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -40,13 +44,13 @@ func ContaIndex(w http.ResponseWriter, r *http.Request) {
 
 	var listaContas conta.Contas
 	if admin {
-		listaContas, err = dao.CarregaContas(db)
+		listaContas, err = dao.CarregaContas02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
 		}
 	} else {
-		listaContas, err = dao.CarregaContasAtiva(db)
+		listaContas, err = dao.CarregaContasAtiva02(db02)
 		err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 		if err != nil {
 			return
@@ -67,6 +71,9 @@ func ContaIndex(w http.ResponseWriter, r *http.Request) {
 
 // ContaShow é um handler/controller que responde a rota '[GET] /contas/{conta}' e retorna StatusOK(200) e os dados da conta(nome) solicitada caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func ContaShow(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -84,13 +91,13 @@ func ContaShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	contaEncontrada, err := dao.ProcuraConta(db, contaRota)
+	contaEncontrada, err := dao.ProcuraConta02(db02, contaRota)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -118,6 +125,9 @@ func ContaShow(w http.ResponseWriter, r *http.Request) {
 
 // ContaCreate é um handler/controller que responde a rota '[POST] /contas' e retorna StatusCreated(201) e os dados do tipa criada através das informações informadas via JSON(body) caso o TOKEN informado for válido e o usuário associado ao token for cadastrado na API/DB. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422) caso as informações no JSON não corresponderem ao formato {"nome":"?",  "nome_tipo_conta":"?", "codigo":"?", "conta_pai":"?", "comentario":"?"}
 func ContaCreate(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError
 	var contaFromJSON conta.Conta
 	var novaConta *conta.Conta
@@ -134,7 +144,7 @@ func ContaCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	_, err = dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -163,7 +173,7 @@ func ContaCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c, err := dao.AdicionaConta(db, novaConta)
+	c, err := dao.AdicionaConta02(db02, novaConta)
 	status = http.StatusInternalServerError // 500
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
@@ -184,6 +194,9 @@ func ContaCreate(w http.ResponseWriter, r *http.Request) {
 
 // ContaRemove é um handler/controller que responde a rota '[DELETE] /contas/{Conta}' e retorna StatusOK(200) e uma mensagem de confirmação caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e seja um administrador, que a conta informada esteja cadastrado no BD. Caso ocorra algum erro, retorna StatusInternalServerError(500)
 func ContaRemove(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 
 	vars := mux.Vars(r)
@@ -201,7 +214,7 @@ func ContaRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -213,7 +226,7 @@ func ContaRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dao.RemoveConta(db, contaRemocao)
+	err = dao.RemoveConta02(db02, contaRemocao)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -233,6 +246,9 @@ func ContaRemove(w http.ResponseWriter, r *http.Request) {
 
 // ContaAlter é um handler/controller que responde a rota '[PUT] /contas/{conta}' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da conta alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e a conta informada na rota existir. Caso ocorra algum erro, retorna StatusInternalServerError(500) ou StatusUnprocessableEntity(422), caso o JSON não seguir o formato {["nome":"?",]  "nome_tipo_conta":"?", "codigo":"?", "conta_pai":"?", "comentario":"?"}, sendo campo nome opcional, ou StatusNotModified(304) caso ocorra algum erro na alteração do BD. Quando não for informado nome, esse campo não será alterado
 func ContaAlter(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 	var contaFromJSON conta.Conta
 
@@ -251,7 +267,7 @@ func ContaAlter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	_, err = dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -277,8 +293,8 @@ func ContaAlter(w http.ResponseWriter, r *http.Request) {
 		contaFromJSON.Nome = contaAlteracao
 	}
 
-	c, err := dao.AlteraConta(
-		db,
+	c, err := dao.AlteraConta02(
+		db02,
 		contaAlteracao,
 		&contaFromJSON)
 	status = http.StatusNotModified // 304
@@ -301,6 +317,9 @@ func ContaAlter(w http.ResponseWriter, r *http.Request) {
 
 // ContaEstado é um handler/controller que responde a rota '[PUT] /contas/{conta}/estado' e retorna StatusOK(200) e uma mensagem de confirmação com os dados da conta alterada caso o TOKEN informado for válido, o usuário associado ao token for cadastrado na API/DB e a conta informada na rota existir. Somente usuários ADMINISTRADORES podem ATIVAR contas, USUÁRIO COMUNS podem somente INATIVAR. Caso ocorra algum erro, retorna StatusInternalServerError(500), StatusUnprocessableEntity(422), caso o JSON não seguir o formato {"estado": ?}, StatusNotModified(304) caso ocorra algum erro na alteração do BD ou StatusNotFound(404) caso a conta informada na rota não existir
 func ContaEstado(w http.ResponseWriter, r *http.Request) {
+	db02 := dao.GetDB02()
+	defer dao.CloseDB(db02)
+
 	var status = http.StatusInternalServerError // 500
 	var estadoConta estado
 
@@ -319,7 +338,7 @@ func ContaEstado(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarioDB, err := dao.ProcuraPessoaPorUsuario(db, usuarioToken)
+	usuarioDB, err := dao.ProcuraPessoaPorUsuario02(db02, usuarioToken)
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
@@ -352,20 +371,20 @@ func ContaEstado(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	contaDBAlteracao, err := dao.ProcuraConta(db, contaAlteracao)
+	contaDBAlteracao, err := dao.ProcuraConta02(db02, contaAlteracao)
 	status = http.StatusNotFound // 404
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {
 		return
 	}
 
-	var alteraEstado func(*sql.DB, string) (*conta.Conta, error)
+	var alteraEstado func(*gorm.DB, string) (*conta.Conta, error)
 	if estadoConta.Estado {
-		alteraEstado = dao.AtivaConta
+		alteraEstado = dao.AtivaConta02
 	} else {
-		alteraEstado = dao.InativaConta
+		alteraEstado = dao.InativaConta02
 	}
-	c, err := alteraEstado(db, contaDBAlteracao.Nome)
+	c, err := alteraEstado(db02, contaDBAlteracao.Nome)
 	status = http.StatusNotModified // 304
 	err = DefineHeaderRetorno(w, SetHeaderJSON, err != nil, status, err)
 	if err != nil {

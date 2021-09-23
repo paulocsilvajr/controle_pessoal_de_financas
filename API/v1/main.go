@@ -13,6 +13,7 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
+	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/route"
 )
 
@@ -82,6 +83,33 @@ func criarUsuarioAdminInicial() {
 	}
 }
 
+func criarContasPadrao() {
+	db := dao.GetDB02()
+	defer dao.CloseDB(db)
+
+	var tiposConta tipo_conta.TiposConta
+	tc1, _ := tipo_conta.NewTipoConta("banco", "saque", "deposito")
+	tc2, _ := tipo_conta.NewTipoConta("carteira", "gastar", "receber")
+	tc3, _ := tipo_conta.NewTipoConta("despesa", "desconto", "despesa")
+	tc4, _ := tipo_conta.NewTipoConta("cartão de crédito", "cobrar", "pagamento")
+	tc5, _ := tipo_conta.NewTipoConta("receita", "receita", "cobrar")
+	tc6, _ := tipo_conta.NewTipoConta("ativo", "diminuir", "aumentar")
+	tc7, _ := tipo_conta.NewTipoConta("passivo", "aumentar", "diminuir")
+	tc8, _ := tipo_conta.NewTipoConta("líquido", "aumentar", "diminuir")
+
+	tiposConta = append(tiposConta, tc1, tc2, tc3, tc4, tc5, tc6, tc7, tc8)
+	var err error
+
+	for _, tc := range tiposConta {
+		_, err = dao.AdicionaTipoConta02(db, tc)
+		if err != nil {
+			// fmt.Printf("ERRO ao adicionar o tipo conta padrão '%s'[%s]", tc.Nome, err)
+			continue
+		}
+		fmt.Printf("Adicionado tipo conta padrão '%s'", tc.Nome)
+	}
+}
+
 func verificaParametrosInicializacao() int {
 	args := os.Args
 
@@ -97,6 +125,8 @@ func verificaParametrosInicializacao() int {
 			}
 
 			criarUsuarioAdminInicial()
+
+			criarContasPadrao()
 
 			fmt.Println("\nCriado banco de dados, tabelas e usuário Admin, se essas estruturas não existirem.\nReexecute a API sem parâmetros para reconhecer o banco de dados e iniciar o seu uso")
 			return 0

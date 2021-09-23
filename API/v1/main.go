@@ -12,8 +12,6 @@ import (
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/config"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/dao"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/helper"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/pessoa"
-	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/model/tipo_conta"
 	"github.com/paulocsilvajr/controle_pessoal_de_financas/API/v1/route"
 )
 
@@ -47,66 +45,6 @@ func main() {
 		log.Fatal(http.ListenAndServeTLS(endereco, certFile, keyFile, router))
 	} else {
 		log.Fatal(http.ListenAndServe(endereco, router))
-	}
-}
-
-func criarUsuarioAdminInicial() {
-	db := dao.GetDB02()
-	defer dao.CloseDB(db)
-
-	admin := pessoa.New("00000000000", "Administrador", "admin", "admin", "meuemail@email.com")
-
-	_, err := dao.ProcuraPessoaPorUsuario02(db, admin.Usuario)
-	var novaPessoa *pessoa.Pessoa
-	if err != nil {
-		novaPessoa, err = dao.AdicionaPessoaAdmin02(db, admin)
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			fmt.Println("Novo usuário ADMINISTRADOR:", novaPessoa)
-		}
-	} else {
-		confirmacao := inputString("Usuário admin já existe, deseja resetar para a senha padrão?[s/N]: ")
-		if strings.ToLower(confirmacao) == "s" {
-			novaPessoa, err = dao.AlteraPessoaPorUsuario02(db, admin.Usuario, admin)
-			if err != nil {
-				log.Fatal(err)
-			} else {
-				fmt.Println("Novo usuário ADMINISTRADOR:", novaPessoa)
-			}
-		}
-	}
-
-	err = dao.CloseDB(db)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func criarContasPadrao() {
-	db := dao.GetDB02()
-	defer dao.CloseDB(db)
-
-	var tiposConta tipo_conta.TiposConta
-	tc1, _ := tipo_conta.NewTipoConta("banco", "saque", "deposito")
-	tc2, _ := tipo_conta.NewTipoConta("carteira", "gastar", "receber")
-	tc3, _ := tipo_conta.NewTipoConta("despesa", "desconto", "despesa")
-	tc4, _ := tipo_conta.NewTipoConta("cartão de crédito", "cobrar", "pagamento")
-	tc5, _ := tipo_conta.NewTipoConta("receita", "receita", "cobrar")
-	tc6, _ := tipo_conta.NewTipoConta("ativo", "diminuir", "aumentar")
-	tc7, _ := tipo_conta.NewTipoConta("passivo", "aumentar", "diminuir")
-	tc8, _ := tipo_conta.NewTipoConta("líquido", "aumentar", "diminuir")
-
-	tiposConta = append(tiposConta, tc1, tc2, tc3, tc4, tc5, tc6, tc7, tc8)
-	var err error
-
-	for _, tc := range tiposConta {
-		_, err = dao.AdicionaTipoConta02(db, tc)
-		if err != nil {
-			// fmt.Printf("ERRO ao adicionar o tipo conta padrão '%s'[%s]", tc.Nome, err)
-			continue
-		}
-		fmt.Printf("Adicionado tipo conta padrão '%s'", tc.Nome)
 	}
 }
 

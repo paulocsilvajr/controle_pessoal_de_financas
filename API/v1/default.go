@@ -80,7 +80,7 @@ func criarContasPadrao() {
 	c7, _ := conta.NewConta("conta poupança", "banco", "7", "", "")
 	c8, _ := conta.NewConta("dinheiro em carteira", "carteira", "8", "", "")
 	c9, _ := conta.NewConta("banco teste 1", "banco", "9", "conta corrente", "")
-	c10, _ := conta.NewConta("banco teste 2", "banco", "9", "conta poupança", "")
+	c10, _ := conta.NewConta("banco teste 2", "banco", "10", "conta poupança", "")
 	c11, _ := conta.NewConta("internet", "despesa", "11", "despesas", "")
 	c12, _ := conta.NewConta("telefone", "despesa", "12", "despesas", "")
 	c13, _ := conta.NewConta("serviços", "despesa", "13", "despesas", "")

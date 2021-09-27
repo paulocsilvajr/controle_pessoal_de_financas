@@ -1,0 +1,76 @@
+{
+	"info": {
+		"_postman_id": "5ab743c5-ea36-4d10-a64c-7d3b5568090f",
+		"name": "Teste API Controle Pessoa de Finanças",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a291c002-3d60-4123-a755-d1d3046a842b",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonObject = responseBody;",
+							"pm.globals.set(\"token\", jsonObject.token);  // variável global token, para utilizar em outras requisições",
+							"",
+							"pm.globals.set(\"base\", \"localhost:8085\");",
+							"pm.globals.set(\"usuario\", \"teste01\");",
+							"pm.globals.set(\"senha\", \"123456\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"nome\":\"{{usuario}}\",  \"senha\":\"{{senha}}\"}"
+				},
+				"url": {
+					"raw": "http://{{base}}/login/{{usuario}}",
+					"protocol": "http",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"login",
+						"{{usuario}}"
+					]
+				},
+				"description": "Login com usuário Administrador(admin) com retorno de TOKEN. Defina na guia Tests a url base da API."
+			},
+			"response": []
+		},
+		{
+			"name": "PessoaIndex",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8085/pessoas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"pessoas"
+					]
+				},
+				"description": "Listagem de pessoas simplificada, sem necessidade de token"
+			},
+			"response": []
+		}
+	]
+}

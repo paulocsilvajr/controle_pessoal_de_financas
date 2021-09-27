@@ -1,0 +1,38 @@
+.mensagem-inicial {
+    margin-top: 8rem;
+}
+
+.informacoes-sessao {
+    margin: auto;
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+    background-color: khaki;
+}
+
+.titulo {
+    margin-top: 5rem;
+}
+
+.margem-navbar-conteudo {
+    margin-top: 5rem;
+}
+
+.alinhamento-numeros-tabela {
+    text-align: right;
+}
+
+@media screen and (max-width: 576px) {
+    .titulo-conta-sm {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 380px) {
+    .navbar {
+        padding: .5rem .5rem;
+    }
+
+    .navbar-brand {
+        margin-right: .5rem;
+    }
+}

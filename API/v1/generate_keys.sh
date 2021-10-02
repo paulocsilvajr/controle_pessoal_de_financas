@@ -7,6 +7,8 @@ PRIVATE_KEY=$PASTA/privkey.pem
 CERTIFICATE_KEY=$PASTA/new.cert.key
 CERTIFICATE=$PASTA/new.cert.cert
 
+mkdir -p $PASTA 2> /dev/null
+
 openssl genrsa -out $PRIVATE_KEY -des3 2048 && \
     openssl req -new -key $PRIVATE_KEY -out $CSR && \
     openssl rsa -in $PRIVATE_KEY -out $CERTIFICATE_KEY && \

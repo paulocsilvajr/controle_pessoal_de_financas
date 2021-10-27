@@ -5,7 +5,7 @@ namespace App\Helpers;
 final class Formata
 {
     /**
-     * valorParaMonetarioBrasil converte um número(float ou integer) um uma string no formato monetário brasileiro(vírgula separando decimais) SEM o símbolo de reais(R$)
+     * valorParaMonetarioBrasil converte um número(float ou integer) em uma string no formato monetário brasileiro(vírgula separando decimais) SEM o símbolo de reais(R$)
      */
     public static function valorParaMonetarioBrasil(float $valor): string
     {

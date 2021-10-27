@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Imprime;
+use App\Helpers\LogPersonalizado;
 use App\Services\RequisicaoHttp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -73,14 +74,16 @@ class EntrarController extends Controller
 
             if ($resposta->successful()) {
                 $request->session()->put('estadoApi', true);
-                Imprime::console(">>> API ONLINE <<<");
+                LogPersonalizado::info("API ONLINE");
+
                 return;
             }
             $request->session()->put('estadoApi', false);
-            Imprime::console(">>> API OFFLINE <<<");
+            LogPersonalizado::info("API OFFLINE");
+
         } catch (\Throwable $th) {
             $request->session()->put('estadoApi', false);
-            Imprime::console(">>> API OFFLINE <<<");
+            LogPersonalizado::info("API OFFLINE");
         }
     }
 

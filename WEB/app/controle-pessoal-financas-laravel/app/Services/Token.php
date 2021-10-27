@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\Imprime;
+use App\Helpers\LogPersonalizado;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 
@@ -21,10 +22,10 @@ final class Token
             $resposta = $http->get('/token');
 
             if ($resposta->successful()) {
-                Imprime::console(">>> TOKEN válido <<<");
+                LogPersonalizado::info("TOKEN válido");
                 return true;
             } else if ($resposta->clientError()) {
-                Imprime::console(">>> Renovando TOKEN <<<");
+                LogPersonalizado::info("Renovando TOKEN");
                 $usuario = $this->request->session()->get('usuario');
                 $senha = $this->request->session()->put('senha');
 
@@ -35,7 +36,7 @@ final class Token
                 }
             }
         } catch (\Throwable $th) {
-            Imprime::console(">>> NÃO foi obtido resposta do servidor/API para a rota '/token' <<<");
+            LogPersonalizado::info("NÃO foi obtido resposta do servidor/API para a rota '/token'");
         }
 
         return false;

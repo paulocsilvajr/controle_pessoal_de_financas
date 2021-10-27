@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Imprime;
+use App\Helpers\LogPersonalizado;
 use App\Services\RequisicaoHttp;
 use App\Services\Token;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ class ContaController extends Controller
 
             if ($resposta->successful()) {
                 if ($resposta['count'] == 0) {
-                    Imprime::console(">>> Sem registro de Lançamentos para a conta '$nomeConta' <<<");
+                    LogPersonalizado::info("Sem registro de Lançamentos para a conta '$nomeConta'");
                 }
 
                 $dados = $resposta['data'];

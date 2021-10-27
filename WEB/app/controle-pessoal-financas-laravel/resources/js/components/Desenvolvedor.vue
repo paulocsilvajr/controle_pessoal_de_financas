@@ -9,7 +9,7 @@
 <script>
     export default {
         mounted() {
-            console.log('Componente desenvolvedor mountado')
+            console.log('Componente desenvolvedor montado')
         }
     }
 </script>

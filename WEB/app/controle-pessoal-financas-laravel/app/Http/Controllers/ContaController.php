@@ -75,6 +75,7 @@ class ContaController extends Controller
 
                 $contas = $request->session()->get('contas');
                 $contas = $this->filtraContas($contas, $nomeConta);
+                array_multisort($contas);  // ordenação de array associativo pelos valores(nome completo da conta com separador >)
 
                 $destino = '';
                 $tipo = 'debito';

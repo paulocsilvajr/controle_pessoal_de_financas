@@ -15,6 +15,8 @@
         <form method="post" action="/conta/{{ $nomeConta }}/cadastroLancamento">
             @csrf
 
+            <input type="hidden" id="id" name="id" value="{{ $id ?? '' }}">
+
             <input type="hidden" id="cpf_pessoa" name="cpf_pessoa" value="{{ $cpf ?? '' }}">
 
             <input type="hidden" id="nome_conta_origem" name="nome_conta_origem" value="{{ $nomeConta }}">

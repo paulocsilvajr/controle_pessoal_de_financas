@@ -100,6 +100,37 @@ class ContaController extends Controller
         }
     }
 
+    public function carregaLancamento(Request $request, RequisicaoHttp $http, Token $token, int $idLancamento) {
+        if ($token->valido()) {
+            $mensagem = '';
+            $tipoMensagem = '';
+
+            $resposta = $http->get("/lancamentos/$idLancamento");
+
+            if ($resposta->successful()) {
+                $dados = $resposta['data'];
+
+                dd($dados);
+                // $id = $dados['id'];
+                // $nomeConta = $dados['']
+
+                // $contas = $request->session()->get('contas');
+                // $contas = $this->filtraContas($contas, $nomeConta);
+                // array_multisort($contas);
+
+                return view(
+                    'Conta.cadastroLancamento',
+                    compact(
+                        'id'
+                    )
+                );
+            }
+            return redirect()->back();
+        } else {
+            return redirect()->route('login');
+        }
+    }
+
     public function cadastraLancamento(Request $request, RequisicaoHttp $http, Token $token) {
         $cpf = $request->cpf_pessoa;
         $nome_conta_origem = $request->nome_conta_origem;

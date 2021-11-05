@@ -54,7 +54,7 @@
                                 <td class="alinhamento-numeros-tabela align-middle">{{ App\Helpers\Formata::valorParaMonetarioBrasil($dado['debito']) }}</td>
                                 <td class="alinhamento-numeros-tabela align-middle">{{ App\Helpers\Formata::valorParaMonetarioBrasil($dado['credito']) }}</td>
                                 <td class="text-center">
-                                    <input name="" id="" class="btn btn-primary" type="button" value="Detalhes">
+                                    <a href="/lancamentos/{{ $dado['id'] }}" class="btn btn-primary">Detalhes</a>
                                     <input name="" id="" class="btn btn-danger" type="button" value="Remover">
                                 </td>
                             </tr>

@@ -2,6 +2,9 @@
 
 namespace App\Helpers;
 
+use DateTime;
+use Exception;
+
 final class Formata
 {
     /**
@@ -23,5 +26,16 @@ final class Formata
         $mes = intval($data[1]);
         $ano = intval($data[0]);
         return sprintf('%02d/%02d/%04d', $dia, $mes, $ano);
+    }
+
+    public static function textoParaDatetime(string $data): DateTime
+    {
+        $data = substr($data, 0, 19);
+        $data = str_replace("T", " ", $data);
+        $dataConvertida = DateTime::createFromFormat('Y-m-d H:i:s', $data);
+        if (!$dataConvertida) {
+            throw new \UnexpectedValueException("Não foi possível converter a data informada[$data]");
+        }
+        return $dataConvertida;
     }
 }

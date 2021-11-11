@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Imprime;
 use App\Helpers\LogPersonalizado;
+use App\Models\Lancamento;
 use App\Services\RequisicaoHttp;
 use App\Services\Token;
 use Illuminate\Http\Request;
@@ -110,7 +111,10 @@ class ContaController extends Controller
             if ($resposta->successful()) {
                 $dados = $resposta['data'];
 
-                dd($dados);
+                // dd($dados);
+                $lanc = new Lancamento($dados);
+                dd($lanc);
+
                 // $id = $dados['id'];
                 // $nomeConta = $dados['']
 

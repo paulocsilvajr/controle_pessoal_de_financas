@@ -2,22 +2,41 @@
 
 namespace App\Models;
 
+use App\Helpers\Formata;
 use DateTime;
 
 class Lancamento {
 
-    private int $id;
-    private string $cpf;
-    private string $nomeContaOrigem;
-    private DateTime $data;
-    private string $numero;
-    private string $descricao;
-    private string $nomeContaDestino;
-    private float $debito;
-    private float $credito;
+    public int $id;
+    public string $cpfPessoa;
+    public string $nomeContaOrigem;
+    public DateTime $data;
+    public string $numero;
+    public string $descricao;
+    public string $nomeContaDestino;
+    public float $debito;
+    public float $credito;
+    public Datetime $dataCriacao;
+    public Datetime $dataModificacao;
+    public bool $estado;
 
-    public function __construct()
+    public function __construct($dados)
     {
-        # code...
+        $this->fromJSON($dados);
+    }
+
+    public function fromJSON($dados) {
+        $this->id = $dados['id'];
+        $this->cpfPessoa = $dados['cpf_pessoa'];
+        $this->nomeContaOrigem = $dados['nome_conta_origem'];
+        $this->data = Formata::textoParaDatetime($dados['data']);
+        $this->numero = $dados['numero'];
+        $this->descricao = $dados['descricao'];
+        $this->nomeContaDestino = $dados['nome_conta_destino'];
+        $this->debito = $dados['debito'];
+        $this->credito = $dados['credito'];
+        $this->dataCriacao = Formata::textoParaDatetime($dados['data_criacao']);
+        $this->dataModificacao = Formata::textoParaDatetime($dados['data_modificacao']);
+        $this->estado = $dados['estado'];
     }
 }

@@ -113,7 +113,8 @@ class ContaController extends Controller
 
                 // dd($dados);
                 $lanc = new Lancamento($dados);
-                dd($lanc);
+                // dd($lanc);
+                dd($lanc->toJson());
 
                 // $id = $dados['id'];
                 // $nomeConta = $dados['']

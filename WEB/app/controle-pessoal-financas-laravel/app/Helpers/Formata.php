@@ -3,7 +3,7 @@
 namespace App\Helpers;
 
 use DateTime;
-use Exception;
+use UnexpectedValueException;
 
 final class Formata
 {
@@ -34,8 +34,12 @@ final class Formata
         $data = str_replace("T", " ", $data);
         $dataConvertida = DateTime::createFromFormat('Y-m-d H:i:s', $data);
         if (!$dataConvertida) {
-            throw new \UnexpectedValueException("Não foi possível converter a data informada[$data]");
+            throw new UnexpectedValueException("Não foi possível converter a data informada[$data]");
         }
         return $dataConvertida;
+    }
+
+    public static function DatetimeParaJSON(Datetime $data): string {
+        return $data->format('Y-m-d\TH:i:s.000\Z');
     }
 }

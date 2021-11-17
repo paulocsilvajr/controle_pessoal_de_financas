@@ -39,4 +39,18 @@ class Lancamento {
         $this->dataModificacao = Formata::textoParaDatetime($dados['data_modificacao']);
         $this->estado = $dados['estado'];
     }
+
+    public function toJSON(): string {
+        $json = array(
+            "cpf_pessoa" => $this->cpfPessoa,
+            "nome_conta_origem" => $this->nomeContaOrigem,
+            "data" => Formata::DatetimeParaJson($this->data),
+            "numero" => $this->numero,
+            "descricao" => $this->descricao,
+            "nome_conta_destino" => $this->nomeContaDestino,
+            "debito" => $this->debito,
+            "credito" => $this->credito
+        );
+        return json_encode($json);
+    }
 }

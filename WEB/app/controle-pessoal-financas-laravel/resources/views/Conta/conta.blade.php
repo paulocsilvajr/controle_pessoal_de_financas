@@ -16,10 +16,10 @@
             {
                 $texto .= '<ul class="nav-item" style="list-style: none;">';
                 foreach ($contas as $conta) {
-                    if ($conta['conta_pai'] == $nomeAnterior) {
+                    if ($conta->contaPai == $nomeAnterior) {
                         $texto .= '<li class="nav-item">';
-                        $texto .= '<a href="/conta/' . $conta['nome'] . '" class="nav-link">' . ucfirst($conta['nome']) . '</a>';
-                        imprime($contas, $conta['nome'], $texto);
+                        $texto .= '<a href="/conta/' . $conta->nome . '" class="nav-link">' . ucfirst($conta->nome) . '</a>';
+                        imprime($contas, $conta->nome, $texto);
                         $texto .= '</li>';
                     }
                 }
@@ -29,14 +29,14 @@
 
         {{-- impressão de contas recursiva --}}
         <ul class="nav flex-column mt-3">
-            @if (is_array($dados))
-                @foreach ($dados as $conta)
-                    @if (empty($conta['conta_pai']))
+            @if (is_array($listaContas))
+                @foreach ($listaContas as $conta)
+                    @if (empty($conta->contaPai))
                         <li class="nav-item">
-                        <a href="/conta/{{ $conta['nome'] }}" class="nav-link"><strong>{{ ucfirst($conta['nome']) }}</strong></a>
+                        <a href="/conta/{{ $conta->nome }}" class="nav-link"><strong>{{ ucfirst($conta->nome) }}</strong></a>
                             <?php
                                 $texto = '';
-                                imprime($dados, $conta['nome'], $texto);
+                                imprime($listaContas, $conta->nome, $texto);
                                 echo $texto;
                             ?>
                         </li>

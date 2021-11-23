@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Cria;
 use App\Helpers\Imprime;
 use App\Helpers\LogPersonalizado;
+use App\Models\Conta;
 use App\Models\Lancamento;
 use App\Services\RequisicaoHttp;
 use App\Services\Token;
@@ -19,6 +21,8 @@ class ContaController extends Controller
             if ($resposta->successful()) {
                 $dados = $resposta['data'];
 
+                $listaContas = Cria::arrayContas($dados);
+
                 $nomesCompletos = $this->geraListaContasCompleto($dados);
 
                 $request->session()->put('contas', $nomesCompletos);
@@ -26,7 +30,7 @@ class ContaController extends Controller
                 return view(
                     'Conta.conta',
                     compact(
-                        'dados',
+                        'listaContas',
                     )
                 );
             }

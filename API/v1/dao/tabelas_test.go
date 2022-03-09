@@ -20,13 +20,35 @@ func init() {
 	CreateDBParaTestes()
 
 	db2 = GetDB02ParaTestes()
-}
 
-func TestCriarTabelaPessoa(t *testing.T) {
 	err := CriarTabelaPessoa(db2)
 	if err != nil {
-		t.Error(err)
+		return
 	}
+
+	err = CriarTabelaTipoConta(db2)
+	if err != nil {
+		return
+	}
+
+	err = CriarTabelaConta(db2)
+	// ERROR: constraint "tipo_conta_fk" for relation "conta" already exists (SQLSTATE 42710)
+	if err := verificaErroConstraintExists(err); err != nil {
+		return
+	}
+
+	err = CriarTabelaLancamento(db2)
+	// ERROR: constraint "pessoa_lancamento_fk" for relation "lancamento" already exists (SQLSTATE 42710)
+	if err := verificaErroConstraintExists(err); err != nil {
+		return
+	}
+
+	err = CriarTabelaDetalheLancamento(db2)
+	// ERROR: constraint "conta_detalhe_lancamento_fk" for relation "detalhe_lancamento" already exists (SQLSTATE 42710)
+	if err := verificaErroConstraintExists(err); err != nil {
+		return
+	}
+
 }
 
 func TestCRUDPessoa(t *testing.T) {
@@ -86,13 +108,6 @@ func TestCRUDPessoa(t *testing.T) {
 	}
 
 	err = db2.Delete(&p2).Error
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-func TestCriarTabelaTipoConta(t *testing.T) {
-	err := CriarTabelaTipoConta(db2)
 	if err != nil {
 		t.Error(err)
 	}
@@ -159,15 +174,6 @@ func TestCRUDTipoConta(t *testing.T) {
 
 	err = db2.Delete(&tc2).Error
 	if err != nil {
-		t.Error(err)
-	}
-}
-
-func TestCriarTabelaConta(t *testing.T) {
-	err := CriarTabelaConta(db2)
-
-	// ERROR: constraint "tipo_conta_fk" for relation "conta" already exists (SQLSTATE 42710)
-	if err := verificaErroConstraintExists(err); err != nil {
 		t.Error(err)
 	}
 }
@@ -283,15 +289,6 @@ func TestCRUDTabelaConta(t *testing.T) {
 	}
 }
 
-func TestCriarTabelaLancamento(t *testing.T) {
-	err := CriarTabelaLancamento(db2)
-
-	// ERROR: constraint "pessoa_lancamento_fk" for relation "lancamento" already exists (SQLSTATE 42710)
-	if err := verificaErroConstraintExists(err); err != nil {
-		t.Error(err)
-	}
-}
-
 func TestCRUDTabelaLancamento(t *testing.T) {
 	// Criar - INSERT
 	p1 := getTPessoa1()
@@ -336,15 +333,6 @@ func TestCRUDTabelaLancamento(t *testing.T) {
 
 	err = db2.Delete(p1).Error
 	if err != nil {
-		t.Error(err)
-	}
-}
-
-func TestCriarTabelaDetalheLancamento(t *testing.T) {
-	err := CriarTabelaDetalheLancamento(db2)
-
-	// ERROR: constraint "conta_detalhe_lancamento_fk" for relation "detalhe_lancamento" already exists (SQLSTATE 42710)
-	if err := verificaErroConstraintExists(err); err != nil {
 		t.Error(err)
 	}
 }

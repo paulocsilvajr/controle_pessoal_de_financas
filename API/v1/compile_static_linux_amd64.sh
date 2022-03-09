@@ -12,7 +12,7 @@ else
 fi
 
 echo "Instalação de 'musl' e dependências via APT ..." &&
-    apt install musl musl-dev musl-tools tree -qqq && echo -e "Musl Instalado\n"
+    sudo apt install musl musl-dev musl-tools tree -qqq && echo -e "Musl Instalado\n"
 
 export GOOS=linux
 export GOARCH=amd64

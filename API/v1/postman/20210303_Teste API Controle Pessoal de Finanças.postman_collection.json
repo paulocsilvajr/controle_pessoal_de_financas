@@ -1,0 +1,1037 @@
+{
+	"info": {
+		"_postman_id": "5ab743c5-ea36-4d10-a64c-7d3b5568090f",
+		"name": "Teste API Controle Pessoal de Finanças",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/login/usuario_admin [Login]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.token); // variável de ambiente token, para utilizar em outras requisições",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"usuario\":\"{{usuario_admin}}\",  \"senha\":\"{{senha_admin}}\"}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/login/{{usuario_admin}}",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"login",
+						"{{usuario_admin}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/token [TokenValido]",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/token",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ [Index]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/API [API]",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/API",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"API"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas [PessoaIndex]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/usuario_admin [PessoaShow]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/{{usuario_admin}}",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"{{usuario_admin}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas [PessoaCreate]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"cpf\":\"00000000019\",  \"nome_completo\":\"Teste de usuário número 19\", \"usuario\":\"{{usuario_comum}}\", \"senha\":\"{{senha_comum}}\", \"email\":\"teste19@email.com\"}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas"
+					]
+				},
+				"description": "Adiciona uma nova pessoa. Somente para administradores."
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/usuario_admin/usuario_comum [PessoaShowAdmin]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/{{usuario_admin}}/{{usuario_comum}}",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"{{usuario_admin}}",
+						"{{usuario_comum}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas [PessoaCreate Administrador teste18]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"cpf\":\"00000000900\",  \"nome_completo\":\"Teste 18\", \"usuario\":\"teste18\", \"senha\":\"9123456\", \"email\":\"teste18@email.com\", \"administrador\": true}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas"
+					]
+				},
+				"description": "Adiciona uma nova pessoa. Somente para administradores."
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/usuario_admin/teste18 [PessoaShowAdmin]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/{{usuario_admin}}/teste18",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"{{usuario_admin}}",
+						"teste18"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/teste18 [PessoaAlter]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"usuarioAlteracao\", \"teste10\");",
+							"pm.environment.set(\"novoCPF\", \"00000001000\");",
+							"pm.environment.set(\"novoNome\", \"Teste 10 novo\");",
+							"pm.environment.set(\"novaSenha\", \"01123456\");",
+							"pm.environment.set(\"novoEmail\", \"teste10@gmail.com\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"cpf\": \"00000000900\",\n    \"nome_completo\": \"Usuário número 18\",\n    \"usuario\": \"teste18\",\n    \"senha\": \"123123\",\n    \"email\": \"teste18@novoemail.com\"\n}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/teste18",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"teste18"
+					]
+				},
+				"description": "Altera uma pessoa. Somente para administradores ou o próprio usuário/pessoa."
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/usuario_comum/estado [PessoaEstado inativar]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"usuarioAlteracao\", \"teste10\");",
+							"pm.environment.set(\"novoCPF\", \"00000001000\");",
+							"pm.environment.set(\"novoNome\", \"Teste 10 novo\");",
+							"pm.environment.set(\"novaSenha\", \"01123456\");",
+							"pm.environment.set(\"novoEmail\", \"teste10@gmail.com\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"estado\": false\n}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/{{usuario_comum}}/estado",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"{{usuario_comum}}",
+						"estado"
+					]
+				},
+				"description": "Altera uma pessoa. Somente para administradores ou o próprio usuário/pessoa."
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/usuario_comum/estado [PessoaEstado Ativar]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"usuarioAlteracao\", \"teste10\");",
+							"pm.environment.set(\"novoCPF\", \"00000001000\");",
+							"pm.environment.set(\"novoNome\", \"Teste 10 novo\");",
+							"pm.environment.set(\"novaSenha\", \"01123456\");",
+							"pm.environment.set(\"novoEmail\", \"teste10@gmail.com\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"estado\": true\n}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/{{usuario_comum}}/estado",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"{{usuario_comum}}",
+						"estado"
+					]
+				},
+				"description": "Altera uma pessoa. Somente para administradores ou o próprio usuário/pessoa."
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/usuario_comum/admin [PessoaAdmin Ativar]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"usuarioAlteracao\", \"teste10\");",
+							"pm.environment.set(\"novoCPF\", \"00000001000\");",
+							"pm.environment.set(\"novoNome\", \"Teste 10 novo\");",
+							"pm.environment.set(\"novaSenha\", \"01123456\");",
+							"pm.environment.set(\"novoEmail\", \"teste10@gmail.com\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"administrador\": true\n}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/{{usuario_comum}}/admin",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"{{usuario_comum}}",
+						"admin"
+					]
+				},
+				"description": "Altera uma pessoa. Somente para administradores ou o próprio usuário/pessoa."
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/usuario_comum/admin [PessoaAdmin inativar]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"usuarioAlteracao\", \"teste10\");",
+							"pm.environment.set(\"novoCPF\", \"00000001000\");",
+							"pm.environment.set(\"novoNome\", \"Teste 10 novo\");",
+							"pm.environment.set(\"novaSenha\", \"01123456\");",
+							"pm.environment.set(\"novoEmail\", \"teste10@gmail.com\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"administrador\": false\n}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/{{usuario_comum}}/admin",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"{{usuario_comum}}",
+						"admin"
+					]
+				},
+				"description": "Altera uma pessoa. Somente para administradores ou o próprio usuário/pessoa."
+			},
+			"response": []
+		},
+		{
+			"name": "/pessoas/teste18 [PessoaRemove]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.globals.set(\"usuarioRemocao\", \"teste10\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/teste18",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"teste18"
+					]
+				},
+				"description": "Remove uma nova pessoa. Somente para administradores."
+			},
+			"response": []
+		},
+		{
+			"name": "Login Comum",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"// pm.globals.set(\"token\", jsonObject.token);  // variável global token, para utilizar em outras requisições",
+							"",
+							"// pm.globals.set(\"base\", \"localhost:8085\");  // definido em Environment Teste API...",
+							"// pm.globals.set(\"usuario\", \"teste05\");  // idem",
+							"// pm.globals.set(\"senha\", \"123456\");  // idem",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.token); // variável de ambiente token, para utilizar em outras requisições",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"usuario\":\"{{usuario_comum}}\",  \"senha\":\"{{senha_comum}}\"}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/login/{{usuario_comum}}",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"login",
+						"{{usuario_comum}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PessoaShow Comum",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/pessoas/{{usuario_comum}}",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas",
+						"{{usuario_comum}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Testes Manuais",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"// pm.globals.set(\"token\", jsonObject.token);  // variável global token, para utilizar em outras requisições",
+							"",
+							"// pm.globals.set(\"base\", \"localhost:8085\");  // definido em Environment Teste API...",
+							"// pm.globals.set(\"usuario\", \"teste05\");  // idem",
+							"// pm.globals.set(\"senha\", \"123456\");  // idem",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.token); // variável de ambiente token, para utilizar em outras requisições",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.globals.set(\"usuarioTeste\", \"admin\");",
+							"pm.globals.set(\"senhaTeste\", \"\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"usuario\":\"{{usuarioTeste}}\",  \"senha\":\"{{senhaTeste}}\"}"
+				},
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/login/{{usuarioTeste}}",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"login",
+						"{{usuarioTeste}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rotas",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lançamentos por Conta",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"postman.setEnvironmentVariable(\"nome_conta\", \"serviços\"); "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocolo}}://{{base}}:{{porta}}/lancamentos_conta/{{nome_conta}}",
+					"protocol": "{{protocolo}}",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"lancamentos_conta",
+						"{{nome_conta}}"
+					],
+					"query": [
+						{
+							"key": "nome_conta",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

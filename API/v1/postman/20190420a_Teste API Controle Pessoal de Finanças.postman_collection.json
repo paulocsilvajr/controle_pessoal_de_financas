@@ -1,0 +1,289 @@
+{
+	"info": {
+		"_postman_id": "5ab743c5-ea36-4d10-a64c-7d3b5568090f",
+		"name": "Teste API Controle Pessoal de Finanças",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cfe03d81-9f54-4014-b1e6-8aaedb970317",
+						"exec": [
+							"",
+							"// pm.globals.set(\"token\", jsonObject.token);  // variável global token, para utilizar em outras requisições",
+							"",
+							"// pm.globals.set(\"base\", \"localhost:8085\");  // definido em Environment Teste API...",
+							"// pm.globals.set(\"usuario\", \"teste05\");  // idem",
+							"// pm.globals.set(\"senha\", \"123456\");  // idem",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.token); // variável de ambiente token, para utilizar em outras requisições",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"usuario\":\"{{usuario}}\",  \"senha\":\"{{senha}}\"}"
+				},
+				"url": {
+					"raw": "https://{{base}}:{{porta}}/login/{{usuario}}",
+					"protocol": "https",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"login",
+						"{{usuario}}"
+					]
+				},
+				"description": "Login com usuário Administrador(admin) com retorno de TOKEN. Defina na guia Tests a url base da API."
+			},
+			"response": []
+		},
+		{
+			"name": "Login Errado",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cfe03d81-9f54-4014-b1e6-8aaedb970317",
+						"exec": [
+							"",
+							"// pm.globals.set(\"token\", jsonObject.token);  // variável global token, para utilizar em outras requisições",
+							"",
+							"// pm.globals.set(\"base\", \"localhost:8085\");  // definido em Environment Teste API...",
+							"// pm.globals.set(\"usuario\", \"teste05\");  // idem",
+							"// pm.globals.set(\"senha\", \"123456\");  // idem",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.token); // variável de ambiente token, para utilizar em outras requisições",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"usuario\":\"teste01\",  \"senha\":\"12345\"}"
+				},
+				"url": {
+					"raw": "https://{{base}}:{{porta}}/login/teste01",
+					"protocol": "https",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"login",
+						"teste01"
+					]
+				},
+				"description": "Login com usuário Administrador(admin) com retorno de TOKEN. Defina na guia Tests a url base da API."
+			},
+			"response": []
+		},
+		{
+			"name": "Login Comum",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cfe03d81-9f54-4014-b1e6-8aaedb970317",
+						"exec": [
+							"",
+							"// pm.globals.set(\"token\", jsonObject.token);  // variável global token, para utilizar em outras requisições",
+							"",
+							"// pm.globals.set(\"base\", \"localhost:8085\");  // definido em Environment Teste API...",
+							"// pm.globals.set(\"usuario\", \"teste05\");  // idem",
+							"// pm.globals.set(\"senha\", \"123456\");  // idem",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.token); // variável de ambiente token, para utilizar em outras requisições",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"usuario\":\"{{usuario_comum}}\",  \"senha\":\"{{senha_comum}}\"}"
+				},
+				"url": {
+					"raw": "https://{{base}}:{{porta}}/login/{{usuario_comum}}",
+					"protocol": "https",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"login",
+						"{{usuario_comum}}"
+					]
+				},
+				"description": "Login com usuário Administrador(admin) com retorno de TOKEN. Defina na guia Tests a url base da API."
+			},
+			"response": []
+		},
+		{
+			"name": "PessoaIndex",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cd414779-6647-412a-b8bf-76fa2d3c64f5",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{base}}:{{porta}}/pessoas",
+					"protocol": "https",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"pessoas"
+					]
+				},
+				"description": "Consulta de quilometragens utilizando token previamente solicitada."
+			},
+			"response": []
+		},
+		{
+			"name": "Index",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cd414779-6647-412a-b8bf-76fa2d3c64f5",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{base}}:{{porta}}/",
+					"protocol": "https",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						""
+					]
+				},
+				"description": "Consulta de quilometragens utilizando token previamente solicitada."
+			},
+			"response": []
+		},
+		{
+			"name": "TokenValido",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{base}}:{{porta}}/token",
+					"protocol": "https",
+					"host": [
+						"{{base}}"
+					],
+					"port": "{{porta}}",
+					"path": [
+						"token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,1 @@
+docker network inspect postgresqlpgadmin4_postgres-network

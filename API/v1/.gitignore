@@ -1,0 +1,5 @@
+logs
+bin
+postgreSQL_pgadmin4_docker
+.vscode/settings.json
+keys/*

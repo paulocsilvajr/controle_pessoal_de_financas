@@ -7,6 +7,15 @@ GOLANG=go1.18.1.linux-amd64
 ARQUIVO=${GOLANG}.tar.gz
 LINK=https://go.dev/dl/${ARQUIVO}
 
+is_root(){
+    if [ "$(id -u)" != "0" ]; then
+        echo "Execute esse programa como ROOT"
+        exit 1
+    fi
+}
+
+is_root
+
 if [ -d "/usr/local/go" ]; then
     versao=$(/usr/local/go/bin/go version)
     echo "Removendo versão anterior do GO[$versao]"

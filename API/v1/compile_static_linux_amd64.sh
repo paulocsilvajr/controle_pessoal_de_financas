@@ -11,8 +11,15 @@ else
     exit 1
 fi
 
+admin="sudo"
+if [ "$(id -u)" == "0" ]; then
+    admin=""
+fi
+
 echo "Instalação de 'musl' e dependências via APT ..." &&
-    sudo apt install musl musl-dev musl-tools tree -qqq && echo -e "Musl Instalado\n"
+    $admin apt update &&
+    $admin apt install musl musl-dev musl-tools tree file -qqq &&
+    echo -e "Musl Instalado\n"
 
 export GOOS=linux
 export GOARCH=amd64

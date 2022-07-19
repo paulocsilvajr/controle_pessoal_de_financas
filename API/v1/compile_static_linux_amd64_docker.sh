@@ -1,7 +1,5 @@
-#!/bin/bash
-
 BASE=$(dirname $0)
-BASE=$(readlink -e $BASE)
+BASE=$(readlink -f $BASE)
 PASTA=$BASE/bin/API_CPF
 ARQUIVO=$PASTA/API_CPF
 
@@ -12,23 +10,9 @@ else
     exit 1
 fi
 
-admin="sudo"
-if [ "$(id -u)" == "0" ]; then
-    admin=""
-fi
-
-echo "Instalação de 'musl' e dependências via APT ..." &&
-    $admin apt update &&
-    $admin apt install musl musl-dev musl-tools tree file -qqq &&
-    echo -e "Musl Instalado\n"
-
-export GOOS=linux
-export GOARCH=amd64
-export CGO_ENABLED=0
-export CXX_FOR_TARGET=musl-gcc
-export CC_FOR_TARGET=musl-gcc
-export CC=musl-gcc
-export CXX=musl-gcc
+# export GOOS=linux
+# export GOARCH=amd64
+# export CGO_ENABLED=0
 
 if [ -d $PASTA ]; then
     rm -r $PASTA && echo -e "Limpado $PASTA\n"
@@ -37,7 +21,7 @@ fi
 mkdir -p $PASTA 2> /dev/null
 
 echo -e "Compilando para $GOOS:$GOARCH\n"
-go build -v -o $ARQUIVO -a -installsuffix cgo -ldflags '-extldflags "-static" -s' $BASE
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -ldflags '-extldflags "-static"' -o $ARQUIVO $BASE
 
 echo -e "\nCopiando 'keys' para pasta de API compilada" &&
     cp -vr $BASE/keys $PASTA &&

@@ -1,5 +1,5 @@
-FROM golang:1.18-bullseye
+FROM golang:1.18-alpine
 
-WORKDIR /go/src/controle_pessoal_de_financas
+WORKDIR /go/src/github.com/paulocsilvajr/controle_pessoal_de_financas
 
-RUN apt update && apt install -y musl musl-dev musl-tools tree file
+RUN apk add --no-cache tree file

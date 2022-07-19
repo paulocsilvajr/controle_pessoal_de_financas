@@ -1,5 +1,3 @@
-#!/bin/bash
-
 install(){
     echo "$1:"
     go get -u -v $1

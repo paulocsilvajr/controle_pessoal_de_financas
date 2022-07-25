@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-USUARIO=$(users|awk ' {print $1} ');
+USUARIO=$(logname)
 HOME_USUARIO=/home/$USUARIO
 
-GOLANG=go1.15.linux-amd64
+# https://go.dev/dl/go1.18.4.linux-amd64.tar.gz
+GOLANG=go1.18.4.linux-amd64
+LINK=https://go.dev/dl/$GOLANG.tar.gz
 
 if [ -d "/usr/local/go" ]; then
     versao=$(/usr/local/go/bin/go version)
@@ -22,11 +24,12 @@ adicionar_go_em_profile() {
     fi
 }
 
-wget -c https://dl.google.com/go/$GOLANG.tar.gz &&
-    tar -C /usr/local/ -xzf $GOLANG.tar.gz &&
+wget -c $LINK &&
+    sudo tar -C /usr/local/ -xzf $GOLANG.tar.gz &&
     mkdir $HOME_USUARIO/go $HOME_USUARIO/go/bin $HOME_USUARIO/go/pkg $HOME_USUARIO/go/src ||
     chown -R $USUARIO $HOME_USUARIO/go &&
     adicionar_go_em_profile $HOME_USUARIO/.profile &&
     rm -v $GOLANG.tar.gz &&
-    echo 'Disponibilizado variável $GOPATH, diretório ~/go e finalizado instalação.' &&
-    echo -e "Para usuários do ZSH, execute o comando abaixo para reconhecer o executável go:\ncp -v ~/.profile ~/.zprofile"
+    echo -e "\nDisponibilizado variável $GOPATH, diretório ~/go e finalizado instalação.\n" &&
+    echo -e "\nPara usuários do ZSH, execute o comando abaixo para reconhecer o executável go:\ncp -v ~/.profile ~/.zprofile\n" &&
+    echo -e "\nReinicie a sessão para poder usar o GO\n"

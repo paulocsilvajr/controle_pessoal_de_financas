@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 DIAS=365
 PASTA=keys
 CSR=$PASTA/new.ssl.csr

@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+    cpf-api-service:
+      image: golang_custom:controle_pessoal_de_financas 
+      command: sh -c "cd controle_pessoal_de_financas/API/v1/bin/API_CPF/ && ./API_CPF"
+      ports:
+        - "8085:8085"
+      volumes:
+        - cpf-api-volume:/go/src
+      networks:
+        - cpf-api-network
+networks:
+    cpf-api-network:
+volumes:
+    cpf-api-volume:

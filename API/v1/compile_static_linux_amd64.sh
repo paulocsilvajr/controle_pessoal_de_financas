@@ -1,7 +1,6 @@
 #!/bin/bash
 
 BASE=$(dirname $0)
-BASE=$(readlink -e $BASE)
 PASTA=$BASE/bin/API_CPF
 ARQUIVO=$PASTA/API_CPF
 

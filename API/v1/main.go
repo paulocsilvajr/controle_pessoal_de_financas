@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/jedib0t/go-pretty/table"
@@ -16,7 +17,7 @@ import (
 )
 
 func main() {
-	helper.CriarDiretorioSeNaoExistir("config")
+	helper.CriarDiretorioAbs("config")
 
 	configuracoes := config.AbrirConfiguracoes()
 	porta := helper.FormatarPorta(configuracoes["porta"])
@@ -40,8 +41,13 @@ func main() {
 	fmt.Printf("ou pelo IP: %s://%s%s\n\n[CTRL + c] para sair\n\n", protocolo, helper.GetLocalIP(), porta)
 
 	if protocolo == "https" {
-		certFile := "keys/new.cert.cert"
-		keyFile := "keys/new.cert.key"
+		dir, err := helper.GetDiretorioAbs()
+		if err != nil {
+			log.Fatal(err)
+		}
+		certFile := path.Join(dir, "keys/new.cert.cert")
+		keyFile := path.Join(dir, "keys/new.cert.key")
+
 		log.Fatal(http.ListenAndServeTLS(endereco, certFile, keyFile, router))
 	} else {
 		log.Fatal(http.ListenAndServe(endereco, router))

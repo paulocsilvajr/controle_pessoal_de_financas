@@ -1,1 +1,2 @@
-/home/kdepaulo/programas/ngrok http https://localhost:8085
+DIR=$HOME/programas
+$DIR/ngrok http https://localhost:8085
